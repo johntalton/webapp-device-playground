@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<title>Web I²C Playground</title>
+
+		<script type="importmap">
+			{
+				"imports": {
+					"@johntalton/and-other-delights": "/node_modules/@johntalton/and-other-delights/lib/aod.js",
+					"@johntalton/bitsmush": "/node_modules/@johntalton/bitsmush/lib/bitsmush.js",
+
+					"@johntalton/excamera-i2cdriver": "/node_modules/@johntalton/excamera-i2cdriver/src/i2c-driver.js",
+					"@johntalton/excamera-i2cdriver/capture": "/node_modules/@johntalton/excamera-i2cdriver/src/capture-generator/index.js",
+					"@johntalton/i2c-bus-excamera-i2cdriver": "/node_modules/@johntalton/i2c-bus-excamera-i2cdriver/src/index.js",
+
+					"@johntalton/mcp2221": "/node_modules/@johntalton/mcp2221/lib/index.js",
+					"@johntalton/i2c-bus-mcp2221": "/node_modules/@johntalton/i2c-bus-mcp2221/lib/index.js",
+
+					"@johntalton/tca9548a": "/node_modules/@johntalton/tca9548a/src/index.js",
+
+					"@johntalton/boschieu": "/node_modules/@johntalton/boschieu/src/boschieu.js",
+					"@johntalton/ds3502": "/node_modules/@johntalton/ds3502/src/index.mjs",
+					"@johntalton/ssd1306": "/node_modules/@johntalton/ssd1306/src/index.js"
+				}
+			}
+		</script>
+		<script src="./index.js" type="module" async defer></script>
+		<link rel="stylesheet" type="text/css" href="./index.css"></link>
+	</head>
+	<body>
+		<html-import id="excamera-i2cdriver" src="./custom-elements/excamera-i2cdriver.html"></html-import>
+		<html-import id="mcp2221-config" src="./custom-elements/mcp2221-config.html"></html-import>
+		<html-import id="ds3502-config" src="./custom-elements/ds3502-config.html"></html-import>
+		<html-import id="tca9548-config" src="./custom-elements/tca9548-config.html"></html-import>
+		<html-import id="addr-display" src="./custom-elements/address-display.html"></html-import>
+		<html-import id="capture-event" src="./custom-elements/capture-event.html"></html-import>
+
+		<h1>Web I²C Playground</h1>
+		<nav>
+			<button disabled id="requestSerial">🔌 Web Serial</button>
+			<button disabled id="requestUSB">🔌 Web USB</button>
+			<button disabled id="requestHID">🔌 Web HID</button>
+		</nav>
+
+		<aside>
+			<h2>⚙️ Devices:</h2>
+			<span>header</span>
+			<ul id="deviceList">
+				<!--  -->
+			</ul>
+			<span>footer</span>
+		</aside>
+
+		<main>
+			<section id="excameraI2CDriver">
+				<h4>Excamera Labs</h4>
+				<img src="https://github.com/jamesbowman/i2cdriver/raw/master/images/logo.png" />
+				<p></p>
+			</section>
+		</main>
+	</body>
+</html>
