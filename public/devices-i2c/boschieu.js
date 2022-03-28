@@ -48,8 +48,8 @@ export class BoschIEUBuilder {
 					await this.#device.calibration()
 
 					//
-					// const measurement = await this.#device.measurement()
-					// console.log(measurement)
+					const measurement = await this.#device.measurement()
+					console.log(measurement)
 
 				})
 				.catch(e => console.warn)
