@@ -1,12 +1,9 @@
 // import { MCP2111_USB_FILTER } from '../devices-usb/mcp2111a.js'
+export const MCP2111_HID_FILTER = { vendorId: 1240, productId: 221 }
 
-
-const MCP2111_HID_FILTER = { vendorId: 1240, productId: 221 }
-
-const SUPPORTED_HID_FILTER = [
+export const SUPPORTED_HID_FILTER = [
 	MCP2111_HID_FILTER
 ]
-
 
 async function addHIDDevice(ui, device, knownDevices) {
 	if(knownDevices.includes(device)) {
@@ -37,7 +34,10 @@ async function requestHIDDevice(filters) {
 }
 
 function requestHIDHandler(addDevice, event) {
-	requestHIDDevice(SUPPORTED_HID_FILTER)
+	const all = event?.altKey
+	const filters = all ? [] : SUPPORTED_HID_FILTER
+
+	requestHIDDevice(filters)
 		.then(devices => devices.forEach(addDevice))
 		.catch(e => console.log('issues requesting hid device', e))
 }

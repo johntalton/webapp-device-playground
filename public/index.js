@@ -12,10 +12,17 @@ import { TCA9548ConfigElement } from './custom-elements/tca9548-config.js'
 import { DS3502ConfigElement } from './custom-elements/ds3502-config.js'
 
 //
-import { EXCAMERA_LABS_USB_FILTER, ExcameraI2CDriverUIBuilder } from './devices-serial/exc-i2cdriver.js'
+import { ExcameraI2CDriverUIBuilder } from './devices-serial/exc-i2cdriver.js'
 import { MCP2221UIBuilder } from './devices-hid/mcp2221.js'
+import { FT232H_PRODUCT_ID, FT232H_VENDOR_ID, FT232HUIBuilder } from './devices-usb/ft232h.js'
 //
 import { I2CDeviceBuilderFactory } from './devices-i2c/device-factory.js'
+
+import {
+	EXCAMERA_LABS_VENDOR_ID,
+	EXCAMERA_LABS_PRODUCT_ID,
+	EXCAMERA_LABS_MINI_PRODUCT_ID
+} from '@johntalton/excamera-i2cdriver'
 
 const MCP2221_USB_FILTER = {
 	vendorId: 1240,
@@ -153,24 +160,59 @@ async function onContentLoaded() {
 
 	const deviceListElem = document.getElementById('deviceList')
 
+	const isExcameraLabs = (vendorId, productId) => {
+		//
+		if(vendorId !== EXCAMERA_LABS_VENDOR_ID) { return false }
+
+		//
+		if(productId === EXCAMERA_LABS_PRODUCT_ID) { return true }
+		if(productId === EXCAMERA_LABS_MINI_PRODUCT_ID) { return true }
+
+		return false
+	}
+
+	const isFT232H = (vendorId, productId) => {
+		//
+		if(vendorId !== FT232H_VENDOR_ID) { return false }
+
+		//
+		if(productId === FT232H_PRODUCT_ID) { return true }
+
+		return false
+	}
+
 	const ui = {
 		addSerialPort: async port => {
-			//console.log('addSerialPort')
+			console.log('addSerialPort')
 
 			const info =  port.getInfo()
 
-			if(info.usbVendorId === EXCAMERA_LABS_USB_FILTER.usbVendorId) {
-				//console.log('adding excamera i2cdriver', port)
+			console.log(info)
+
+			//
+			if(isExcameraLabs(info.usbVendorId, info.usbProductId)) {
+				console.log('adding excamera i2cdriver', port)
 
 				const builder = await ExcameraI2CDriverUIBuilder.builder(port, ui)
 				buildDeviceListItem(deviceListElem, builder)
 				return
 			}
 
-			//console.log('no driver for serial port', info)
+			//
+			console.log('no driver for serial port', info)
 		},
 		addUSBDevice: async device => {
-			console.warn('no usb devices supported')
+			//
+			if(isFT232H(device.vendorId, device.productId)) {
+				console.log('adding FT232H', device)
+
+				const builder = await FT232HUIBuilder.builder(device, ui)
+				buildDeviceListItem(deviceListElem, builder)
+				return
+			}
+
+			//
+			console.warn('no usb devices supported', device)
 		},
 		addHIDDevice: async hid => {
 			console.log('UI:addHID', hid.serialNumber, hid.productName)

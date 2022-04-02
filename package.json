@@ -17,6 +17,8 @@
     "@johntalton/i2c-bus-mcp2221": "file:../i2c-bus-mcp2221",
     "@johntalton/ssd1306": "file:../ssd1306",
     "@johntalton/excamera-i2cdriver": "file:../excamera-i2cdriver",
-    "@johntalton/i2c-bus-excamera-i2cdriver": "file:../i2c-bus-excamera-i2cdriver"
+    "@johntalton/i2c-bus-excamera-i2cdriver": "file:../i2c-bus-excamera-i2cdriver",
+
+    "@johntalton/ft232h": "file:../ft232h"
   }
 }

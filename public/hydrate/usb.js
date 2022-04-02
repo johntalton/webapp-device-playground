@@ -1,12 +1,10 @@
-// import { MCP2111_USB_FILTER } from '../devices-usb/mcp2111a.js'
+import { FT232H_PRODUCT_ID, FT232H_VENDOR_ID } from '../devices-usb/ft232h.js'
 
+export const FT232H_USB_FILTER = { vendorId: FT232H_VENDOR_ID, productId: FT232H_PRODUCT_ID }
 
-const MCP2111_USB_FILTER = { vendorId: 1240, productId: 221 }
-
-const SUPPORTED_USB_FILTER = [
-	MCP2111_USB_FILTER
+export const SUPPORTED_USB_FILTER = [
+	FT232H_USB_FILTER
 ]
-
 
 async function addUSBDevice(ui, device, devlist) {
 	if(devlist.includes(device)) {
@@ -39,7 +37,10 @@ async function requestUSBDevice(filters) {
 }
 
 function requestUSBPHandler(addDevice, event) {
-	requestUSBDevice(SUPPORTED_USB_FILTER)
+	const all = event?.altKey
+	const filters = all ? [] : SUPPORTED_USB_FILTER
+
+	requestUSBDevice(filters)
 		.then(addDevice)
 		.catch(e => console.log('issues requesting device', e.message))
 }

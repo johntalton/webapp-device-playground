@@ -1,9 +1,9 @@
 import { EXCAMERA_LABS_USB_FILTER } from '../devices-serial/exc-i2cdriver.js'
 
-const SUPPORTED_USB_FILTER = [
-	EXCAMERA_LABS_USB_FILTER
+export const SUPPORTED_SERIAL_FILTER = [
+	EXCAMERA_LABS_USB_FILTER,
+	//FT232H_USB_FILTER
 ]
-
 
 const handleSerialPortConnect = e => console.log('port connect', e)
 const handleSerialPortDisconnect = e => console.log('port disconnect', e)
@@ -31,7 +31,10 @@ async function requestSerialDevice(filters) {
 }
 
 function requestSerialPortHandler(add, event) {
-	requestSerialDevice(SUPPORTED_USB_FILTER)
+	const all = event?.altKey
+	const filters = all ? [] : SUPPORTED_SERIAL_FILTER
+
+	requestSerialDevice(filters)
 		.then(add)
 		.catch(e => console.log('issues requesting device', e.message))
 }

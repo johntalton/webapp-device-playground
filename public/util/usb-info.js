@@ -1,8 +1,8 @@
 
 export function dumpUSBDevice(device) {
-  console.log(device.manufacturerName)
-  console.log(device.productName)
-  console.log(device.serialNumber)
+  console.log('Manufacturer', device.manufacturerName)
+  console.log('Product', device.productName)
+  console.log('Serial', device.serialNumber)
   console.log()
   device.configurations.forEach(c => {
     const defaultConfig = c === device.configuration ? '*' : '-'

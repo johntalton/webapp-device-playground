@@ -51,10 +51,10 @@ export class MCP2221UIBuilder {
 				if(!returnValue) { throw new Error('no return value') }
 				return data.buffer
 			},
-			write: async sourceBuffer => {
-				// console.log('usbWrite', sourceBuffer)
-				await this.#hidDevice.sendReport(0, sourceBuffer)
-				return sourceBuffer.bytesLength
+			write: async bufferSource => {
+				// console.log('usbWrite', bufferSource)
+				await this.#hidDevice.sendReport(0, bufferSource)
+				return bufferSource.bytesLength
 			}
 		}
 

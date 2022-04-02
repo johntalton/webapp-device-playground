@@ -21,6 +21,28 @@ export class BoschIEUBuilder {
 
 	async open() {
 		this.#device = await BoschIEU.detect(this.#abus)
+
+		await this.#device.setProfile({
+			mode: 'NORMAL',
+
+			oversampling_t: 1,
+			oversampling_p: 1,
+			filter_coefficient: 7,
+
+			fifo: {
+				temp: true,
+				press: false,
+				time: true,
+
+				data: 'unfiltered'
+			}
+		})
+
+
+		const profile = await this.#device.profile()
+		console.log(profile)
+		//
+		await this.#device.calibration()
 	}
 
 	async close() {}
@@ -31,8 +53,12 @@ export class BoschIEUBuilder {
 		const root = document.createElement('boschieu-config')
 
 		const pollButton = document.createElement('button')
-		pollButton.textContent = 'Poll'
+		pollButton.textContent = 'Measure'
 		root.appendChild(pollButton)
+
+		const outputElem = document.createElement('output')
+		outputElem.textContent = 'no reading yet'
+		root.appendChild(outputElem)
 
 		pollButton.addEventListener('click', e => {
 			//
@@ -41,19 +67,15 @@ export class BoschIEUBuilder {
 			Promise.resolve()
 				.then(async () => {
 					//
-					const profile = await this.#device.profile()
-					console.log(profile)
-
-					//
-					await this.#device.calibration()
-
-					//
 					const measurement = await this.#device.measurement()
 					console.log(measurement)
 
+					outputElem.textContent = Math.round(measurement.temperature.C * 100) / 100 + ' C'
+
+					pollButton.disabled = false
 				})
 				.catch(e => console.warn)
-		}, { once: true })
+		}, { once: false })
 
 
     return root
