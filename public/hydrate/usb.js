@@ -6,59 +6,33 @@ export const SUPPORTED_USB_FILTER = [
 	FT232H_USB_FILTER
 ]
 
-async function addUSBDevice(ui, device, devlist) {
-	if(devlist.includes(device)) {
-		console.log('re-adding existing paired device ... ')
-		return
-	}
-
-	devlist.push(device)
-
-	console.log('add usb device')
-
-	return ui.addUSBDevice(device)
-}
-
-async function hydrateUSBBackgroundDevices(addDevice) {
-	const devices = await navigator.usb.getDevices()
-	devices.forEach(addDevice)
-}
-
-const handleUSBConnect = e => console.log(e)
-const handleUSBDisconnect = e => console.log(e)
-
-async function hydrateUSBEvents(addDevice) {
-	navigator.usb.addEventListener('connect', handleUSBConnect)
-  navigator.usb.addEventListener('disconnect', handleUSBDisconnect)
-}
-
+//
 async function requestUSBDevice(filters) {
 	return navigator.usb.requestDevice({ filters })
 }
 
-function requestUSBPHandler(addDevice, event) {
+function requestUSBPHandler(add, event) {
 	const all = event?.altKey
 	const filters = all ? [] : SUPPORTED_USB_FILTER
 
 	requestUSBDevice(filters)
-		.then(addDevice)
+		.then(add)
 		.catch(e => console.log('issues requesting device', e.message))
 }
 
-const build_requestUSBHandler = addDevice => event => requestUSBPHandler(addDevice, event)
+const build_requestUSBHandler = add => event => requestUSBPHandler(add, event)
 
-async function hydrateUSBReqeustButton(requestUSBButton, addDevice) {
-	requestUSBButton.addEventListener('click', build_requestUSBHandler(addDevice), { once: false })
+async function hydrateUSBReqeustButton(requestUSBButton, add) {
+	requestUSBButton.addEventListener('click', build_requestUSBHandler(add), { once: false })
 	requestUSBButton.disabled = false
 }
 
+//
 export async function hydrateUSB(requestUSBButton, ui) {
 	const devlist = []
-	const add = device => addUSBDevice(ui, device, devlist)
+	const add = device => ui.addUSBDevice(device)
 
 	return Promise.all([
-		hydrateUSBBackgroundDevices(add),
-		hydrateUSBEvents(add),
 		hydrateUSBReqeustButton(requestUSBButton, add)
 	])
 }

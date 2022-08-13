@@ -1,5 +1,11 @@
 console.log('Serial Worker')
 
+function scan() {
+
+}
+
+
+
 onmessage = async message => {
 	console.log('message', message)
 
@@ -8,3 +14,4 @@ onmessage = async message => {
 
 	postMessage({ reply: true })
 }
+

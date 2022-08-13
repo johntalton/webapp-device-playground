@@ -20,12 +20,17 @@ export const PCA_9536_INFO = {
 	addresses: [ 0x41 ], name: 'pca9536'
 }
 
+export const PCF_8574_INFO = {
+	addresses: [ 0x20 ], name: 'pcf8574'
+}
+
 
 export const I2C_GUESSES =[
 	// 0x00
 	// 0x10
 	{ addresses: [ ...range(0x18, 0x1F) ], name: 'mcp9808' },
 	// 0x20
+	PCF_8574_INFO,
 	{ addresses: [ ...range(0x20, 0x27) ], name: 'mcp23xxx' },
 	{ addresses: [ 0x29 ], name: 'tcs34725' },
 	{ addresses: [ ...range(0x28, 0x2b) ], name: 'ds1841' },

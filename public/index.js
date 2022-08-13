@@ -15,6 +15,7 @@ import { DS3502ConfigElement } from './custom-elements/ds3502-config.js'
 import { ExcameraI2CDriverUIBuilder } from './devices-serial/exc-i2cdriver.js'
 import { MCP2221UIBuilder } from './devices-hid/mcp2221.js'
 import { FT232H_PRODUCT_ID, FT232H_VENDOR_ID, FT232HUIBuilder } from './devices-usb/ft232h.js'
+
 //
 import { I2CDeviceBuilderFactory } from './devices-i2c/device-factory.js'
 
@@ -24,82 +25,140 @@ import {
 	EXCAMERA_LABS_MINI_PRODUCT_ID
 } from '@johntalton/excamera-i2cdriver'
 
+
+
+
+
 const MCP2221_USB_FILTER = {
 	vendorId: 1240,
 	productId: 221
 }
 
+const FT232H_USB_FILTER = { vendorId: FT232H_VENDOR_ID, productId: FT232H_PRODUCT_ID }
+
+const SUPPORTED_USB_FILTER = [
+	FT232H_USB_FILTER
+]
+
+
+
+
+
+
+const isExcameraLabs = (vendorId, productId) => {
+	//
+	if(vendorId !== EXCAMERA_LABS_VENDOR_ID) { return false }
+
+	//
+	if(productId === EXCAMERA_LABS_PRODUCT_ID) { return true }
+	if(productId === EXCAMERA_LABS_MINI_PRODUCT_ID) { return true }
+
+	return false
+}
+
+const isFT232H = (vendorId, productId) => {
+	//
+	if(vendorId !== FT232H_VENDOR_ID) { return false }
+
+	//
+	if(productId === FT232H_PRODUCT_ID) { return true }
+
+	return false
+}
+
+
+function buildDeviceSection(builder) {
+	//
+	const sectionElem = document.createElement('section')
+	sectionElem.setAttribute('data-active', true)
+	sectionElem.setAttribute('data-connect', true)
+
+	const connectButtonEleme = document.createElement('button')
+	connectButtonEleme.textContent = 'Connect to Device'
+	sectionElem.appendChild(connectButtonEleme)
+
+	connectButtonEleme.addEventListener('click', e => {
+		connectButtonEleme.disabled = true
+		connectButtonEleme.remove()
+
+		Promise.resolve()
+			.then(builder.open())
+			.then(async () => {
+
+				const closeButton = document.createElement('button')
+				closeButton.textContent = 'Close Device'
+				sectionElem.appendChild(closeButton)
+
+				const signal = {}
+
+				try {
+					const customElem = await builder.buildCustomView({ signal })
+					sectionElem.appendChild(customElem)
+				}
+				catch(e) {
+					console.error('error buiding view', e)
+				}
+
+				closeButton.addEventListener('click', e => {
+
+					sectionElem.remove()
+
+					builder.close()
+						.then(() => {
+							console.log('closed')
+						})
+						.catch(console.warn)
+
+				}, { once: true })
+			})
+			.catch(console.warn)
+
+
+	}, { once: true })
+
+
+	return sectionElem
+}
+
 function buildDeviceListItem(deviceListElem, builder) {
+	const mainElem = document.querySelector('main')
+
 	const liElem = document.createElement('li')
+	//
 	const buttonElem = document.createElement('button')
 	buttonElem.textContent = builder.title
 	liElem.appendChild(buttonElem)
 	deviceListElem.appendChild(liElem)
 
+	//
+	const sectionElem = buildDeviceSection(builder)
+	mainElem.appendChild(sectionElem)
 
+	//
 	liElem.addEventListener('click', e => {
-		deviceListElem.querySelectorAll('li').forEach(li => li.removeAttribute('data-active'))
+		deviceListElem.querySelectorAll('li').forEach(li => {
+			li.removeAttribute('data-active')
+			buttonElem.disabled = false
+		})
 
 		liElem.setAttribute('data-active', true)
 		buttonElem.disabled = true
 
-		//
-		const mainElem = document.querySelector('main')
+
+
 		mainElem.querySelectorAll('section').forEach(s => s.removeAttribute('data-active'))
 
-		const sectionElem = document.createElement('section')
-		sectionElem.setAttribute('data-active', true)
-		sectionElem.setAttribute('data-connect', true)
-
-		sectionElem.setAttribute('data-signature', builder.signature())
-
-		const connectButtonEleme = document.createElement('button')
-		connectButtonEleme.textContent = 'Connect to Device'
-		sectionElem.appendChild(connectButtonEleme)
-		mainElem.appendChild(sectionElem)
-
-		connectButtonEleme.addEventListener('click', e => {
-			connectButtonEleme.disabled = true
-			connectButtonEleme.remove()
-
-			Promise.resolve()
-				.then(builder.open())
-				.then(async () => {
-
-					const closeButton = document.createElement('button')
-					closeButton.textContent = 'Close Device'
-					sectionElem.appendChild(closeButton)
-
-					const signal = {}
-
-					try {
-						const customElem = await builder.buildCustomView({ signal })
-						sectionElem.appendChild(customElem)
-					}
-					catch(e) {
-						console.error('error buiding view', e)
-					}
-
-					closeButton.addEventListener('click', e => {
-
-						sectionElem.remove()
-
-						builder.close()
-							.then(() => {
-								console.log('closed')
-							})
-							.catch(console.warn)
-
-					}, { once: true })
-				})
-				.catch(console.warn)
-
-
-		}, { once: true })
+		sectionElem.toggleAttribute('data-active', true)
 
 	}, { once: true })
 
-	//
+	// demolisher
+	return (device) => {
+		liElem.removeEventListener('click')
+		liElem.remove()
+
+		sectionElem.remove()
+	}
 }
 
 function hydrateCustomeElementTemplateImport(importElemId, name, konstructor) {
@@ -150,9 +209,6 @@ async function onContentLoaded() {
 		console.error('importmap support not available')
 	}
 
-	const serialWorker = new Worker('./serial-worker.js', { type: 'module' })
-	serialWorker.onmessage = msg => console.log(msg)
-	//serialWorker.postMessage({ go: true })
 
 	const requestSerialButton = document.getElementById('requestSerial')
 	const requestUSBButton = document.getElementById('requestUSB')
@@ -160,26 +216,65 @@ async function onContentLoaded() {
 
 	const deviceListElem = document.getElementById('deviceList')
 
-	const isExcameraLabs = (vendorId, productId) => {
-		//
-		if(vendorId !== EXCAMERA_LABS_VENDOR_ID) { return false }
+	requestUSBButton.addEventListener('click', event => {
+		const all = event?.altKey
+		const filters = all ? [] : SUPPORTED_USB_FILTER
 
-		//
-		if(productId === EXCAMERA_LABS_PRODUCT_ID) { return true }
-		if(productId === EXCAMERA_LABS_MINI_PRODUCT_ID) { return true }
+		navigator.usb.requestDevice({ filters })
+			.then(device => {
+				console.log('user selected a device', device)
+				usbWorker.postMessage({ type: 'scan' })
+			})
+			.catch(e => console.warn(e.message))
 
-		return false
+
+	}, { once: false })
+
+	//
+	requestUSBButton.disabled = false
+
+
+
+	function makeListItem() {
+		const liElem = document.createElement('li')
+		//
+		const buttonElem = document.createElement('button')
+		buttonElem.textContent = builder.title
+		liElem.appendChild(buttonElem)
+		deviceListElem.appendChild(liElem)
+
+		return liElem
 	}
 
-	const isFT232H = (vendorId, productId) => {
-		//
-		if(vendorId !== FT232H_VENDOR_ID) { return false }
 
-		//
-		if(productId === FT232H_PRODUCT_ID) { return true }
+	const serialWorker = new Worker('./workers/serial-worker.js', { type: 'module' })
+	serialWorker.onmessage = msg => console.log(msg)
+	//serialWorker.postMessage({ go: true })
 
-		return false
+	const usbWorker = new Worker('./workers/usb-worker.js', { type: 'module' })
+	usbWorker.onmessage = event => {
+		const { data: message } = event
+		const { type, info, port } = message
+
+		console.log('main: message from usb worker', type)
+
+		if(type === 'usb-added' && isFT232H(info.vendorId, info.productId)) {
+
+			console.log('main: added FT232H message', info, port)
+
+			port.onmessage = event => {
+				console.log('main: ft port message', event)
+			}
+
+			//const liElem = makeListItem()
+		}
+
+
 	}
+
+	usbWorker.postMessage({ type: 'scan' })
+
+
 
 	const ui = {
 		addSerialPort: async port => {
@@ -201,19 +296,7 @@ async function onContentLoaded() {
 			//
 			console.log('no driver for serial port', info)
 		},
-		addUSBDevice: async device => {
-			//
-			if(isFT232H(device.vendorId, device.productId)) {
-				console.log('adding FT232H', device)
-
-				const builder = await FT232HUIBuilder.builder(device, ui)
-				buildDeviceListItem(deviceListElem, builder)
-				return
-			}
-
-			//
-			console.warn('no usb devices supported', device)
-		},
+		removeUSBDevice: async device => {},
 		addHIDDevice: async hid => {
 			console.log('UI:addHID', hid.serialNumber, hid.productName)
 
@@ -236,10 +319,13 @@ async function onContentLoaded() {
 		}
 	}
 
+
+
+
 	await Promise.all([
 		hydrateCustomElements(),
 		hydrateSerial(requestSerialButton, ui),
-		hydrateUSB(requestUSBButton, ui),
+		//hydrateUSB(requestUSBButton, ui),
 		hydrateHID(requestHIDButton, ui),
 
 		hydrateEffects()
