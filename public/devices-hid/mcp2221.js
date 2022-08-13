@@ -61,11 +61,11 @@ export class MCP2221UIBuilder {
 		this.#device = await MCP2221A.from(binding)
 		//await this.#device.common.reset()
 
-		// const status = await this.#device.common.status({ cancelI2c: true })
+		// const status = await this.#device.common.status({  })
 		// console.log({ status })
 
-		const speed = await this.#device.common.status({ i2cClock: 50 })
-		console.log({ speed })
+		// const speed = await this.#device.common.status({ i2cClock: 50 })
+		// console.log({ speed })
 
 		//
 		await this.#device.sram.set({
@@ -110,6 +110,11 @@ export class MCP2221UIBuilder {
 
 			Promise.resolve()
 				.then(async () => {
+
+
+					// const speed = await this.#device.common.status({ i2cClock: 50 })
+					// console.log({ speed })
+
 
 					const futureScans = [ ...range(0x08, 0x77) ].map(addr => {
 						return async () => {
@@ -321,8 +326,8 @@ export class MCP2221UIBuilder {
 				.then(async () => {
 
 
-					// const can = await this.#device.common.status({ cancelI2c: true })
-					// console.log({  can  })
+					const can = await this.#device.common.status({ cancelI2c: true })
+					console.log({  can  })
 					// await delayMs(100)
 
 					// const speed = await this.#device.common.status({ i2cClock: 100 })
@@ -331,20 +336,20 @@ export class MCP2221UIBuilder {
 
 					//await this.#device.common.status({ cancelI2c: true })
 
-					const wresult = await this.#device.i2c.writeData({ address: 0x77, buffer: Uint8Array.from([ 0x00 ]) })
-					console.log(wresult)
+					// const wresult = await this.#device.i2c.writeData({ address: 0x77, buffer: Uint8Array.from([ 0x00 ]) })
+					// console.log(wresult)
 
 					// for(let i = 0; i < 10; i += 1) {
 					// 	await delayMs(100)
-						const statis = await this.#device.common.status()
-						console.log(statis)
+						// const statis = await this.#device.common.status()
+						// console.log(statis)
 					// }
 
-					const result = await this.#device.i2c.readData({ address: 0x77, length: 1 })
-					console.log(result)
+					// const result = await this.#device.i2c.readData({ address: 0x77, length: 1 })
+					// console.log(result)
 
-					const data = await this.#device.i2c.readGetData()
-					console.log(data)
+					// const data = await this.#device.i2c.readGetData()
+					// console.log(data)
 
 
 
@@ -381,7 +386,7 @@ export class MCP2221UIBuilder {
 
 
 				})
-		}, { once: true })
+		}, { once: false })
 
 		return root
 	}
