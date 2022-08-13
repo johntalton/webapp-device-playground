@@ -11,6 +11,7 @@
 
     "@johntalton/tca9548a": "^5.0.0",
 
+    "@johntalton/pca9536": "../pca9536",
     "@johntalton/boschieu": "../boschieu",
     "@johntalton/ds3502": "../ds3502",
     "@johntalton/mcp2221": "../mcp2221",

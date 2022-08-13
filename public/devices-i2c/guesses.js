@@ -16,6 +16,10 @@ export const SSD1306_INFO = {
 	addresses: [ 0x3c, 0x3d ], name: 'ssd1306'
 }
 
+export const PCA_9536_INFO = {
+	addresses: [ 0x41 ], name: 'pca9536'
+}
+
 
 export const I2C_GUESSES =[
 	// 0x00
@@ -33,6 +37,7 @@ export const I2C_GUESSES =[
 	{ addresses: [ 0x3c, 0x3d ], name: 'adxl375' },
 	{ addresses: [ 0x38 ], name: 'AHT20' },
 	// 0x40
+	PCA_9536_INFO,
 	{ addresses: [ ...range(0x48, 0x4b) ], name: 'ads1115' },
 	{ addresses: [ 0x4a, 0x4b ], name: 'bno085' },
 	{ addresses: [ ...range(0x40,  0x4f), ], name: 'ina219' },
