@@ -24,10 +24,9 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
-      - run: npm i
+      - run: git clone https://github.com/johntalton/and-other-delights
       - uses: actions/upload-pages-artifact@main
         with:
-          name: github-pages
           path: '.'
       - id: deployment
         uses: actions/deploy-pages@main
