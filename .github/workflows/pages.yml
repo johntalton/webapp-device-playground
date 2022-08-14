@@ -24,9 +24,5 @@ jobs:
     steps:
       - uses: actions/checkout@v3
       - run: npm i
-      - uses: actions/configure-pages@v1
-      - uses: actions/upload-pages-artifact@v1
-        with:
-          path: '.'
-      - id: deployment
-        uses: actions/deploy-pages@main
+      - uses: actions/deploy-pages@main
+      
