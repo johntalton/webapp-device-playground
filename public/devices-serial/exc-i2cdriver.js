@@ -34,7 +34,7 @@ class VBusFactory {
 	static from({ port }) {
 		// console.log('make driver over port', port)
 		const I2CAPI = ExcameraLabsI2CDriver.from({ port })
-		const vbus = I2CBusExcameraI2CDriver.from({ I2CAPI })
+		const vbus = I2CBusExcameraI2CDriver.from(I2CAPI)
 		return vbus
 	}
 }

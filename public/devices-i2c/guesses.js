@@ -21,7 +21,7 @@ export const PCA_9536_INFO = {
 }
 
 export const PCF_8574_INFO = {
-	addresses: [ 0x20 ], name: 'pcf8574'
+	addresses: [ 0x20, 0x21 ], name: 'pcf8574'
 }
 
 
