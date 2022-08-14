@@ -20,9 +20,14 @@ jobs:
     environment:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
+      
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
       - run: npm i
-      - uses: actions/deploy-pages@main
+      - uses: actions/upload-artifact@main
+        with:
+          name: github-pages
+      - id: deployment
+        uses: actions/deploy-pages@main
       
