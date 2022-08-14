@@ -28,6 +28,7 @@ jobs:
       - uses: actions/upload-artifact@main
         with:
           name: github-pages
+          path: '.'
       - id: deployment
         uses: actions/deploy-pages@main
       
