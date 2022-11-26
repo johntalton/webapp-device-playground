@@ -18,6 +18,10 @@ async function initScript(port) {
 
 	// exit and return to i2x mode if not in it already
 	await ExcameraLabsI2CDriver.endBitbangCommand(port)
+	await ExcameraLabsI2CDriver.exitMonitorMode(port)
+	// await ExcameraLabsI2CDriver.resetBus(port)
+	// await ExcameraLabsI2CDriver.reboot(port)
+	// await ExcameraLabsI2CDriver.setSpeed(port, 400)
 
 	// end more (64) bytes of @ to flush the connection
 	// ?
@@ -26,7 +30,10 @@ async function initScript(port) {
 	console.log('basic echo test for validity')
 	const echoSig = [0x55, 0x00, 0xff, 0xaa]
 	for (let echoByte of echoSig) {
-		await ExcameraLabsI2CDriver.echoByte(port, echoByte)
+		// console.log('echoByte', echoByte)
+		const result = await ExcameraLabsI2CDriver.echoByte(port, echoByte)
+		// console.log({ echoByte, result })
+		if(echoByte !== result) { console.warn('EchoByte miss-match')}
 	}
 }
 
@@ -98,11 +105,22 @@ export class ExcameraI2CDriverUIBuilder {
 		scanButton.setAttribute('slot', 'scan-display')
 		scanButton.textContent = 'Scan'
 
-		const rebootElem = document.createElement('button')
-		rebootElem.textContent = 'Reboot'
+		const resetButton = root.shadowRoot.getElementById('reset')
+		resetButton.addEventListener('click', e => {
+			Promise.resolve()
+				.then(async () => {
+					await ExcameraLabsI2CDriver.endBitbangCommand(this.#port)
+				})
+				.catch(e => {
+					console.warn(e)
+				})
+		})
 
-		const resetElem = document.createElement('button')
-		resetElem.textContent = 'Reset Bus'
+		// const rebootElem = document.createElement('button')
+		// rebootElem.textContent = 'Reboot'
+
+		// const resetElem = document.createElement('button')
+		// resetElem.textContent = 'Reset Bus'
 
 		const captureStartElem = document.createElement('button')
 		const captureEndElem = document.createElement('button')
@@ -234,6 +252,9 @@ export class ExcameraI2CDriverUIBuilder {
 					scanButton.disabled = false
 				})
 				.catch(console.warn)
+				.then(() => {
+					scanButton.disabled = false
+				})
 		}, { once: false })
 
 		root.appendChild(addressElem)

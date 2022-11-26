@@ -1,5 +1,9 @@
 import { range } from '../util/range.js'
 
+export const HT16K33_INFO = {
+	addresses: [ 0x70, 0x71 ], name: 'ht16k33'
+}
+
 export const TCA9548_INFO = {
 	addresses: [ ...range(0x70, 0x77) ], name: 'tca9548a'
 }
@@ -25,7 +29,7 @@ export const PCF_8574_INFO = {
 }
 
 
-export const I2C_GUESSES =[
+export const I2C_GUESSES = [
 	// 0x00
 	// 0x10
 	{ addresses: [ ...range(0x18, 0x1F) ], name: 'mcp9808' },
@@ -56,7 +60,8 @@ export const I2C_GUESSES =[
 	{ addresses: [ 0x68 ], name: 'pcf8523'},
 	// 0x70
 	TCA9548_INFO,
-	BOSCH_IEU_INFO
+	BOSCH_IEU_INFO,
+	HT16K33_INFO
 ]
 
 export function deviceGuessByAddress(address) {

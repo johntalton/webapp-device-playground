@@ -80,6 +80,8 @@ export class PCF8574Builder {
 			const button = root.querySelector('button')
 			if(event.target === button) {
 
+				button.disabled = true
+
 				// async
 				Promise.resolve()
 			 	.then(async () => {
@@ -88,7 +90,7 @@ export class PCF8574Builder {
 						console.log(result)
 
 
-
+						button.disabled = false
 					})
 					.catch(e => console.warn(e))
 
