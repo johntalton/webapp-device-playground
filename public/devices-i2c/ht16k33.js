@@ -106,37 +106,20 @@ function encodeLayoutDigit(digit, DP) {
 function encodeLayout_4Digit_7Segment_56(layout) {
 	// console.log({ layout })
 
-	const DIGIT_MAP = [
-		[7, 1],
-		[6, 1],
-		[5, 1],
-		[4, 1],
-		[3, 1],
-		[2, 1],
-		[1, 1],
-		[0, 1],
-	]
-
-	function makeDigit({ A, B, C, D, E, F, G, DP }) {
-		const digits = [DP, G, F, E, D, C, B, A]
-		return BitSmush.smushBits(DIGIT_MAP, digits)
+	function makeCom(digit) {
+		const { A, B, C, D, E, F, G, DP } = digit
+		return { row0: A, row1: B, row2: C, row3: D, row4: E, row5: F, row6: G, row7: DP }
 	}
 
-	const digitOne = makeDigit(layout.digit.one)
-	const digitTwo = makeDigit(layout.digit.two)
-	const digitThree = makeDigit(layout.digit.three)
-	const digitFour = makeDigit(layout.digit.four)
-
-	const colon = layout.colon << 1
-
-	return Uint8Array.from([
-		0, digitOne,
-		0, digitTwo,
-		0, colon,
-		0, digitThree,
-		0, digitFour
-	])
+	return {
+		com0: makeCom(layout.digit.one),
+		com1: makeCom(layout.digit.two),
+		com2: { row1: layout.colon },
+		com3: makeCom(layout.digit.three),
+		com4: makeCom(layout.digit.four)
+	}
 }
+
 
 function encodeDigits_4Digit_7Segment_56(digits, colon) {
 	const dp = 0
@@ -197,18 +180,22 @@ function encodeTime12_4Digit_7Segment_56(time, colon) {
 
 
 
-function script_Time(abus) {
+
+
+
+function script_Time(device) {
 		let colon = false
 		setInterval(async () => {
 			colon = !colon
 			const d = new Date()
-			abus.i2cWrite(encodeTime24_4Digit_7Segment_56(d, colon))
+
+			device.setMemory(encodeTime24_4Digit_7Segment_56(d, colon))
 				.then()
 				.catch(e => console.warn(e))
 		}, 1000)
 }
 
-function script_Font(abus, input) {
+function script_Font(device, input) {
 		// const s = ' john 0123456789 -_. '
 		// const s = 'abcdefghijklmnopqrstuvwxyz1234567890-_ ABCDEFGHIJKLMNOPQRSTUVWXYZ-_ aAbBcCdDeEfFgGhHiIjJkKlLmMnNoOpPqQrRsStTuUvVwWxXyYzZ-_ '
 		// const s = 'The Quick Brown Fox Jumped Over the Lazy Sleeping Dog -_.1234567890°'
@@ -225,7 +212,7 @@ function script_Font(abus, input) {
 
 			const dp = 0
 
-			await abus.i2cWrite(encodeLayout_4Digit_7Segment_56({
+			await device.setMemory(encodeLayout_4Digit_7Segment_56({
 						colon: 0,
 						digit: {
 							one: encodeLayoutDSEG7(digit0, dp),
@@ -243,7 +230,7 @@ function script_Font(abus, input) {
 
 }
 
-function script_Count(abus) {
+function script_Count(device) {
 
 		let start = 0
 		setInterval(async () => {
@@ -253,7 +240,7 @@ function script_Count(abus) {
 
 			const dp = 0
 
-			await abus.i2cWrite(encodeLayout_4Digit_7Segment_56({
+			await device.setMemory(encodeLayout_4Digit_7Segment_56({
 				colon: 0,
 				digit: {
 					one: encodeLayoutDSEG7(digits[0], dp),
@@ -267,11 +254,11 @@ function script_Count(abus) {
 
 }
 
-function script_Script(abus) {
+function script_Script(device) {
 	const s = segmentDisplayScript()
 		.from('begin')
 		.scroll('-_-_-_').forSeconds(2)
-		.time().forMinutes(5)
+		.time().forSeconds(30)
 		// .flash('SALE').forSeconds(5)
 		// .scroll('buy now....').slow().once()
 
@@ -311,7 +298,7 @@ function script_Script(abus) {
 					clearInterval(scroller)
 				}
 
-				abus.i2cWrite(encodeDigits_4Digit_7Segment_56(digits, false))
+				device.setMemory(encodeDigits_4Digit_7Segment_56(digits, false))
 					.then()
 					.catch(e => console.warn(e))
 					.finally(() => {
@@ -343,13 +330,13 @@ function script_Script(abus) {
 			const { fourLetters, seconds } = action
 			console.log(action)
 
-			abus.i2cWrite(Uint8Array.from([DS | DISPLAY_ON | BLINK_1_HZ ]))
+			device.setDisplay(true, '1hz')
 				.then(() =>
 					abus.i2cWrite(encodeDigits_4Digit_7Segment_56(fourLetters, false)))
 				.catch(e => console.warn(e))
 
 			setTimeout(() => {
-				abus.i2cWrite(Uint8Array.from([DS | DISPLAY_ON | BLINK_OFF ]))
+				device.setDisplay(true, 'off')
 					.then(() => {
 						handleAction(s, stackIndex + 1)
 					})
@@ -359,7 +346,7 @@ function script_Script(abus) {
 
 		if(action.type === 'display') {
 			const { fourLetters, seconds } = action
-			abus.i2cWrite(encodeDigits_4Digit_7Segment_56(fourLetters, false))
+			device.setMemory(encodeDigits_4Digit_7Segment_56(fourLetters, false))
 				.then()
 				.catch(e => console.warn(e))
 
@@ -386,7 +373,7 @@ function script_Script(abus) {
 				console.log('update and cache time')
 				lastD = d
 
-				abus.i2cWrite(encodeTime24_4Digit_7Segment_56(d, toggle))
+				device.setMemory(encodeTime24_4Digit_7Segment_56(d, toggle))
 					.then(() => {
 						toggle = !toggle
 					})
@@ -414,7 +401,7 @@ function script_Script(abus) {
 		}
 
 		if(action.type === 'end') {
-			abus.i2cWrite(encodeDigits_4Digit_7Segment_56('EOL.', false))
+			device.setMemory(encodeDigits_4Digit_7Segment_56('EOL.', false))
 				.then()
 				.catch(e => console.warn(e))
 			console.log('END OF LINE.')
@@ -646,26 +633,28 @@ export class HT16K33Builder {
 		await this.#device.setDisplay(true, 'off')
 		await this.#device.setDimming(1)
 
-		await this.#device.setMemory({
-			com0: {
-				row1: true,
-				row2: true,
-				row3: true,
-				row4: true
-			},
+		// await this.#device.setMemory({
+		// 	com1: {
+		// 		row1: true,
+		// 		row2: true,
+		// 		row3: true,
+		// 		row4: false,
 
-			com2: { row1: true },
-		})
+		// 		row6: true
+		// 	},
 
-		// await this.#abus.i2cWrite(encodeLayout_4Digit_7Segment_56({
-		// 	colon: 0,
-		// 	digit: {
-		// 		one: encodeLayoutDSEG7('_', 1),
-		// 		two: encodeLayoutDSEG7('_', 1),
-		// 		three: encodeLayoutDSEG7('_', 1),
-		// 		four: encodeLayoutDSEG7('_', 1)
-		// 	}
-		// }))
+		// 	com2: { row1: true },
+		// })
+
+		await this.#device.setMemory(encodeLayout_4Digit_7Segment_56({
+			colon: 0,
+			digit: {
+				one: encodeLayoutDSEG7('_', 1),
+				two: encodeLayoutDSEG7('_', 1),
+				three: encodeLayoutDSEG7('_', 1),
+				four: encodeLayoutDSEG7('_', 1)
+			}
+		}))
 	}
 
 	async close() { }
@@ -695,11 +684,11 @@ export class HT16K33Builder {
 			return b1
 		}
 
-		root.appendChild(buildButton('Quick Fox', () => script_Font(this.#abus, input)))
-		root.appendChild(buildButton('Time', () => script_Time(this.#abus)))
-		root.appendChild(buildButton('Script', () => script_Script(this.#abus)))
-		root.appendChild(buildButton('Fast Count', () => script_Count(this.#abus)))
-		root.appendChild(buildButton('Game', () => script_Game(this.#abus)))
+		root.appendChild(buildButton('Quick Fox', () => script_Font(this.#device, input)))
+		root.appendChild(buildButton('Time', () => script_Time(this.#device)))
+		root.appendChild(buildButton('Script', () => script_Script(this.#device)))
+		root.appendChild(buildButton('Fast Count', () => script_Count(this.#device)))
+		root.appendChild(buildButton('Game', () => script_Game(this.#device)))
 
 
 		return root
