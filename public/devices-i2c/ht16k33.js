@@ -1,39 +1,13 @@
 import { I2CAddressedBus } from '@johntalton/and-other-delights'
 import { BitSmush, SMUSH_MAP_8_BIT_NAMES } from '@johntalton/bitsmush'
 
+import { HT16K33 } from '@johntalton/ht16k33'
+
 import { segmentDisplayScript } from '../util/segment-display-script.js'
 
-// System Setup
-export const SS = 0b0010 << 4
-
-export const OSCILLATOR_ON = 0b1
-export const OSCILLATOR_OFF = 0b0
-
-// Row/INT Set
-export const RIS = 0b1010 << 4
-
-// Display Setup
-export const DS = 0b1000 << 4
-
-export const DISPLAY_ON = 0b1
-export const DISPLAY_OFF = 0b0
-
-export const BLINK_OFF = 0b00 << 1
-export const BLINK_2_HZ = 0b01 << 1
-export const BLINK_1_HZ = 0b10 << 1
-export const BLINK_HALF_HZ = 0b11 << 1
-
-// Digital Dimming Data
-export const DDD = 0b1110 << 4
 
 
-// Key Data Memory 0x40 - 0x45
-export const KDM = 0x40
-
-// INT register flag
-export const IRF = 0x60
-
-function encodeLayoutDSEG7(digit) {
+function encodeLayoutDSEG7(digit, DP) {
 	// https://www.keshikan.net/fonts-e.html
 	const dseg7 = {
 		'a': 'A',
@@ -64,72 +38,74 @@ function encodeLayoutDSEG7(digit) {
 		'z': 'Z',
 	}
 
-	return encodeLayoutDigit(dseg7[digit.toLowerCase()] ?? digit)
+	return encodeLayoutDigit(dseg7[digit.toLowerCase()] ?? digit, DP)
 }
 
-function encodeLayoutDigit(digit) {
+function encodeLayoutDigit(digit, DP) {
 	const font = {
-		' ': { A: 0, B: 0, C: 0, D: 0, E: 0, F: 0, G: 0, DP: 0 },
-		'-': { A: 0, B: 0, C: 0, D: 0, E: 0, F: 0, G: 1, DP: 0 },
-		'_': { A: 0, B: 0, C: 0, D: 1, E: 0, F: 0, G: 0, DP: 0 },
+		' ': { A: 0, B: 0, C: 0, D: 0, E: 0, F: 0, G: 0, DP },
+		'-': { A: 0, B: 0, C: 0, D: 0, E: 0, F: 0, G: 1, DP },
+		'_': { A: 0, B: 0, C: 0, D: 1, E: 0, F: 0, G: 0, DP },
 		'.': { A: 0, B: 0, C: 0, D: 0, E: 0, F: 0, G: 0, DP: 1 },
-		'°': { A: 1, B: 1, C: 0, D: 0, E: 0, F: 1, G: 1, DP: 0 },
+		'°': { A: 1, B: 1, C: 0, D: 0, E: 0, F: 1, G: 1, DP },
 
-		'0': { A: 1, B: 1, C: 1, D: 1, E: 1, F: 1, G: 0, DP: 0 },
-		'1': { A: 0, B: 1, C: 1, D: 0, E: 0, F: 0, G: 0, DP: 0 },
-		'2': { A: 1, B: 1, C: 0, D: 1, E: 1, F: 0, G: 1, DP: 0 },
-		'3': { A: 1, B: 1, C: 1, D: 1, E: 0, F: 0, G: 1, DP: 0 },
-		'4': { A: 0, B: 1, C: 1, D: 0, E: 0, F: 1, G: 1, DP: 0 },
-		'5': { A: 1, B: 0, C: 1, D: 1, E: 0, F: 1, G: 1, DP: 0 },
-		'6': { A: 0, B: 0, C: 1, D: 1, E: 1, F: 1, G: 1, DP: 0 },
-		'7': { A: 1, B: 1, C: 1, D: 0, E: 0, F: 0, G: 0, DP: 0 },
-		'8': { A: 1, B: 1, C: 1, D: 1, E: 1, F: 1, G: 1, DP: 0 },
-		'9': { A: 1, B: 1, C: 1, D: 0, E: 0, F: 1, G: 1, DP: 0 },
+		'0': { A: 1, B: 1, C: 1, D: 1, E: 1, F: 1, G: 0, DP },
+		'1': { A: 0, B: 1, C: 1, D: 0, E: 0, F: 0, G: 0, DP },
+		'2': { A: 1, B: 1, C: 0, D: 1, E: 1, F: 0, G: 1, DP },
+		'3': { A: 1, B: 1, C: 1, D: 1, E: 0, F: 0, G: 1, DP },
+		'4': { A: 0, B: 1, C: 1, D: 0, E: 0, F: 1, G: 1, DP },
+		'5': { A: 1, B: 0, C: 1, D: 1, E: 0, F: 1, G: 1, DP },
+		'6': { A: 0, B: 0, C: 1, D: 1, E: 1, F: 1, G: 1, DP },
+		'7': { A: 1, B: 1, C: 1, D: 0, E: 0, F: 0, G: 0, DP },
+		'8': { A: 1, B: 1, C: 1, D: 1, E: 1, F: 1, G: 1, DP },
+		'9': { A: 1, B: 1, C: 1, D: 0, E: 0, F: 1, G: 1, DP },
 
-		'b': { A: 0, B: 0, C: 1, D: 1, E: 1, F: 1, G: 1, DP: 0 },
-		'c': { A: 0, B: 0, C: 0, D: 1, E: 1, F: 0, G: 1, DP: 0 },
-		'd': { A: 0, B: 1, C: 1, D: 1, E: 1, F: 0, G: 1, DP: 0 },
-		'h': { A: 0, B: 0, C: 1, D: 0, E: 1, F: 1, G: 1, DP: 0 },
-		'i': { A: 0, B: 0, C: 1, D: 0, E: 0, F: 0, G: 0, DP: 0 },
-		'k': { A: 1, B: 0, C: 1, D: 0, E: 1, F: 1, G: 1, DP: 0 },
-		'n': { A: 0, B: 0, C: 1, D: 0, E: 1, F: 0, G: 1, DP: 0 },
-		'o': { A: 0, B: 0, C: 1, D: 1, E: 1, F: 0, G: 1, DP: 0 },
-		'q': { A: 1, B: 1, C: 1, D: 0, E: 0, F: 1, G: 1, DP: 0 },
-		'r': { A: 0, B: 0, C: 0, D: 0, E: 1, F: 0, G: 1, DP: 0 },
-		't': { A: 0, B: 0, C: 0, D: 1, E: 1, F: 1, G: 1, DP: 0 },
-		'u': { A: 0, B: 0, C: 1, D: 1, E: 1, F: 0, G: 0, DP: 0 },
-		'y': { A: 0, B: 1, C: 1, D: 1, E: 0, F: 1, G: 1, DP: 0 },
+		'b': { A: 0, B: 0, C: 1, D: 1, E: 1, F: 1, G: 1, DP },
+		'c': { A: 0, B: 0, C: 0, D: 1, E: 1, F: 0, G: 1, DP },
+		'd': { A: 0, B: 1, C: 1, D: 1, E: 1, F: 0, G: 1, DP },
+		'h': { A: 0, B: 0, C: 1, D: 0, E: 1, F: 1, G: 1, DP },
+		'i': { A: 0, B: 0, C: 1, D: 0, E: 0, F: 0, G: 0, DP },
+		'k': { A: 1, B: 0, C: 1, D: 0, E: 1, F: 1, G: 1, DP },
+		'n': { A: 0, B: 0, C: 1, D: 0, E: 1, F: 0, G: 1, DP },
+		'o': { A: 0, B: 0, C: 1, D: 1, E: 1, F: 0, G: 1, DP },
+		'q': { A: 1, B: 1, C: 1, D: 0, E: 0, F: 1, G: 1, DP },
+		'r': { A: 0, B: 0, C: 0, D: 0, E: 1, F: 0, G: 1, DP },
+		't': { A: 0, B: 0, C: 0, D: 1, E: 1, F: 1, G: 1, DP },
+		'u': { A: 0, B: 0, C: 1, D: 1, E: 1, F: 0, G: 0, DP },
+		'y': { A: 0, B: 1, C: 1, D: 1, E: 0, F: 1, G: 1, DP },
 
 
-		'A': { A: 1, B: 1, C: 1, D: 0, E: 1, F: 1, G: 1, DP: 0 },
-		'B': { A: 1, B: 1, C: 1, D: 1, E: 1, F: 1, G: 1, DP: 0 },
-		'C': { A: 1, B: 0, C: 0, D: 1, E: 1, F: 1, G: 0, DP: 0 },
-		'D': { A: 1, B: 1, C: 1, D: 1, E: 1, F: 1, G: 0, DP: 0 },
-		'E': { A: 1, B: 0, C: 0, D: 1, E: 1, F: 1, G: 1, DP: 0 },
-		'F': { A: 1, B: 0, C: 0, D: 0, E: 1, F: 1, G: 1, DP: 0 },
-		'G': { A: 1, B: 0, C: 1, D: 1, E: 1, F: 1, G: 0, DP: 0 },
-		'H': { A: 0, B: 1, C: 1, D: 0, E: 1, F: 1, G: 1, DP: 0 },
-		'I': { A: 0, B: 1, C: 1, D: 0, E: 0, F: 0, G: 0, DP: 0 },
-		'I*': { A: 0, B: 0, C: 0, D: 0, E: 1, F: 1, G: 0, DP: 0 },
-		'J': { A: 0, B: 1, C: 1, D: 1, E: 1, F: 0, G: 0, DP: 0 },
-		'K': { A: 0, B: 1, C: 1, D: 0, E: 1, F: 1, G: 1, DP: 0 },
-		'L': { A: 0, B: 0, C: 0, D: 1, E: 1, F: 1, G: 0, DP: 0 },
-		'M': { A: 1, B: 1, C: 1, D: 0, E: 1, F: 1, G: 0, DP: 0 },
-		'N': { A: 1, B: 1, C: 1, D: 0, E: 1, F: 1, G: 0, DP: 0 },
-		'O': { A: 1, B: 1, C: 1, D: 1, E: 1, F: 1, G: 0, DP: 0 },
-		'P': { A: 1, B: 1, C: 0, D: 0, E: 1, F: 1, G: 1, DP: 0 },
-		'S': { A: 0, B: 0, C: 1, D: 1, E: 0, F: 1, G: 1, DP: 0 },
-		'U': { A: 0, B: 1, C: 1, D: 1, E: 1, F: 1, G: 0, DP: 0 },
-		'V': { A: 0, B: 1, C: 1, D: 1, E: 1, F: 1, G: 0, DP: 0 },
-		'W': { A: 0, B: 1, C: 1, D: 1, E: 1, F: 1, G: 1, DP: 0 },
-		'X': { A: 0, B: 1, C: 1, D: 0, E: 1, F: 1, G: 1, DP: 0 },
-		'Z': { A: 1, B: 1, C: 0, D: 1, E: 1, F: 0, G: 0, DP: 0 },
+		'A': { A: 1, B: 1, C: 1, D: 0, E: 1, F: 1, G: 1, DP },
+		'B': { A: 1, B: 1, C: 1, D: 1, E: 1, F: 1, G: 1, DP },
+		'C': { A: 1, B: 0, C: 0, D: 1, E: 1, F: 1, G: 0, DP },
+		'D': { A: 1, B: 1, C: 1, D: 1, E: 1, F: 1, G: 0, DP },
+		'E': { A: 1, B: 0, C: 0, D: 1, E: 1, F: 1, G: 1, DP },
+		'F': { A: 1, B: 0, C: 0, D: 0, E: 1, F: 1, G: 1, DP },
+		'G': { A: 1, B: 0, C: 1, D: 1, E: 1, F: 1, G: 0, DP },
+		'H': { A: 0, B: 1, C: 1, D: 0, E: 1, F: 1, G: 1, DP },
+		'I': { A: 0, B: 1, C: 1, D: 0, E: 0, F: 0, G: 0, DP },
+		'I*': { A: 0, B: 0, C: 0, D: 0, E: 1, F: 1, G: 0, DP },
+		'J': { A: 0, B: 1, C: 1, D: 1, E: 1, F: 0, G: 0, DP },
+		'K': { A: 0, B: 1, C: 1, D: 0, E: 1, F: 1, G: 1, DP },
+		'L': { A: 0, B: 0, C: 0, D: 1, E: 1, F: 1, G: 0, DP },
+		'M': { A: 1, B: 1, C: 1, D: 0, E: 1, F: 1, G: 0, DP },
+		'N': { A: 1, B: 1, C: 1, D: 0, E: 1, F: 1, G: 0, DP },
+		'O': { A: 1, B: 1, C: 1, D: 1, E: 1, F: 1, G: 0, DP },
+		'P': { A: 1, B: 1, C: 0, D: 0, E: 1, F: 1, G: 1, DP },
+		'S': { A: 0, B: 0, C: 1, D: 1, E: 0, F: 1, G: 1, DP },
+		'U': { A: 0, B: 1, C: 1, D: 1, E: 1, F: 1, G: 0, DP },
+		'V': { A: 0, B: 1, C: 1, D: 1, E: 1, F: 1, G: 0, DP },
+		'W': { A: 0, B: 1, C: 1, D: 1, E: 1, F: 1, G: 1, DP },
+		'X': { A: 0, B: 1, C: 1, D: 0, E: 1, F: 1, G: 1, DP },
+		'Z': { A: 1, B: 1, C: 0, D: 1, E: 1, F: 0, G: 0, DP },
 	}
 
 	return font[digit] ?? { A: 1, B: 1, C: 1, D: 1, E: 1, F: 1, G: 1, DP: 1 }
 }
 
 function encodeLayout_4Digit_7Segment_56(layout) {
+	// console.log({ layout })
+
 	const DIGIT_MAP = [
 		[7, 1],
 		[6, 1],
@@ -163,38 +139,62 @@ function encodeLayout_4Digit_7Segment_56(layout) {
 }
 
 function encodeDigits_4Digit_7Segment_56(digits, colon) {
+	const dp = 0
+
 	return encodeLayout_4Digit_7Segment_56({
 		colon: colon ? 1 : 0,
 		digit: {
-			one: encodeLayoutDSEG7(digits[0]),
-			two: encodeLayoutDSEG7(digits[1]),
-			three: encodeLayoutDSEG7(digits[2]),
-			four: encodeLayoutDSEG7(digits[3])
+			one: encodeLayoutDSEG7(digits[0], dp),
+			two: encodeLayoutDSEG7(digits[1], dp),
+			three: encodeLayoutDSEG7(digits[2], dp),
+			four: encodeLayoutDSEG7(digits[3], dp)
 		}
 	})
 }
 
+function encodeTime24_4Digit_7Segment_56(time, colon) {
+	const dp = 0
 
-function encodeTime_4Digit_7Segment_56(time, colon) {
 	const h = time.getHours()
 	const m = time.getMinutes()
 
-	const g = (h > 12)
-	const H = g ? h - 12 : h
-
-	const [ digit0, digit1 ] = h.toString().padStart(2, g ? ' ' : '0').split('')
+	const [ digit0, digit1 ] = h.toString().padStart(2, '0').split('')
 	const [ digit2, digit3 ] = m.toString().padStart(2, '0').split('')
 
 	return encodeLayout_4Digit_7Segment_56({
 		colon: colon ? 1 : 0,
 		digit: {
-			one: encodeLayoutDigit(digit0),
-			two: encodeLayoutDigit(digit1),
-			three: encodeLayoutDigit(digit2),
-			four: encodeLayoutDigit(digit3)
+			one: encodeLayoutDigit(digit0, dp),
+			two: encodeLayoutDigit(digit1, dp),
+			three: encodeLayoutDigit(digit2, dp),
+			four: encodeLayoutDigit(digit3, dp)
 		}
 	})
 }
+
+function encodeTime12_4Digit_7Segment_56(time, colon) {
+	const dp = 0
+
+	const h = time.getHours()
+	const m = time.getMinutes()
+
+	const pm = h > 12
+	const H = pm ? h - 12 : h
+
+	const [ digit0, digit1 ] = H.toString().padStart(2, ' ').split('')
+	const [ digit2, digit3 ] = m.toString().padStart(2, '0').split('')
+
+	return encodeLayout_4Digit_7Segment_56({
+		colon: colon ? 1 : 0,
+		digit: {
+			one: encodeLayoutDigit(digit0, dp),
+			two: encodeLayoutDigit(digit1, dp),
+			three: encodeLayoutDigit(digit2, dp),
+			four: encodeLayoutDigit(digit3, dp)
+		}
+	})
+}
+
 
 
 function script_Time(abus) {
@@ -202,7 +202,7 @@ function script_Time(abus) {
 		setInterval(async () => {
 			colon = !colon
 			const d = new Date()
-			abus.i2cWrite(encodeTime_4Digit_7Segment_56(d, colon))
+			abus.i2cWrite(encodeTime24_4Digit_7Segment_56(d, colon))
 				.then()
 				.catch(e => console.warn(e))
 		}, 1000)
@@ -223,13 +223,15 @@ function script_Font(abus, input) {
 			i += 1
 			if(i >= sl) { i = 0 }
 
+			const dp = 0
+
 			await abus.i2cWrite(encodeLayout_4Digit_7Segment_56({
 						colon: 0,
 						digit: {
-							one: encodeLayoutDSEG7(digit0),
-							two: encodeLayoutDSEG7(digit1),
-							three: encodeLayoutDSEG7(digit2),
-							four: encodeLayoutDSEG7(digit3)
+							one: encodeLayoutDSEG7(digit0, dp),
+							two: encodeLayoutDSEG7(digit1, dp),
+							three: encodeLayoutDSEG7(digit2, dp),
+							four: encodeLayoutDSEG7(digit3, dp)
 						}
 					}))
 
@@ -241,9 +243,6 @@ function script_Font(abus, input) {
 
 }
 
-
-
-
 function script_Count(abus) {
 
 		let start = 0
@@ -252,13 +251,15 @@ function script_Count(abus) {
 			if(start > 9999) { start = 0 }
 			const digits = start.toString().padStart(4, 0).split('')
 
+			const dp = 0
+
 			await abus.i2cWrite(encodeLayout_4Digit_7Segment_56({
 				colon: 0,
 				digit: {
-					one: encodeLayoutDSEG7(digits[0]),
-					two: encodeLayoutDSEG7(digits[1]),
-					three: encodeLayoutDSEG7(digits[2]),
-					four: encodeLayoutDSEG7(digits[3])
+					one: encodeLayoutDSEG7(digits[0], dp),
+					two: encodeLayoutDSEG7(digits[1], dp),
+					three: encodeLayoutDSEG7(digits[2], dp),
+					four: encodeLayoutDSEG7(digits[3], dp)
 				}
 			}))
 
@@ -266,13 +267,11 @@ function script_Count(abus) {
 
 }
 
-
-
 function script_Script(abus) {
 	const s = segmentDisplayScript()
 		.from('begin')
-		.scroll('-_-_-_').forSeconds(10)
-		.time().forMinutes(1)
+		.scroll('-_-_-_').forSeconds(2)
+		.time().forMinutes(5)
 		// .flash('SALE').forSeconds(5)
 		// .scroll('buy now....').slow().once()
 
@@ -376,12 +375,26 @@ function script_Script(abus) {
 			const rate = 500
 
 			let toggle = true
+			let lastD = undefined
+
 			const scroller = setInterval(() => {
-				abus.i2cWrite(encodeTime_4Digit_7Segment_56(new Date(), toggle))
+				const d = new Date()
+				const diff = lastD ? Math.trunc(d.getTime() / (1000 * 60)) - Math.trunc(lastD.getTime() / (1000 * 60)) : 1
+
+				if(diff < 1) { return }
+
+				console.log('update and cache time')
+				lastD = d
+
+				abus.i2cWrite(encodeTime24_4Digit_7Segment_56(d, toggle))
 					.then(() => {
 						toggle = !toggle
 					})
 					.catch(e => console.warn(e))
+					.finally(() => {
+						console.log('cache time')
+						lastD = d
+					})
 			}, rate)
 
 			setTimeout(() => {
@@ -413,6 +426,200 @@ function script_Script(abus) {
 	handleAction(s, 0)
 }
 
+function script_Game(abus) {
+	function encodeLayoutBoard(board, digit) {
+		const ri = digit
+		const ci = digit * 2
+
+		const a = board.row[0][ri]
+		const b = board.column[0][ci + 1]
+		const c = board.column[1][ci + 1]
+		const d = board.row[2][ri]
+		const e = board.column[1][ci]
+		const f = board.column[0][ci]
+		const g = board.row[1][ri]
+
+		const DP = ((a * b * c * d * e * f * g) < 0) ? 1 : 0
+
+		return {
+			A: Math.abs(a),
+			B: Math.abs(b),
+			C: Math.abs(c),
+			D: Math.abs(d),
+			E: Math.abs(e),
+			F: Math.abs(f),
+			G: Math.abs(g),
+			DP
+		}
+	}
+
+	const state = {
+		board: {
+			row: [
+				[  0,  0,  1,  1 ],
+				[ -1,  0,  0,  0 ],
+				[  0,  0,  0,  1 ]
+			],
+			column: [
+				[  0,  0,   0,  0,   0,  0,   1,  1 ],
+				[ -1,  0,   0,  0,   0,  0,   0,  1 ]
+			]
+		}
+	}
+
+	function applyGravity(board) {
+		function gravity(line) {
+			let playerIndex = line.indexOf(-1)
+			if(playerIndex < 0) { return }
+			if(playerIndex >= line.length - 1) { throw new Error('un-solidified player at bottom') }
+
+			line[playerIndex] = 0
+			playerIndex += 1
+
+			const atBottom = playerIndex >= (line.length - 1)
+			const nextTaken = !atBottom && (line[playerIndex + 1] !== 0)
+			const solidify = atBottom || nextTaken
+
+			line[playerIndex] = solidify ? 1 : -1
+		}
+
+		gravity(board.row[0])
+		gravity(board.row[1])
+		gravity(board.row[2])
+
+		gravity(board.column[0])
+		gravity(board.column[1])
+	}
+
+	function handleBoardUpdate() {
+
+
+		applyGravity(state.board)
+
+		abus.i2cWrite(encodeLayout_4Digit_7Segment_56({
+			colon: 0,
+			digit: {
+				one: encodeLayoutBoard(state.board, 0),
+				two: encodeLayoutBoard(state.board, 1),
+				three: encodeLayoutBoard(state.board, 2),
+				four: encodeLayoutBoard(state.board, 3),
+			}
+		}))
+		.then(() => {
+			setTimeout(handleBoardUpdate, 1500)
+		})
+		.catch(e => console.warn(e))
+	}
+
+
+
+	window.addEventListener('keydown', e => {
+		console.log(e.code)
+		if(e.code === 'Space') {
+			//
+			handleBoardUpdate()
+		}
+
+		const hasRow0 = state.board.row[0].includes(-1)
+		const hasRow1 = state.board.row[1].includes(-1)
+		const hasRow2 = state.board.row[2].includes(-1)
+
+		const hasCol0 = state.board.column[0].includes(-1)
+		const hasCol1 = state.board.column[1].includes(-1)
+
+		const hasRow = hasRow0 || hasRow1 || hasRow2
+		const hasCol =  hasCol0 || hasCol1
+
+		function applyVertical(line, targetLine) {
+			const playerIndex = line.indexOf(-1)
+
+			const target = targetLine[playerIndex]
+			if(target !== 0) { return }
+
+			line[playerIndex] = 0
+			line = targetLine
+
+			const atBottom = playerIndex >= (line.length - 1)
+			const nextTaken = !atBottom && (line[playerIndex + 1] !== 0)
+			const solidify = atBottom || nextTaken
+
+			line[playerIndex] = solidify ? 1 : -1
+		}
+
+		if(e.code === 'ArrowUp') {
+			if(hasRow) {
+				if(hasRow0) { return }
+				if(hasRow1) {
+					const line = state.board.row[1]
+					const targetLine = state.board.row[0]
+					applyVertical(line, targetLine)
+				}
+				if(hasRow2) {
+					const line = state.board.row[2]
+					const targetLine = state.board.row[1]
+					applyVertical(line, targetLine)
+				}
+			}
+			else if(hasCol) {
+				if(hasCol0) { return }
+				if(hasCol1) {
+					const line = state.board.column[1]
+					const targetLine = state.board.column[0]
+					applyVertical(line, targetLine)
+				}
+			}
+		}
+		else if(e.code === 'ArrowDown') {
+			if(hasRow) {
+				if(hasRow0) {
+					const line = state.board.row[0]
+					const targetLine = state.board.row[1]
+					applyVertical(line, targetLine)
+				}
+				if(hasRow1) {
+					const line = state.board.row[1]
+					const targetLine = state.board.row[2]
+					applyVertical(line, targetLine)
+				}
+				if(hasRow2) { return }
+			}
+			else if(hasCol) {
+				if(hasCol0) {
+					const line = state.board.colum[0]
+					const targetLine = state.board.colum[1]
+					applyVertical(line, targetLine)
+				}
+				if(hasCol1) { return }
+			}
+		}
+		else if(e.code === 'ArrowLeft') {
+
+		}
+		else if(e.code === 'ArrowRight') {
+
+		}
+
+
+		// abus.i2cWrite(encodeLayout_4Digit_7Segment_56({
+		// 	colon: 0,
+		// 	digit: {
+		// 		one: encodeLayoutBoard(state.board, 0),
+		// 		two: encodeLayoutBoard(state.board, 1),
+		// 		three: encodeLayoutBoard(state.board, 2),
+		// 		four: encodeLayoutBoard(state.board, 3),
+		// 	}
+		// }))
+		// .then(() => {
+		// 	setTimeout(handleBoardUpdate, 1500)
+		// })
+		// .catch(e => console.warn(e))
+	})
+
+}
+
+
+
+
 
 export class HT16K33Builder {
 	#abus
@@ -435,17 +642,16 @@ export class HT16K33Builder {
 	async open() {
 		//this.#device = await PCA9536.from(this.#abus, {})
 
-		await this.#abus.i2cWrite(Uint8Array.from([SS | OSCILLATOR_ON ]))
-		await this.#abus.i2cWrite(Uint8Array.from([DS | DISPLAY_ON | BLINK_OFF ]))
-		await this.#abus.i2cWrite(Uint8Array.from([DDD | 1 ]))
+		const driver = new HT16K33()
+		driver.open()
 
 		await this.#abus.i2cWrite(encodeLayout_4Digit_7Segment_56({
 			colon: 0,
 			digit: {
-				one: encodeLayoutDSEG7('J'),
-				two: encodeLayoutDSEG7('o'),
-				three: encodeLayoutDSEG7('h'),
-				four: encodeLayoutDSEG7('n')
+				one: encodeLayoutDSEG7('_', 1),
+				two: encodeLayoutDSEG7('_', 1),
+				three: encodeLayoutDSEG7('_', 1),
+				four: encodeLayoutDSEG7('_', 1)
 			}
 		}))
 	}
@@ -477,10 +683,11 @@ export class HT16K33Builder {
 			return b1
 		}
 
-		root.appendChild(buildButton('Script', () => script_Script(this.#abus)))
-		root.appendChild(buildButton('Fast Count', () => script_Count(this.#abus)))
 		root.appendChild(buildButton('Quick Fox', () => script_Font(this.#abus, input)))
 		root.appendChild(buildButton('Time', () => script_Time(this.#abus)))
+		root.appendChild(buildButton('Script', () => script_Script(this.#abus)))
+		root.appendChild(buildButton('Fast Count', () => script_Count(this.#abus)))
+		root.appendChild(buildButton('Game', () => script_Game(this.#abus)))
 
 
 		return root

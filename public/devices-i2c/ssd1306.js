@@ -28,7 +28,23 @@ export class SSD1306Builder {
 	async buildCustomView(selectionElem) {
 		const root = document.createElement('ssd1306-config')
 
-		root.textContent = 'My Little Display'
+		const canvas = document.createElement('canvas')
+		canvas.width = 128
+		canvas.height = 64
+		root.appendChild(canvas)
+
+		const context = canvas.getContext('2d')
+
+		context.lineWidth = 10;
+		context.strokeRect(10, 10, 108, 44);
+		// context.fillRect(130, 190, 40, 60);
+
+		const img = context.getImageData(0, 0, 128, 64)
+
+		img.data.forEach(value => {
+			console.log(value)
+		})
+
 
 		return root
 	}

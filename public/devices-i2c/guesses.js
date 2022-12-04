@@ -12,6 +12,10 @@ export const DS3502_INFO = {
 	addresses: [ ...range(0x28, 0x2b) ], name: 'ds3502'
 }
 
+export const DS1841_INFO = {
+	addresses: [ ...range(0x28, 0x2b) ], name: 'ds1841'
+}
+
 export const BOSCH_IEU_INFO = {
 	addresses: [ 0x76, 0x77 ], name: 'boschIEU'
 }
@@ -37,7 +41,7 @@ export const I2C_GUESSES = [
 	PCF_8574_INFO,
 	{ addresses: [ ...range(0x20, 0x27) ], name: 'mcp23xxx' },
 	{ addresses: [ 0x29 ], name: 'tcs34725' },
-	{ addresses: [ ...range(0x28, 0x2b) ], name: 'ds1841' },
+	DS1841_INFO,
 	DS3502_INFO,
 	{ addresses: [ 0x2d, 0x53, 0x57 ], name: 'st25dv16k' },
 	// 0x30

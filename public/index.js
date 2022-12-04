@@ -70,7 +70,7 @@ const isFT232H = (vendorId, productId) => {
 function buildDeviceSection(builder) {
 	//
 	const sectionElem = document.createElement('section')
-	sectionElem.setAttribute('data-active', true)
+	// sectionElem.setAttribute('data-active', true)
 	sectionElem.setAttribute('data-connect', true)
 
 	const connectButtonEleme = document.createElement('button')
@@ -248,7 +248,7 @@ async function onContentLoaded() {
 
 
 	const serialWorker = new Worker('./workers/serial-worker.js', { type: 'module' })
-	serialWorker.onmessage = msg => console.log(msg)
+	serialWorker.onmessage = msg => console.log('from serial worker', msg)
 	//serialWorker.postMessage({ go: true })
 
 	const usbWorker = new Worker('./workers/usb-worker.js', { type: 'module' })
@@ -268,8 +268,6 @@ async function onContentLoaded() {
 
 			//const liElem = makeListItem()
 		}
-
-
 	}
 
 	usbWorker.postMessage({ type: 'scan' })

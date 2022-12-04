@@ -23,6 +23,8 @@
     "@johntalton/pcf8574": "^1.0.7",
     "@johntalton/ssd1306": "../ssd1306",
     "@johntalton/tca9548a": "^5.0.0",
-    "@johntalton/tcs34725": "^1.1.1"
+    "@johntalton/tcs34725": "^1.1.1",
+    "@johntalton/ht16k33": "../ht16k33",
+    "@johntalton/ds1841": "../ds1841"
   }
 }
