@@ -640,20 +640,32 @@ export class HT16K33Builder {
 
 
 	async open() {
-		//this.#device = await PCA9536.from(this.#abus, {})
+		this.#device = HT16K33.from(this.#abus)
 
-		const driver = new HT16K33()
-		driver.open()
+		await this.#device.enableOscillator()
+		await this.#device.setDisplay(true, 'off')
+		await this.#device.setDimming(1)
 
-		await this.#abus.i2cWrite(encodeLayout_4Digit_7Segment_56({
-			colon: 0,
-			digit: {
-				one: encodeLayoutDSEG7('_', 1),
-				two: encodeLayoutDSEG7('_', 1),
-				three: encodeLayoutDSEG7('_', 1),
-				four: encodeLayoutDSEG7('_', 1)
-			}
-		}))
+		await this.#device.setMemory({
+			com0: {
+				row1: true,
+				row2: true,
+				row3: true,
+				row4: true
+			},
+
+			com2: { row1: true },
+		})
+
+		// await this.#abus.i2cWrite(encodeLayout_4Digit_7Segment_56({
+		// 	colon: 0,
+		// 	digit: {
+		// 		one: encodeLayoutDSEG7('_', 1),
+		// 		two: encodeLayoutDSEG7('_', 1),
+		// 		three: encodeLayoutDSEG7('_', 1),
+		// 		four: encodeLayoutDSEG7('_', 1)
+		// 	}
+		// }))
 	}
 
 	async close() { }
