@@ -6,6 +6,8 @@ import { HT16K33, Adafruit_LED_BP056, Segment } from '@johntalton/ht16k33'
 import { segmentDisplayScript } from '../util/segment-display-script.js'
 
 
+let Q = Promise.resolve()
+
 function script_Time(device) {
 		let colon = false
 		setInterval(async () => {
@@ -431,35 +433,40 @@ function script_Channel(device) {
 
 	const channel = new BroadcastChannel('8digit7seg-first')
 
-	function firstHalf() {
-
+	function firstHalf(message) {
+		return message.substring(0, 4)
 	}
 
-	function secondHalf() {
-
+	function secondHalf(message) {
+		return message.substring(4)
 	}
 
 	const NAME_MAP = {
-		'0x70': '8digit7seg-first-first',
-		'0x71': '8digit7seg-first-second'
+		'excamera:bus:0x70': '8digit7seg-first-first',
+		'excamera:bus:0x71': '8digit7seg-first-second'
 	}
 
 	channel.onmessage = msg => {
 		const { data } = msg
-		const { message } = data
+		const { message, font } = data
 		const first = firstHalf(message)
 		const second = secondHalf(message)
 
 		const name = NAME_MAP[device.name]
 
-		if(name === '8digit7seg-first-first') {
-			device.setMemory({
+		const encodeString =
+			font === 'segASCII' ? Segment.encodeString_4Digit_SegmentASCII :
+			font === 'DSEG7' ?  Segment.encodeString_4Digit_DSEG7 :
+			() => { throw new Error('unknown font') }
 
-			})
+		if (name === '8digit7seg-first-first') {
+			Q = Q.then(() => device.setMemory(Adafruit_LED_BP056.toLayout(encodeString(first, false)))
+				.then()
+				.catch(e => console.warn(e)))
 		} else if(name === '8digit7seg-first-second') {
-			device.setMemory({
-
-			})
+			Q = Q.then(() => device.setMemory(Adafruit_LED_BP056.toLayout(encodeString(second, false)))
+				.then()
+				.catch(e => console.warn(e)))
 		}
 
 	}
@@ -468,10 +475,21 @@ function script_Channel(device) {
 function script_ChannelSquawk() {
 	const channel = new BroadcastChannel('8digit7seg-first')
 
+	const ALPHA = 'The Quick Brow Fox Jumped Over The Lazy Sleeping Dog   '
+	const DIGITS = 8
+	const FONTS = [ 'segASCII', 'DSEG7' ]
+	let fontAscii = true
+	let idx = 0
+
+
 	setInterval(() => {
 		channel.postMessage({
-			message: '12345678'
+			font: fontAscii ? FONTS[0] : FONTS[1],
+			message: ALPHA.substring(idx, idx + DIGITS)
 		})
+
+		idx = idx >= (ALPHA.length - 1 - DIGITS) ? 0 : idx + 1
+		fontAscii = idx === 0 ? !fontAscii : fontAscii
 	}, 1000 * 1)
 }
 
@@ -516,15 +534,7 @@ export class HT16K33Builder {
 		// 	com2: { row1: true },
 		// })
 
-		await this.#device.setMemory(encodeLayout_4Digit_7Segment_56({
-			colon: 0,
-			digit: {
-				one: encodeLayoutDSEG7('_', 1),
-				two: encodeLayoutDSEG7('_', 1),
-				three: encodeLayoutDSEG7('_', 1),
-				four: encodeLayoutDSEG7('_', 1)
-			}
-		}))
+		await this.#device.setMemory(Adafruit_LED_BP056.toLayout(Segment.encodeString_4Digit_SegmentASCII('_-_-')))
 	}
 
 	async close() { }
@@ -559,8 +569,8 @@ export class HT16K33Builder {
 		root.appendChild(buildButton('Script', () => script_Script(this.#device)))
 		root.appendChild(buildButton('Fast Count', () => script_Count(this.#device)))
 		root.appendChild(buildButton('Game', () => script_Game(this.#device)))
-		root.appendChild(buildButton('Game', () => script_Channel(this.#device)))
-		root.appendChild(buildButton('Game', () => script_ChannelSquawk(this.#device)))
+		root.appendChild(buildButton('Channel', () => script_Channel(this.#device)))
+		root.appendChild(buildButton('Squawk', () => script_ChannelSquawk(this.#device)))
 
 
 		return root
