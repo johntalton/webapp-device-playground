@@ -83,7 +83,7 @@ function script_Script(device) {
 	const s = segmentDisplayScript()
 		.from('begin')
 		.scroll('-_-_-_').forSeconds(2)
-		.time().forSeconds(30)
+		.time().forMinutes(5)
 		// .flash('SALE').forSeconds(5)
 		// .scroll('buy now....').slow().once()
 
@@ -123,7 +123,7 @@ function script_Script(device) {
 					clearInterval(scroller)
 				}
 
-				device.setMemory(encodeDigits_4Digit_7Segment_56(digits, false))
+				device.setMemory(Adafruit_LED_BP056.toLayout(Segment.encodeString_4Digit_SegmentASCII(digits, false)))
 					.then()
 					.catch(e => console.warn(e))
 					.finally(() => {
@@ -171,7 +171,7 @@ function script_Script(device) {
 
 		if(action.type === 'display') {
 			const { fourLetters, seconds } = action
-			device.setMemory(encodeDigits_4Digit_7Segment_56(fourLetters, false))
+			device.setMemory(Adafruit_LED_BP056.toLayout(Segment.encodeString_4Digit_SegmentASCII(fourLetters, false)))
 				.then()
 				.catch(e => console.warn(e))
 
@@ -198,7 +198,7 @@ function script_Script(device) {
 				console.log('update and cache time')
 				lastD = d
 
-				device.setMemory(encodeTime24_4Digit_7Segment_56(d, toggle))
+				device.setMemory(Adafruit_LED_BP056.toLayout(Segment.encodeTime24_4Digit_7Segment(d, toggle)))
 					.then(() => {
 						toggle = !toggle
 					})
@@ -226,7 +226,7 @@ function script_Script(device) {
 		}
 
 		if(action.type === 'end') {
-			device.setMemory(encodeDigits_4Digit_7Segment_56('EOL.', false))
+			device.setMemory(Adafruit_LED_BP056.toLayout(Segment.encodeString_4Digit_SegmentASCII('EOL.', false)))
 				.then()
 				.catch(e => console.warn(e))
 			console.log('END OF LINE.')
@@ -490,7 +490,7 @@ function script_ChannelSquawk() {
 
 		idx = idx >= (ALPHA.length - 1 - DIGITS) ? 0 : idx + 1
 		fontAscii = idx === 0 ? !fontAscii : fontAscii
-	}, 1000 * 1)
+	}, 1000 * 0.5)
 }
 
 
