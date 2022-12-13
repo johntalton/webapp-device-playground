@@ -1,186 +1,9 @@
 import { I2CAddressedBus } from '@johntalton/and-other-delights'
 import { BitSmush, SMUSH_MAP_8_BIT_NAMES } from '@johntalton/bitsmush'
 
-import { HT16K33 } from '@johntalton/ht16k33'
+import { HT16K33, Adafruit_LED_BP056, Segment } from '@johntalton/ht16k33'
 
 import { segmentDisplayScript } from '../util/segment-display-script.js'
-
-
-
-function encodeLayoutDSEG7(digit, DP) {
-	// https://www.keshikan.net/fonts-e.html
-	const dseg7 = {
-		'a': 'A',
-		'b': 'b',
-		'c': 'c',
-		'd': 'd',
-		'e': 'E',
-		'f': 'F',
-		'g': 'G',
-		'h': 'h',
-		'i': 'i',
-		'j': 'J',
-		'k': 'k',
-		'l': 'L',
-		'm': 'M',
-		'n': 'n',
-		'o': 'o',
-		'p': 'P',
-		'q': 'q',
-		'r': 'r',
-		's': 'S',
-		't': 't',
-		'u': 'u',
-		'v': 'V',
-		'w': 'W',
-		'x': 'X',
-		'y': 'y',
-		'z': 'Z',
-	}
-
-	return encodeLayoutDigit(dseg7[digit.toLowerCase()] ?? digit, DP)
-}
-
-function encodeLayoutDigit(digit, DP) {
-	const font = {
-		' ': { A: 0, B: 0, C: 0, D: 0, E: 0, F: 0, G: 0, DP },
-		'-': { A: 0, B: 0, C: 0, D: 0, E: 0, F: 0, G: 1, DP },
-		'_': { A: 0, B: 0, C: 0, D: 1, E: 0, F: 0, G: 0, DP },
-		'.': { A: 0, B: 0, C: 0, D: 0, E: 0, F: 0, G: 0, DP: 1 },
-		'°': { A: 1, B: 1, C: 0, D: 0, E: 0, F: 1, G: 1, DP },
-
-		'0': { A: 1, B: 1, C: 1, D: 1, E: 1, F: 1, G: 0, DP },
-		'1': { A: 0, B: 1, C: 1, D: 0, E: 0, F: 0, G: 0, DP },
-		'2': { A: 1, B: 1, C: 0, D: 1, E: 1, F: 0, G: 1, DP },
-		'3': { A: 1, B: 1, C: 1, D: 1, E: 0, F: 0, G: 1, DP },
-		'4': { A: 0, B: 1, C: 1, D: 0, E: 0, F: 1, G: 1, DP },
-		'5': { A: 1, B: 0, C: 1, D: 1, E: 0, F: 1, G: 1, DP },
-		'6': { A: 0, B: 0, C: 1, D: 1, E: 1, F: 1, G: 1, DP },
-		'7': { A: 1, B: 1, C: 1, D: 0, E: 0, F: 0, G: 0, DP },
-		'8': { A: 1, B: 1, C: 1, D: 1, E: 1, F: 1, G: 1, DP },
-		'9': { A: 1, B: 1, C: 1, D: 0, E: 0, F: 1, G: 1, DP },
-
-		'b': { A: 0, B: 0, C: 1, D: 1, E: 1, F: 1, G: 1, DP },
-		'c': { A: 0, B: 0, C: 0, D: 1, E: 1, F: 0, G: 1, DP },
-		'd': { A: 0, B: 1, C: 1, D: 1, E: 1, F: 0, G: 1, DP },
-		'h': { A: 0, B: 0, C: 1, D: 0, E: 1, F: 1, G: 1, DP },
-		'i': { A: 0, B: 0, C: 1, D: 0, E: 0, F: 0, G: 0, DP },
-		'k': { A: 1, B: 0, C: 1, D: 0, E: 1, F: 1, G: 1, DP },
-		'n': { A: 0, B: 0, C: 1, D: 0, E: 1, F: 0, G: 1, DP },
-		'o': { A: 0, B: 0, C: 1, D: 1, E: 1, F: 0, G: 1, DP },
-		'q': { A: 1, B: 1, C: 1, D: 0, E: 0, F: 1, G: 1, DP },
-		'r': { A: 0, B: 0, C: 0, D: 0, E: 1, F: 0, G: 1, DP },
-		't': { A: 0, B: 0, C: 0, D: 1, E: 1, F: 1, G: 1, DP },
-		'u': { A: 0, B: 0, C: 1, D: 1, E: 1, F: 0, G: 0, DP },
-		'y': { A: 0, B: 1, C: 1, D: 1, E: 0, F: 1, G: 1, DP },
-
-
-		'A': { A: 1, B: 1, C: 1, D: 0, E: 1, F: 1, G: 1, DP },
-		'B': { A: 1, B: 1, C: 1, D: 1, E: 1, F: 1, G: 1, DP },
-		'C': { A: 1, B: 0, C: 0, D: 1, E: 1, F: 1, G: 0, DP },
-		'D': { A: 1, B: 1, C: 1, D: 1, E: 1, F: 1, G: 0, DP },
-		'E': { A: 1, B: 0, C: 0, D: 1, E: 1, F: 1, G: 1, DP },
-		'F': { A: 1, B: 0, C: 0, D: 0, E: 1, F: 1, G: 1, DP },
-		'G': { A: 1, B: 0, C: 1, D: 1, E: 1, F: 1, G: 0, DP },
-		'H': { A: 0, B: 1, C: 1, D: 0, E: 1, F: 1, G: 1, DP },
-		'I': { A: 0, B: 1, C: 1, D: 0, E: 0, F: 0, G: 0, DP },
-		'I*': { A: 0, B: 0, C: 0, D: 0, E: 1, F: 1, G: 0, DP },
-		'J': { A: 0, B: 1, C: 1, D: 1, E: 1, F: 0, G: 0, DP },
-		'K': { A: 0, B: 1, C: 1, D: 0, E: 1, F: 1, G: 1, DP },
-		'L': { A: 0, B: 0, C: 0, D: 1, E: 1, F: 1, G: 0, DP },
-		'M': { A: 1, B: 1, C: 1, D: 0, E: 1, F: 1, G: 0, DP },
-		'N': { A: 1, B: 1, C: 1, D: 0, E: 1, F: 1, G: 0, DP },
-		'O': { A: 1, B: 1, C: 1, D: 1, E: 1, F: 1, G: 0, DP },
-		'P': { A: 1, B: 1, C: 0, D: 0, E: 1, F: 1, G: 1, DP },
-		'S': { A: 0, B: 0, C: 1, D: 1, E: 0, F: 1, G: 1, DP },
-		'U': { A: 0, B: 1, C: 1, D: 1, E: 1, F: 1, G: 0, DP },
-		'V': { A: 0, B: 1, C: 1, D: 1, E: 1, F: 1, G: 0, DP },
-		'W': { A: 0, B: 1, C: 1, D: 1, E: 1, F: 1, G: 1, DP },
-		'X': { A: 0, B: 1, C: 1, D: 0, E: 1, F: 1, G: 1, DP },
-		'Z': { A: 1, B: 1, C: 0, D: 1, E: 1, F: 0, G: 0, DP },
-	}
-
-	return font[digit] ?? { A: 1, B: 1, C: 1, D: 1, E: 1, F: 1, G: 1, DP: 1 }
-}
-
-function encodeLayout_4Digit_7Segment_56(layout) {
-	// console.log({ layout })
-
-	function makeCom(digit) {
-		const { A, B, C, D, E, F, G, DP } = digit
-		return { row0: A, row1: B, row2: C, row3: D, row4: E, row5: F, row6: G, row7: DP }
-	}
-
-	return {
-		com0: makeCom(layout.digit.one),
-		com1: makeCom(layout.digit.two),
-		com2: { row1: layout.colon },
-		com3: makeCom(layout.digit.three),
-		com4: makeCom(layout.digit.four)
-	}
-}
-
-
-function encodeDigits_4Digit_7Segment_56(digits, colon) {
-	const dp = 0
-
-	return encodeLayout_4Digit_7Segment_56({
-		colon: colon ? 1 : 0,
-		digit: {
-			one: encodeLayoutDSEG7(digits[0], dp),
-			two: encodeLayoutDSEG7(digits[1], dp),
-			three: encodeLayoutDSEG7(digits[2], dp),
-			four: encodeLayoutDSEG7(digits[3], dp)
-		}
-	})
-}
-
-function encodeTime24_4Digit_7Segment_56(time, colon) {
-	const dp = 0
-
-	const h = time.getHours()
-	const m = time.getMinutes()
-
-	const [ digit0, digit1 ] = h.toString().padStart(2, '0').split('')
-	const [ digit2, digit3 ] = m.toString().padStart(2, '0').split('')
-
-	return encodeLayout_4Digit_7Segment_56({
-		colon: colon ? 1 : 0,
-		digit: {
-			one: encodeLayoutDigit(digit0, dp),
-			two: encodeLayoutDigit(digit1, dp),
-			three: encodeLayoutDigit(digit2, dp),
-			four: encodeLayoutDigit(digit3, dp)
-		}
-	})
-}
-
-function encodeTime12_4Digit_7Segment_56(time, colon) {
-	const dp = 0
-
-	const h = time.getHours()
-	const m = time.getMinutes()
-
-	const pm = h > 12
-	const H = pm ? h - 12 : h
-
-	const [ digit0, digit1 ] = H.toString().padStart(2, ' ').split('')
-	const [ digit2, digit3 ] = m.toString().padStart(2, '0').split('')
-
-	return encodeLayout_4Digit_7Segment_56({
-		colon: colon ? 1 : 0,
-		digit: {
-			one: encodeLayoutDigit(digit0, dp),
-			two: encodeLayoutDigit(digit1, dp),
-			three: encodeLayoutDigit(digit2, dp),
-			four: encodeLayoutDigit(digit3, dp)
-		}
-	})
-}
-
-
-
-
 
 
 function script_Time(device) {
@@ -189,7 +12,7 @@ function script_Time(device) {
 			colon = !colon
 			const d = new Date()
 
-			device.setMemory(encodeTime24_4Digit_7Segment_56(d, colon))
+			device.setMemory(Adafruit_LED_BP056.toLayout(Segment.encodeTime24_4Digit_7Segment(d, colon)))
 				.then()
 				.catch(e => console.warn(e))
 		}, 1000)
@@ -604,6 +427,53 @@ function script_Game(abus) {
 
 }
 
+function script_Channel(device) {
+
+	const channel = new BroadcastChannel('8digit7seg-first')
+
+	function firstHalf() {
+
+	}
+
+	function secondHalf() {
+
+	}
+
+	const NAME_MAP = {
+		'0x70': '8digit7seg-first-first',
+		'0x71': '8digit7seg-first-second'
+	}
+
+	channel.onmessage = msg => {
+		const { data } = msg
+		const { message } = data
+		const first = firstHalf(message)
+		const second = secondHalf(message)
+
+		const name = NAME_MAP[device.name]
+
+		if(name === '8digit7seg-first-first') {
+			device.setMemory({
+
+			})
+		} else if(name === '8digit7seg-first-second') {
+			device.setMemory({
+
+			})
+		}
+
+	}
+}
+
+function script_ChannelSquawk() {
+	const channel = new BroadcastChannel('8digit7seg-first')
+
+	setInterval(() => {
+		channel.postMessage({
+			message: '12345678'
+		})
+	}, 1000 * 1)
+}
 
 
 
@@ -689,6 +559,8 @@ export class HT16K33Builder {
 		root.appendChild(buildButton('Script', () => script_Script(this.#device)))
 		root.appendChild(buildButton('Fast Count', () => script_Count(this.#device)))
 		root.appendChild(buildButton('Game', () => script_Game(this.#device)))
+		root.appendChild(buildButton('Game', () => script_Channel(this.#device)))
+		root.appendChild(buildButton('Game', () => script_ChannelSquawk(this.#device)))
 
 
 		return root
