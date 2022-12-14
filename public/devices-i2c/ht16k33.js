@@ -184,7 +184,7 @@ function script_Script(device) {
 
 		if(action.type === 'time') {
 			const { seconds } = action
-			const rate = 500
+			const rate = 1000
 
 			let toggle = true
 			let lastD = undefined
