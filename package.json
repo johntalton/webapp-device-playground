@@ -25,6 +25,7 @@
     "@johntalton/tca9548a": "^5.0.0",
     "@johntalton/tcs34725": "^1.1.1",
     "@johntalton/ht16k33": "../ht16k33",
-    "@johntalton/ds1841": "../ds1841"
+    "@johntalton/ds1841": "../ds1841",
+    "@johntalton/bno08x": "../bno08x"
   }
 }

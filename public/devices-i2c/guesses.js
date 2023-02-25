@@ -20,6 +20,10 @@ export const BOSCH_IEU_INFO = {
 	addresses: [ 0x76, 0x77 ], name: 'boschIEU'
 }
 
+export const BNO_08X_INFO = {
+	addresses: [ 0x4a, 0x4b ], name: 'bno085'
+}
+
 export const SSD1306_INFO = {
 	addresses: [ 0x3c, 0x3d ], name: 'ssd1306'
 }
@@ -52,7 +56,7 @@ export const I2C_GUESSES = [
 	// 0x40
 	PCA_9536_INFO,
 	{ addresses: [ ...range(0x48, 0x4b) ], name: 'ads1115' },
-	{ addresses: [ 0x4a, 0x4b ], name: 'bno085' },
+	BNO_08X_INFO,
 	{ addresses: [ ...range(0x40,  0x4f), ], name: 'ina219' },
 	// 0x50
 	{ addresses: [ 0x5c ], name: 'am2320' },

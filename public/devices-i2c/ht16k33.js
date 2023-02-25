@@ -1,7 +1,7 @@
 import { I2CAddressedBus } from '@johntalton/and-other-delights'
 import { BitSmush, SMUSH_MAP_8_BIT_NAMES } from '@johntalton/bitsmush'
 
-import { HT16K33, Adafruit_LED_BP056, Segment } from '@johntalton/ht16k33'
+import { HT16K33, Adafruit_Matrix_BiColor_8x8, Adafruit_LED_BP056, Segment } from '@johntalton/ht16k33'
 
 import { segmentDisplayScript } from '../util/segment-display-script.js'
 
@@ -10,7 +10,7 @@ let Q = Promise.resolve()
 
 function script_Time(device) {
 		let colon = false
-		setInterval(async () => {
+		setInterval(() => {
 			colon = !colon
 			const d = new Date()
 
@@ -26,7 +26,7 @@ function script_Font(device, input) {
 		// const s = 'The Quick Brown Fox Jumped Over the Lazy Sleeping Dog -_.1234567890°'
 		let s = input.value
 		let i = 0
-		setInterval(async () => {
+		setInterval(() => {
 			const sl = s.length
 			const digit0 = s.charAt(i + 0 % sl)
 			const digit1 = s.charAt((i + 1) % sl)
@@ -37,7 +37,7 @@ function script_Font(device, input) {
 
 			const dp = 0
 
-			await device.setMemory(encodeLayout_4Digit_7Segment_56({
+			device.setMemory(encodeLayout_4Digit_7Segment_56({
 						colon: 0,
 						digit: {
 							one: encodeLayoutDSEG7(digit0, dp),
@@ -46,6 +46,8 @@ function script_Font(device, input) {
 							four: encodeLayoutDSEG7(digit3, dp)
 						}
 					}))
+					.then()
+					.catch(e => console.warn(e))
 
 		}, 500)
 
@@ -493,7 +495,92 @@ function script_ChannelSquawk() {
 	}, 1000 * 0.5)
 }
 
+function script_Matrix(device) {
+	class Canvas {
+		#path = []
+		#cursor = { x: 0, y: 0 }
+		#state = {
+			stroke: 'black',
+			fill: 'black'
 
+		}
+
+		moveTo(point) { this.#cursor = point }
+		lineTo(point) {}
+
+		strokeRect(point, w, h) {}
+		fillRect(point, w, h) {}
+
+	}
+
+	function simpleDDALine(p1, p2) {
+		// port of: prog1 cs470 1/6/99
+		const xDx = p1.x - p2.x
+		const yDx = p1.y - p2.y
+
+		const xDif = Math.abs(xDx)
+		const yDif = Math.abs(yDx)
+
+		const nStep = Math.trunc(Math.max(xDif, yDif))
+
+		const xStep = - xDx / (nStep * 1.0)
+		const yStep = - yDx / (nStep * 1.0)
+
+		return [ ...new Array(nStep) ].map((_value, index) => {
+			const x = Math.trunc(p1.x + (index * xStep))
+			const y = Math.trunc(p1.y + (index * yStep))
+
+			return setPixel({ x, y })
+		})
+	}
+
+	function setPixel(p) {
+		return { x: p.x, y: p.y, color: 'green' }
+	}
+
+	// const startT = now()
+	const particles = [
+		{
+			x: 0,
+			y: 0,
+			dx: 0.1,
+			dy: 0.3
+		},
+		{
+			x: 0,
+			y: 0,
+			dx: 0.5,
+			dy: 0.7
+		}
+	]
+
+	setInterval(() => {
+		// const t = now() - startT / 1000
+
+		particles.forEach(particle => {
+			particle.x = particle.x + particle.dx
+			particle.y = particle.y + particle.dy
+
+			if(particle.x >= 8) { particle.x = 7; particle.dx = -particle.dx }
+			if(particle.x < 0) { particle.x = 0; particle.dx = -particle.dx }
+
+			if(particle.y >= 8) { particle.y = 7; particle.dy = -particle.dy }
+			if(particle.y < 0) { particle.y = 0; particle.dy = -particle.dy }
+		})
+
+
+		const [ p1, p2 ] = particles
+
+		const layout = Adafruit_Matrix_BiColor_8x8.toLayout(simpleDDALine(
+			{ x: Math.trunc(p1.x), y: Math.trunc(p1.y) },
+			{ x: Math.trunc(p2.x), y: Math.trunc(p2.y) }
+		))
+
+		device.setMemory(layout)
+			.then()
+			.catch(e => console.warn(e))
+	}, 1000 * 0.125)
+}
 
 
 export class HT16K33Builder {
@@ -534,7 +621,38 @@ export class HT16K33Builder {
 		// 	com2: { row1: true },
 		// })
 
-		await this.#device.setMemory(Adafruit_LED_BP056.toLayout(Segment.encodeString_4Digit_SegmentASCII('_-_-')))
+		// const layout = Adafruit_LED_BP056.toLayout(Segment.encodeString_4Digit_SegmentASCII('_-_-'))
+
+		// const layout = Adafruit_Matrix_BiColor_8x8.toLayout([
+		// 	{ x: 0, y: 0, color: 'red' },
+		// 	{ x: 1, y: 1, color: 'green' },
+		// 	{ x: 2, y: 2, color: 'red' },
+		// 	{ x: 3, y: 3, color: 'yellow' },
+		// 	{ x: 4, y: 4, color: 'yellow' },
+		// 	{ x: 5, y: 5, color: 'green' },
+		// 	{ x: 6, y: 6, color: 'red' },
+		// 	{ x: 7, y: 7, color: 'green' }
+		// ])
+
+		function fromCanvas8x8BiColor(biArray) {
+			return biArray.reduce((accumulator, rows, y) => [
+					...accumulator,
+					...rows.map((color, x) => ({ x, y, color }))
+				], [])
+		}
+
+		// const layout = Adafruit_Matrix_BiColor_8x8.toLayout(fromCanvas8x8BiColor([
+		// 	[ 'green', 'yellow', 'yellow', 'black', 'black', 'black', 'black', 'black' ],
+		// 	[ 'green', 'green', 'yellow', 'black', 'black', 'black', 'black', 'black' ],
+		// 	[ 'yellow', 'yellow', 'yellow', 'black', 'black', 'black', 'black', 'black' ],
+		// 	[ 'black', 'black', 'black', 'black', 'black', 'black', 'black', 'black' ],
+		// 	[ 'black', 'black', 'black', 'black', 'black', 'black', 'black', 'black' ],
+		// 	[ 'black', 'black', 'black', 'black', 'black', 'black', 'black', 'black' ],
+		// 	[ 'black', 'black', 'black', 'black', 'black', 'black', 'black', 'black' ],
+		// 	[ 'black', 'black', 'black', 'black', 'black', 'black', 'black', 'red' ]
+		// ]))
+
+
 	}
 
 	async close() { }
@@ -571,6 +689,7 @@ export class HT16K33Builder {
 		root.appendChild(buildButton('Game', () => script_Game(this.#device)))
 		root.appendChild(buildButton('Channel', () => script_Channel(this.#device)))
 		root.appendChild(buildButton('Squawk', () => script_ChannelSquawk(this.#device)))
+		root.appendChild(buildButton('Matrix', () => script_Matrix(this.#device)))
 
 
 		return root

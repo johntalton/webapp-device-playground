@@ -31,6 +31,9 @@ export class TCA9548Builder {
 	async buildCustomView(selectionElem) {
 		const root = document.createElement('tca9548-config')
 
+		const initialChannels = await this.#device.getChannels()
+		console.log({ initialChannels })
+
 
 
 		root.addEventListener('change', e => {
