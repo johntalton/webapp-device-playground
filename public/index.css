@@ -1,5 +1,6 @@
 @import url('./css/addr-display.css');
 @import url('./css/excamera-i2cdriver.css');
+@import url('./css/ht16k33.css');
 
 * {
 	box-sizing: border-box;

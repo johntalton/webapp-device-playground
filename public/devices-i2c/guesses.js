@@ -1,7 +1,7 @@
 import { range } from '../util/range.js'
 
 export const HT16K33_INFO = {
-	addresses: [ 0x70, 0x71 ], name: 'ht16k33'
+	addresses: [ ...range(0x70, 0x77) ], name: 'ht16k33'
 }
 
 export const TCA9548_INFO = {

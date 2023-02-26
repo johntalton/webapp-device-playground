@@ -1,0 +1,34 @@
+ht16k33-config {
+  display: flex;
+  flex-direction: column;
+  background-color: lime;
+
+  margin-inline: 1em;
+  margin-block: 1em;
+}
+
+ht16k33-config select {
+  margin: 1em;
+}
+
+
+ht16k33-config section {
+  display: none;
+}
+
+
+ht16k33-config[layout="4d7s-a"] section[data-layout="4d7s-a"] {
+  display: flex;
+}
+
+ht16k33-config[layout="4d7s-d"] section[data-layout="4d7s-d"] {
+  display: flex;
+}
+
+ht16k33-config[layout="4d14s-b"] section[data-layout="4d14s-b"] {
+  display: flex;
+}
+
+ht16k33-config[layout="M8x8x2"] section[data-layout="M8x8x2"] {
+  display: flex;
+}

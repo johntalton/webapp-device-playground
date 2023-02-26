@@ -1,20 +1,42 @@
 import { I2CAddressedBus } from '@johntalton/and-other-delights'
 import { BitSmush, SMUSH_MAP_8_BIT_NAMES } from '@johntalton/bitsmush'
 
-import { HT16K33, Adafruit_Matrix_BiColor_8x8, Adafruit_LED_BP056, Segment } from '@johntalton/ht16k33'
+import {
+	HT16K33, Segment,
+	AdafruitMatrix8x8BiColor,
+	Adafruit4Digit7SegmentBackpack,
+	Adafruit4Digit14SegmentFeatherwing,
+	Font14SegmentBespoke, Font7SegmentDSEG, Font7SegmentASCII,
+	FontUtil, Bespoke
+} from '@johntalton/ht16k33'
 
 import { segmentDisplayScript } from '../util/segment-display-script.js'
 
 
 let Q = Promise.resolve()
 
-function script_Time(device) {
+function script_Time(device, getLayoutCB) {
 		let colon = false
+
 		setInterval(() => {
 			colon = !colon
-			const d = new Date()
 
-			device.setMemory(Adafruit_LED_BP056.toLayout(Segment.encodeTime24_4Digit_7Segment(d, colon)))
+			const d = new Date()
+			const digit4 = Segment.encodeTime24_4Digit(d, colon)
+
+			const layouts = {
+				'4d7s-a': () => Adafruit4Digit7SegmentBackpack.toLayout(Font7SegmentASCII.encode4Digit(digit4)),
+				'4d7s-d': () => Adafruit4Digit7SegmentBackpack.toLayout(Font7SegmentDSEG.encode4Digit(digit4)),
+				'4d14s-b': () => Adafruit4Digit14SegmentFeatherwing.toLayout(Font14SegmentBespoke.encode4Digit(digit4)),
+				'M8x8x2': () => {}
+			}
+
+			const currentLayout = getLayoutCB()
+			const layout = layouts[currentLayout]()
+
+			if(layout === undefined) { return }
+
+			device.setMemory(layout)
 				.then()
 				.catch(e => console.warn(e))
 		}, 1000)
@@ -37,7 +59,7 @@ function script_Font(device, input) {
 
 			const dp = 0
 
-			device.setMemory(encodeLayout_4Digit_7Segment_56({
+			device.setMemory(Adafruit4Digit7SegmentBackpack({
 						colon: 0,
 						digit: {
 							one: encodeLayoutDSEG7(digit0, dp),
@@ -67,7 +89,7 @@ function script_Count(device) {
 
 			const dp = 0
 
-			await device.setMemory(encodeLayout_4Digit_7Segment_56({
+			await device.setMemory(Adafruit4Digit7SegmentBackpack({
 				colon: 0,
 				digit: {
 					one: encodeLayoutDSEG7(digits[0], dp),
@@ -125,7 +147,7 @@ function script_Script(device) {
 					clearInterval(scroller)
 				}
 
-				device.setMemory(Adafruit_LED_BP056.toLayout(Segment.encodeString_4Digit_SegmentASCII(digits, false)))
+				device.setMemory(Adafruit4Digit7SegmentBackpack.toLayout(Segment.encodeString_4Digit_SegmentASCII(digits, false)))
 					.then()
 					.catch(e => console.warn(e))
 					.finally(() => {
@@ -173,7 +195,7 @@ function script_Script(device) {
 
 		if(action.type === 'display') {
 			const { fourLetters, seconds } = action
-			device.setMemory(Adafruit_LED_BP056.toLayout(Segment.encodeString_4Digit_SegmentASCII(fourLetters, false)))
+			device.setMemory(Adafruit4Digit7SegmentBackpack.toLayout(Segment.encodeString_4Digit_SegmentASCII(fourLetters, false)))
 				.then()
 				.catch(e => console.warn(e))
 
@@ -200,7 +222,7 @@ function script_Script(device) {
 				console.log('update and cache time')
 				lastD = d
 
-				device.setMemory(Adafruit_LED_BP056.toLayout(Segment.encodeTime24_4Digit_7Segment(d, toggle)))
+				device.setMemory(Adafruit4Digit7SegmentBackpack.toLayout(Segment.encodeTime24_4Digit_7Segment(d, toggle)))
 					.then(() => {
 						toggle = !toggle
 					})
@@ -228,7 +250,7 @@ function script_Script(device) {
 		}
 
 		if(action.type === 'end') {
-			device.setMemory(Adafruit_LED_BP056.toLayout(Segment.encodeString_4Digit_SegmentASCII('EOL.', false)))
+			device.setMemory(Adafruit4Digit7SegmentBackpack.toLayout(Segment.encodeString_4Digit_SegmentASCII('EOL.', false)))
 				.then()
 				.catch(e => console.warn(e))
 			console.log('END OF LINE.')
@@ -310,7 +332,7 @@ function script_Game(abus) {
 
 		applyGravity(state.board)
 
-		abus.i2cWrite(encodeLayout_4Digit_7Segment_56({
+		abus.i2cWrite(Adafruit4Digit7SegmentBackpack({
 			colon: 0,
 			digit: {
 				one: encodeLayoutBoard(state.board, 0),
@@ -414,7 +436,7 @@ function script_Game(abus) {
 		}
 
 
-		// abus.i2cWrite(encodeLayout_4Digit_7Segment_56({
+		// abus.i2cWrite(Adafruit4Digit7SegmentBackpack({
 		// 	colon: 0,
 		// 	digit: {
 		// 		one: encodeLayoutBoard(state.board, 0),
@@ -459,14 +481,15 @@ function script_Channel(device) {
 		const encodeString =
 			font === 'segASCII' ? Segment.encodeString_4Digit_SegmentASCII :
 			font === 'DSEG7' ?  Segment.encodeString_4Digit_DSEG7 :
+			font === 'DSEG14' ? Segment.encodeString_4Digit_DSEG14 :
 			() => { throw new Error('unknown font') }
 
 		if (name === '8digit7seg-first-first') {
-			Q = Q.then(() => device.setMemory(Adafruit_LED_BP056.toLayout(encodeString(first, false)))
+			Q = Q.then(() => device.setMemory(Adafruit4Digit7SegmentBackpack.toLayout(encodeString(first, false)))
 				.then()
 				.catch(e => console.warn(e)))
 		} else if(name === '8digit7seg-first-second') {
-			Q = Q.then(() => device.setMemory(Adafruit_LED_BP056.toLayout(encodeString(second, false)))
+			Q = Q.then(() => device.setMemory(Adafruit4Digit7SegmentBackpack.toLayout(encodeString(second, false)))
 				.then()
 				.catch(e => console.warn(e)))
 		}
@@ -496,24 +519,24 @@ function script_ChannelSquawk() {
 }
 
 function script_Matrix(device) {
-	class Canvas {
-		#path = []
-		#cursor = { x: 0, y: 0 }
-		#state = {
-			stroke: 'black',
-			fill: 'black'
+	// class Canvas {
+	// 	#path = []
+	// 	#cursor = { x: 0, y: 0 }
+	// 	#state = {
+	// 		stroke: 'black',
+	// 		fill: 'black'
 
-		}
+	// 	}
 
-		moveTo(point) { this.#cursor = point }
-		lineTo(point) {}
+	// 	moveTo(point) { this.#cursor = point }
+	// 	lineTo(point) {}
 
-		strokeRect(point, w, h) {}
-		fillRect(point, w, h) {}
+	// 	strokeRect(point, w, h) {}
+	// 	fillRect(point, w, h) {}
 
-	}
+	// }
 
-	function simpleDDALine(p1, p2) {
+	function simpleDDALine(p1, p2, c) {
 		// port of: prog1 cs470 1/6/99
 		const xDx = p1.x - p2.x
 		const yDx = p1.y - p2.y
@@ -530,12 +553,12 @@ function script_Matrix(device) {
 			const x = Math.trunc(p1.x + (index * xStep))
 			const y = Math.trunc(p1.y + (index * yStep))
 
-			return setPixel({ x, y })
+			return setPixel({ x, y }, c)
 		})
 	}
 
-	function setPixel(p) {
-		return { x: p.x, y: p.y, color: 'green' }
+	function setPixel(p, color) {
+		return { x: p.x, y: p.y, color }
 	}
 
 	// const startT = now()
@@ -551,6 +574,12 @@ function script_Matrix(device) {
 			y: 0,
 			dx: 0.5,
 			dy: 0.7
+		},
+		{
+			x: 0,
+			y: 0,
+			dx: 0.25,
+			dy: 0.1
 		}
 	]
 
@@ -569,12 +598,27 @@ function script_Matrix(device) {
 		})
 
 
-		const [ p1, p2 ] = particles
+		const [ p1, p2, p3 ] = particles
 
-		const layout = Adafruit_Matrix_BiColor_8x8.toLayout(simpleDDALine(
-			{ x: Math.trunc(p1.x), y: Math.trunc(p1.y) },
-			{ x: Math.trunc(p2.x), y: Math.trunc(p2.y) }
-		))
+		const lines = [
+			...simpleDDALine(
+				{ x: Math.trunc(p1.x), y: Math.trunc(p1.y) },
+				{ x: Math.trunc(p2.x), y: Math.trunc(p2.y) },
+				'red'
+			),
+			...simpleDDALine(
+				{ x: Math.trunc(p2.x), y: Math.trunc(p2.y) },
+				{ x: Math.trunc(p3.x), y: Math.trunc(p3.y) },
+				'green'
+			),
+			...simpleDDALine(
+				{ x: Math.trunc(p3.x), y: Math.trunc(p3.y) },
+				{ x: Math.trunc(p1.x), y: Math.trunc(p1.y) },
+				'yellow'
+			)
+		]
+
+		const layout = AdafruitMatrixBiColor8x8.toLayout(lines)
 
 		device.setMemory(layout)
 			.then()
@@ -605,54 +649,118 @@ export class HT16K33Builder {
 		this.#device = HT16K33.from(this.#abus)
 
 		await this.#device.enableOscillator()
+		await this.#device.setDisplay(false, 'off')
 		await this.#device.setDisplay(true, 'off')
-		await this.#device.setDimming(1)
+		await this.#device.setDimming(0)
 
-		// await this.#device.setMemory({
-		// 	com1: {
-		// 		row1: true,
-		// 		row2: true,
-		// 		row3: true,
-		// 		row4: false,
+		const font_caseUpper_alignNatural = {
+			...Bespoke,
 
-		// 		row6: true
-		// 	},
+			// '~': Bespoke['M'],
+			// '!': Bespoke['W'],
 
-		// 	com2: { row1: true },
-		// })
-
-		// const layout = Adafruit_LED_BP056.toLayout(Segment.encodeString_4Digit_SegmentASCII('_-_-'))
-
-		// const layout = Adafruit_Matrix_BiColor_8x8.toLayout([
-		// 	{ x: 0, y: 0, color: 'red' },
-		// 	{ x: 1, y: 1, color: 'green' },
-		// 	{ x: 2, y: 2, color: 'red' },
-		// 	{ x: 3, y: 3, color: 'yellow' },
-		// 	{ x: 4, y: 4, color: 'yellow' },
-		// 	{ x: 5, y: 5, color: 'green' },
-		// 	{ x: 6, y: 6, color: 'red' },
-		// 	{ x: 7, y: 7, color: 'green' }
-		// ])
-
-		function fromCanvas8x8BiColor(biArray) {
-			return biArray.reduce((accumulator, rows, y) => [
-					...accumulator,
-					...rows.map((color, x) => ({ x, y, color }))
-				], [])
+			'*': 'HJKLMN',
+			'A': 'BCG2KL',
+			'Y': 'BFG1G2M',
+			'W': 'BCEFLN',
+			'M': 'BCEFHK',
+			//'J': 'BCDL',
+			'S': 'ACDG2H',
 		}
 
-		// const layout = Adafruit_Matrix_BiColor_8x8.toLayout(fromCanvas8x8BiColor([
-		// 	[ 'green', 'yellow', 'yellow', 'black', 'black', 'black', 'black', 'black' ],
-		// 	[ 'green', 'green', 'yellow', 'black', 'black', 'black', 'black', 'black' ],
-		// 	[ 'yellow', 'yellow', 'yellow', 'black', 'black', 'black', 'black', 'black' ],
-		// 	[ 'black', 'black', 'black', 'black', 'black', 'black', 'black', 'black' ],
-		// 	[ 'black', 'black', 'black', 'black', 'black', 'black', 'black', 'black' ],
-		// 	[ 'black', 'black', 'black', 'black', 'black', 'black', 'black', 'black' ],
-		// 	[ 'black', 'black', 'black', 'black', 'black', 'black', 'black', 'black' ],
-		// 	[ 'black', 'black', 'black', 'black', 'black', 'black', 'black', 'red' ]
-		// ]))
+		const font_caseLower_alignNatural = {
+			'a': 'DEG1N',
+			'b': 'DEFG1N',
+			'c': 'DEG1',
+			'd': 'BCDG2L',
+			'e': 'DEG1L',
+			'f': Bespoke['F'],
+			'g': 'BCDG2K', // Bespoke['G'],
+			'h': 'CG2JM',
+			'i': 'M',
+			'j': Bespoke['J'],
+			'k': 'JKMN',
+			'l': 'JM',
+			'm': 'CEG1G2M',
+			'n': 'CG2M', // 'EG1M'
+			'o': 'CDEG1G2',
+			'p': Bespoke['P'],
+			'q': Bespoke['Q'],
+			'r': 'EG1',
+			's': Bespoke['S'],
+			't': 'DEFG1', // 'G1G2JM',
+			'u': 'CDE',
+			'v': 'EL',
+			'w': 'CDEM',
+			'x': Bespoke['X'],
+			'y': 'HKM',
+			'z': 'DG1L'
+		}
+
+		const font_caseUL_alignNatural = {
+			...font_caseUpper_alignNatural,
+			...font_caseLower_alignNatural
+		}
+
+		const font_caseUL_alignLeft = {
+			...font_caseUL_alignNatural,
+
+			'h': 'EFG1M',
+			'i': 'E',
+			'l': 'EF',
+			'n': 'EG1M',
+
+			'y': 'EFG1K'
+		}
+
+		const font_caseUL_alignCenter = {
+			...font_caseUL_alignNatural,
+
+			't': 'G1G2JM',
+			'r': 'G2M'
+		}
+
+		const font_caseUL_alignRight = {
+			...font_caseUL_alignCenter,
+
+			'i': 'C',
+			'l': 'BC',
+			't': 'BCDG2',
+
+			'c': 'G2N',
+
+			'y': 'BCG2H'
+		}
+
+		const pairOff = (accumulator, next, index, arr) => {
+			if(index % 2 !== 0) { return accumulator }
+
+			return [
+				...accumulator,
+				arr.slice(index, index + 2)
+			]
+		}
+
+		const DUAL_UPPER_LOWER_ALPHABET = [ ...'ABCDEFGHIJKLMNOPQRSTUVWXYZ' ].reduce(pairOff, []).map(([ one, two ]) => {
+			const oneLower = one.toLowerCase()
+			const oneUpper = one.toUpperCase()
+			const twoLower = two.toLowerCase()
+			const twoUpper = two.toUpperCase()
+
+			return oneUpper + oneLower + twoUpper + twoLower
+		})
+
+		const delayS = (s) => new Promise(resolve => setTimeout(resolve, 1000 * s))
 
 
+		for (const pair of DUAL_UPPER_LOWER_ALPHABET) {
+			await this.#device.setMemory(Adafruit4Digit14SegmentFeatherwing.toLayout(FontUtil.digits4FromSegmentMap(font_caseUL_alignNatural, pair)))
+			await delayS(4)
+		}
+
+		// await this.#device.setMemory(Adafruit4Digit7SegmentBackpack.toLayout(Font7SegmentDSEG.encode4Digit('WwMm')))
+		// await this.#device.setMemory(Adafruit4Digit14SegmentFeatherwing.toLayout(Font14SegmentBespoke.encode4Digit('AYWJ')))
+		// await this.#device.setMemory(Adafruit4Digit14SegmentFeatherwing.toLayout(FontUtil.digits4FromSegmentMap(font_caseUL_alignRight, 'hiln')))
 	}
 
 	async close() { }
@@ -660,13 +768,60 @@ export class HT16K33Builder {
 	signature() { }
 
 	async buildCustomView(selectionElem) {
+		const layouts = {
+			'4d7s-a': '4 digit 7 segment - ascii',
+			'4d7s-d': '4 digit 7 segment - dseg',
+			'4d14s-b': '4 digit 14 segment - bespoke',
+			'M8x8x2': 'matrix 8x8 BiColor'
+		}
+
 		const root = document.createElement('ht16k33-config')
 
+		const dropDown = document.createElement('select')
+
+		const option = document.createElement('option')
+		option.innerText = '<unselected>'
+		option.disabled = true
+		option.selected = true
+		dropDown.appendChild(option)
+
+
+		Object.entries(layouts).forEach(([key, layoutName]) => {
+			const option = document.createElement('option')
+			option.innerText = layoutName
+			option.value = key
+
+			dropDown.appendChild(option)
+		})
+		dropDown.addEventListener('change', e => {
+			const target = e.target
+			const [ selected, ] = target.selectedOptions
+
+			root.setAttribute('layout', selected.value)
+
+		})
+		root.appendChild(dropDown)
 
 		const input = document.createElement('input')
 		input.value = 'the quick brown fox jumped over the lazy sleeping dog'
 
 		root.appendChild(input)
+
+		const sectionMap = { ...layouts }
+
+		Object.entries(layouts).forEach(([key, layoutName]) => {
+			const section = document.createElement('section')
+			section.setAttribute('data-layout', key)
+
+			const title = document.createElement('span')
+			title.innerText = layoutName
+
+			section.appendChild(title)
+
+			root.appendChild(section)
+
+			sectionMap[key] = section
+		})
 
 
 
@@ -682,14 +837,18 @@ export class HT16K33Builder {
 			return b1
 		}
 
-		root.appendChild(buildButton('Quick Fox', () => script_Font(this.#device, input)))
-		root.appendChild(buildButton('Time', () => script_Time(this.#device)))
-		root.appendChild(buildButton('Script', () => script_Script(this.#device)))
-		root.appendChild(buildButton('Fast Count', () => script_Count(this.#device)))
-		root.appendChild(buildButton('Game', () => script_Game(this.#device)))
-		root.appendChild(buildButton('Channel', () => script_Channel(this.#device)))
-		root.appendChild(buildButton('Squawk', () => script_ChannelSquawk(this.#device)))
-		root.appendChild(buildButton('Matrix', () => script_Matrix(this.#device)))
+		// buildButton('Text', () => script_Font(this.#device, input))
+		root.appendChild(buildButton('Time', () => script_Time(this.#device, () => {
+			return root.getAttribute('layout')
+		})))
+		// buildButton('Script', () => script_Script(this.#device))
+		// buildButton('Fast Count', () => script_Count(this.#device))
+		// buildButton('Game', () => script_Game(this.#device))
+
+		buildButton('Channel', () => script_Channel(this.#device))
+		buildButton('Squawk', () => script_ChannelSquawk(this.#device))
+
+		buildButton('Matrix', () => script_Matrix(this.#device))
 
 
 		return root
