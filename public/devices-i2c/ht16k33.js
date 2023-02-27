@@ -6,38 +6,133 @@ import {
 	AdafruitMatrix8x8BiColor,
 	Adafruit4Digit7SegmentBackpack,
 	Adafruit4Digit14SegmentFeatherwing,
-	Font14SegmentBespoke, Font7SegmentDSEG, Font7SegmentASCII,
+	Font14SegmentBespoke, Font7SegmentDSEG, Font7SegmentASCII, Font14SegmentOpenAI,
 	FontUtil, Bespoke
 } from '@johntalton/ht16k33'
 
 import { segmentDisplayScript } from '../util/segment-display-script.js'
 
+const FONT_LIST = {
+	'dseg7': { name: 'DSEG7', font: Font7SegmentDSEG },
+	'ascii': { name: 'ASCII', font: Font7SegmentASCII },
+	'bespoke14': { name: 'Bespoke 14 Segment', font: Font14SegmentBespoke },
+	'openIA14': { name: 'chatGPT 14', font: Font14SegmentOpenAI },
+	'custom': { name: 'Custom' }
+}
+const LAYOUT_LIST = {
+	'4x14featherwing': { name: '4 Digit 14 Segment (Adafruilt Featherwing)', layout: Adafruit4Digit14SegmentFeatherwing },
+	'4x7backpack': { name: '4 Digit 8 Segment (Adafruilt Backpack)', layout: Adafruit4Digit7SegmentBackpack },
+	'8x8x2': { name: 'BiColor 8x8 Matrix' }
+}
+
+
+const font_caseUpper_alignNatural = {
+	...Bespoke,
+
+	// '~': Bespoke['M'],
+	// '!': Bespoke['W'],
+
+	'*': 'HJKLMN',
+	'A': 'BCG2KL',
+	'Y': 'BFG1G2M',
+	'W': 'BCEFLN',
+	'M': 'BCEFHK',
+	//'J': 'BCDL',
+	'S': 'ACDG2H',
+}
+
+const font_caseLower_alignNatural = {
+	'a': 'DEG1N',
+	'b': 'DEFG1N',
+	'c': 'DEG1',
+	'd': 'BCDG2L',
+	'e': 'DEG1L',
+	'f': Bespoke['F'],
+	'g': 'BCDG2K', // Bespoke['G'],
+	'h': 'CG2JM',
+	'i': 'M',
+	'j': Bespoke['J'],
+	'k': 'JKMN',
+	'l': 'JM',
+	'm': 'CEG1G2M',
+	'n': 'CG2M', // 'EG1M'
+	'o': 'CDEG1G2',
+	'p': Bespoke['P'],
+	'q': Bespoke['Q'],
+	'r': 'EG1',
+	's': Bespoke['S'],
+	't': 'DEFG1', // 'G1G2JM',
+	'u': 'CDE',
+	'v': 'EL',
+	'w': 'CDEM',
+	'x': Bespoke['X'],
+	'y': 'HKM',
+	'z': 'DG1L'
+}
+
+const font_caseUL_alignNatural = {
+	...font_caseUpper_alignNatural,
+	...font_caseLower_alignNatural
+}
+
+const font_caseUL_alignLeft = {
+	...font_caseUL_alignNatural,
+
+	'h': 'EFG1M',
+	'i': 'E',
+	'l': 'EF',
+	'n': 'EG1M',
+
+	'y': 'EFG1K'
+}
+
+const font_caseUL_alignCenter = {
+	...font_caseUL_alignNatural,
+
+	't': 'G1G2JM',
+	'r': 'G2M'
+}
+
+const font_caseUL_alignRight = {
+	...font_caseUL_alignCenter,
+
+	'i': 'C',
+	'l': 'BC',
+	't': 'BCDG2',
+
+	'c': 'G2N',
+
+	'y': 'BCG2H'
+}
+
 
 let Q = Promise.resolve()
 
-function script_Time(device, getLayoutCB) {
+function script_Time(device, root) {
 		let colon = false
+		let onOnce = false
 
 		setInterval(() => {
 			colon = !colon
 
 			const d = new Date()
-			const digit4 = Segment.encodeTime24_4Digit(d, colon)
+			const digit4 = Segment.encodeTime24_4Digit(d)
 
-			const layouts = {
-				'4d7s-a': () => Adafruit4Digit7SegmentBackpack.toLayout(Font7SegmentASCII.encode4Digit(digit4)),
-				'4d7s-d': () => Adafruit4Digit7SegmentBackpack.toLayout(Font7SegmentDSEG.encode4Digit(digit4)),
-				'4d14s-b': () => Adafruit4Digit14SegmentFeatherwing.toLayout(Font14SegmentBespoke.encode4Digit(digit4)),
-				'M8x8x2': () => {}
-			}
+			const currentLayout = root.getAttribute('layout')
+			const currentFont = root.getAttribute('font')
 
-			const currentLayout = getLayoutCB()
-			const layout = layouts[currentLayout]()
+			const font = FONT_LIST[currentFont]?.font
+			const layout = LAYOUT_LIST[currentLayout]?.layout
 
 			if(layout === undefined) { return }
+			if(font === undefined) { return }
 
-			device.setMemory(layout)
-				.then()
+			device.setMemory(layout.toLayout(font.encode4Digit(digit4, colon)))
+				.then(() => {
+					if(onOnce) { return }
+					onOnce = true
+					return device.setDisplay(true, 'off')
+				})
 				.catch(e => console.warn(e))
 		}, 1000)
 }
@@ -626,6 +721,35 @@ function script_Matrix(device) {
 	}, 1000 * 0.125)
 }
 
+// function script_AlphaPairs(device) {
+// 	const pairOff = (accumulator, next, index, arr) => {
+// 		if(index % 2 !== 0) { return accumulator }
+
+// 		return [
+// 			...accumulator,
+// 			arr.slice(index, index + 2)
+// 		]
+// 	}
+
+// 	const DUAL_UPPER_LOWER_ALPHABET = [ ...'ABCDEFGHIJKLMNOPQRSTUVWXYZ' ].reduce(pairOff, []).map(([ one, two ]) => {
+// 		const oneLower = one.toLowerCase()
+// 		const oneUpper = one.toUpperCase()
+// 		const twoLower = two.toLowerCase()
+// 		const twoUpper = two.toUpperCase()
+
+// 		return oneUpper + oneLower + twoUpper + twoLower
+// 	})
+
+// 	const delayS = (s) => new Promise(resolve => setTimeout(resolve, 1000 * s))
+
+
+// 	for (const pair of DUAL_UPPER_LOWER_ALPHABET) {
+// 		await device.setMemory(Adafruit4Digit14SegmentFeatherwing.toLayout(FontUtil.digits4FromSegmentMap(font_caseUL_alignNatural, pair)))
+// 		await delayS(4)
+// 	}
+
+// }
+
 
 export class HT16K33Builder {
 	#abus
@@ -641,126 +765,23 @@ export class HT16K33Builder {
 		this.#abus = new I2CAddressedBus(bus, address)
 	}
 
-
 	get title() { return 'HT16K33' }
-
 
 	async open() {
 		this.#device = HT16K33.from(this.#abus)
 
 		await this.#device.enableOscillator()
-		await this.#device.setDisplay(false, 'off')
-		await this.#device.setDisplay(true, 'off')
 		await this.#device.setDimming(0)
+		await this.#device.setDisplay(false, 'off')
 
-		const font_caseUpper_alignNatural = {
-			...Bespoke,
+		// await this.#device.setMemory(clearMemory)
 
-			// '~': Bespoke['M'],
-			// '!': Bespoke['W'],
-
-			'*': 'HJKLMN',
-			'A': 'BCG2KL',
-			'Y': 'BFG1G2M',
-			'W': 'BCEFLN',
-			'M': 'BCEFHK',
-			//'J': 'BCDL',
-			'S': 'ACDG2H',
-		}
-
-		const font_caseLower_alignNatural = {
-			'a': 'DEG1N',
-			'b': 'DEFG1N',
-			'c': 'DEG1',
-			'd': 'BCDG2L',
-			'e': 'DEG1L',
-			'f': Bespoke['F'],
-			'g': 'BCDG2K', // Bespoke['G'],
-			'h': 'CG2JM',
-			'i': 'M',
-			'j': Bespoke['J'],
-			'k': 'JKMN',
-			'l': 'JM',
-			'm': 'CEG1G2M',
-			'n': 'CG2M', // 'EG1M'
-			'o': 'CDEG1G2',
-			'p': Bespoke['P'],
-			'q': Bespoke['Q'],
-			'r': 'EG1',
-			's': Bespoke['S'],
-			't': 'DEFG1', // 'G1G2JM',
-			'u': 'CDE',
-			'v': 'EL',
-			'w': 'CDEM',
-			'x': Bespoke['X'],
-			'y': 'HKM',
-			'z': 'DG1L'
-		}
-
-		const font_caseUL_alignNatural = {
-			...font_caseUpper_alignNatural,
-			...font_caseLower_alignNatural
-		}
-
-		const font_caseUL_alignLeft = {
-			...font_caseUL_alignNatural,
-
-			'h': 'EFG1M',
-			'i': 'E',
-			'l': 'EF',
-			'n': 'EG1M',
-
-			'y': 'EFG1K'
-		}
-
-		const font_caseUL_alignCenter = {
-			...font_caseUL_alignNatural,
-
-			't': 'G1G2JM',
-			'r': 'G2M'
-		}
-
-		const font_caseUL_alignRight = {
-			...font_caseUL_alignCenter,
-
-			'i': 'C',
-			'l': 'BC',
-			't': 'BCDG2',
-
-			'c': 'G2N',
-
-			'y': 'BCG2H'
-		}
-
-		const pairOff = (accumulator, next, index, arr) => {
-			if(index % 2 !== 0) { return accumulator }
-
-			return [
-				...accumulator,
-				arr.slice(index, index + 2)
-			]
-		}
-
-		const DUAL_UPPER_LOWER_ALPHABET = [ ...'ABCDEFGHIJKLMNOPQRSTUVWXYZ' ].reduce(pairOff, []).map(([ one, two ]) => {
-			const oneLower = one.toLowerCase()
-			const oneUpper = one.toUpperCase()
-			const twoLower = two.toLowerCase()
-			const twoUpper = two.toUpperCase()
-
-			return oneUpper + oneLower + twoUpper + twoLower
-		})
-
-		const delayS = (s) => new Promise(resolve => setTimeout(resolve, 1000 * s))
-
-
-		for (const pair of DUAL_UPPER_LOWER_ALPHABET) {
-			await this.#device.setMemory(Adafruit4Digit14SegmentFeatherwing.toLayout(FontUtil.digits4FromSegmentMap(font_caseUL_alignNatural, pair)))
-			await delayS(4)
-		}
+		// const memory = await this.#device.getMemory()
+		// console.log(memory)
 
 		// await this.#device.setMemory(Adafruit4Digit7SegmentBackpack.toLayout(Font7SegmentDSEG.encode4Digit('WwMm')))
 		// await this.#device.setMemory(Adafruit4Digit14SegmentFeatherwing.toLayout(Font14SegmentBespoke.encode4Digit('AYWJ')))
-		// await this.#device.setMemory(Adafruit4Digit14SegmentFeatherwing.toLayout(FontUtil.digits4FromSegmentMap(font_caseUL_alignRight, 'hiln')))
+		// await this.#device.setMemory(Adafruit4Digit14SegmentFeatherwing.toLayout(FontUtil.digits4FromSegmentMap(font_caseUL_alignRight, 'PpSs')))
 	}
 
 	async close() { }
@@ -768,60 +789,112 @@ export class HT16K33Builder {
 	signature() { }
 
 	async buildCustomView(selectionElem) {
-		const layouts = {
-			'4d7s-a': '4 digit 7 segment - ascii',
-			'4d7s-d': '4 digit 7 segment - dseg',
-			'4d14s-b': '4 digit 14 segment - bespoke',
-			'M8x8x2': 'matrix 8x8 BiColor'
-		}
+
 
 		const root = document.createElement('ht16k33-config')
+		root.setAttribute('layout', '')
+		root.setAttribute('font', '')
 
-		const dropDown = document.createElement('select')
-
-		const option = document.createElement('option')
-		option.innerText = '<unselected>'
-		option.disabled = true
-		option.selected = true
-		dropDown.appendChild(option)
+		const layoutFontControlElem = document.createElement('header')
+		const tabButtonsElem = document.createElement('div')
+		tabButtonsElem.classList.add('tabs')
+		const tabContentElem = document.createElement('div')
+		tabContentElem.classList.add('tabsContent')
 
 
-		Object.entries(layouts).forEach(([key, layoutName]) => {
+		const layoutSelectorElem = document.createElement('select')
+		const fontSelectorElem = document.createElement('select')
+
+		layoutSelectorElem.toggleAttribute('data-layout', true)
+		fontSelectorElem.toggleAttribute('data-font', true)
+
+		layoutFontControlElem.appendChild(layoutSelectorElem)
+		layoutFontControlElem.appendChild(fontSelectorElem)
+
+		root.appendChild(layoutFontControlElem)
+
+		root.appendChild(tabButtonsElem)
+		root.appendChild(tabContentElem)
+
+		//
+		const unselectedFontOptionElem = document.createElement('option')
+		unselectedFontOptionElem.innerText = '<unselected>'
+		unselectedFontOptionElem.disabled = true
+		unselectedFontOptionElem.selected = true
+		fontSelectorElem.appendChild(unselectedFontOptionElem)
+
+		//
+		const unselectedLayoutOptionElem = document.createElement('option')
+		unselectedLayoutOptionElem.innerText = '<unselected>'
+		unselectedLayoutOptionElem.disabled = true
+		unselectedLayoutOptionElem.selected = true
+		layoutSelectorElem.appendChild(unselectedLayoutOptionElem)
+
+		//
+		Object.entries(FONT_LIST).forEach(([key, fontItem]) => {
+			const { name } = fontItem
 			const option = document.createElement('option')
-			option.innerText = layoutName
+			option.innerText = name
 			option.value = key
 
-			dropDown.appendChild(option)
+			fontSelectorElem.appendChild(option)
 		})
-		dropDown.addEventListener('change', e => {
+
+		//
+		Object.entries(LAYOUT_LIST).forEach(([key, layoutItem]) => {
+			const { name } = layoutItem
+
+			const option = document.createElement('option')
+			option.innerText = name
+			option.value = key
+
+			layoutSelectorElem.appendChild(option)
+		})
+
+		//
+		fontSelectorElem.addEventListener('change', e => {
+			const target = e.target
+			const [ selected, ] = target.selectedOptions
+
+			root.setAttribute('font', selected.value)
+		})
+
+		//
+		layoutSelectorElem.addEventListener('change', e => {
 			const target = e.target
 			const [ selected, ] = target.selectedOptions
 
 			root.setAttribute('layout', selected.value)
-
 		})
-		root.appendChild(dropDown)
 
-		const input = document.createElement('input')
-		input.value = 'the quick brown fox jumped over the lazy sleeping dog'
 
-		root.appendChild(input)
 
-		const sectionMap = { ...layouts }
 
-		Object.entries(layouts).forEach(([key, layoutName]) => {
-			const section = document.createElement('section')
-			section.setAttribute('data-layout', key)
 
-			const title = document.createElement('span')
-			title.innerText = layoutName
+		// const input = document.createElement('input')
+		// input.value = 'the quick brown fox jumped over the lazy sleeping dog'
 
-			section.appendChild(title)
+		// root.appendChild(input)
 
-			root.appendChild(section)
 
-			sectionMap[key] = section
-		})
+
+
+
+		// const sectionMap = { ...layouts }
+
+		// Object.entries(layouts).forEach(([key, layoutName]) => {
+		// 	const section = document.createElement('section')
+		// 	section.setAttribute('data-layout', key)
+
+		// 	const title = document.createElement('span')
+		// 	title.innerText = layoutName
+
+		// 	section.appendChild(title)
+
+		// 	root.appendChild(section)
+
+		// 	sectionMap[key] = section
+		// })
 
 
 
@@ -838,17 +911,15 @@ export class HT16K33Builder {
 		}
 
 		// buildButton('Text', () => script_Font(this.#device, input))
-		root.appendChild(buildButton('Time', () => script_Time(this.#device, () => {
-			return root.getAttribute('layout')
-		})))
+		tabButtonsElem.appendChild(buildButton('Time', () => script_Time(this.#device, root)))
 		// buildButton('Script', () => script_Script(this.#device))
 		// buildButton('Fast Count', () => script_Count(this.#device))
 		// buildButton('Game', () => script_Game(this.#device))
 
-		buildButton('Channel', () => script_Channel(this.#device))
-		buildButton('Squawk', () => script_ChannelSquawk(this.#device))
+		tabButtonsElem.appendChild(buildButton('Channel', () => script_Channel(this.#device)))
+		tabButtonsElem.appendChild(buildButton('Squawk', () => script_ChannelSquawk(this.#device)))
 
-		buildButton('Matrix', () => script_Matrix(this.#device))
+		tabButtonsElem.appendChild(buildButton('Matrix', () => script_Matrix(this.#device)))
 
 
 		return root

@@ -1,34 +1,89 @@
 ht16k33-config {
-  display: flex;
-  flex-direction: column;
-  background-color: lime;
+	display: flex;
+	flex-direction: column;
 
-  margin-inline: 1em;
-  margin-block: 1em;
+	margin: 0;
+	margin-inline-start: 2em;
+
+	height: 100%;
 }
 
-ht16k33-config select {
-  margin: 1em;
+ht16k33-config header {
+	display: flex;
+	gap: 1em;
+	margin-block-end: 2em;
 }
 
+ht16k33-config header select {
+	appearance: none;
 
-ht16k33-config section {
-  display: none;
+	font-size: 1.125em;
+	padding-inline: 2em;
+
+	padding-block: 0.5em;
+	border-radius: 1em;
+
+	border-style: dashed;
+	background-color: var(--color-accent--lightest, red);
 }
 
-
-ht16k33-config[layout="4d7s-a"] section[data-layout="4d7s-a"] {
-  display: flex;
+ht16k33-config header select:where(:active, :hover) {
+	box-shadow: 0 0 5px rgba(0,0,0, 0.25);
 }
 
-ht16k33-config[layout="4d7s-d"] section[data-layout="4d7s-d"] {
-  display: flex;
+ht16k33-config header select:focus {
+	outline-color: var(--color-accent, red);
+	outline-width: 5px;
 }
 
-ht16k33-config[layout="4d14s-b"] section[data-layout="4d14s-b"] {
-  display: flex;
+ht16k33-config[layout]:not([layout=""]) header select[data-layout] {
+	border-style: solid;
+	border-color: transparent;
 }
 
-ht16k33-config[layout="M8x8x2"] section[data-layout="M8x8x2"] {
-  display: flex;
+ht16k33-config[font]:not([font=""]) header select[data-font] {
+	border-style: solid;
+	border-color: transparent;
+}
+
+.tabs {
+	display: flex;
+	gap: 0;
+	font-size: 1.25em;
+}
+
+.tabs button {
+	font-size: inherit;
+	border: 0;
+	background-color: var(--color-accent--lightest, red);
+	border-block-end: 0;
+	border-radius: 1em 1em 0 0;
+	padding-block: 0.75em;
+	padding-inline: 5ch;
+}
+
+.tabs button:hover {
+	text-decoration: underline;
+	box-shadow: 0 -2px 5px rgba(0,0,0, 0.125);
+}
+
+.tabs button:first-child {
+	border-inline-start: 0;
+}
+
+.tabs button:last-child {
+	border-inline-end: 0;
+}
+
+.tabsContent {
+	margin-block-start: 0;
+	flex-grow: 1;
+	background-color: var(--color-accent--lightest, red);
+	display: flex;
+	border-radius: 0 2em 2em 2em;
+	/* border-inline-start: 1px solid purple; */
+	padding: 2em;
+	border: 0;
+	border-block-start: 0;
+
 }
