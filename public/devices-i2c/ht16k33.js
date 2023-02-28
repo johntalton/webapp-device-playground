@@ -774,7 +774,7 @@ export class HT16K33Builder {
 		await this.#device.setDimming(0)
 		await this.#device.setDisplay(false, 'off')
 
-		// await this.#device.setMemory(clearMemory)
+		await this.#device.setMemory(Segment.clearMemory())
 
 		// const memory = await this.#device.getMemory()
 		// console.log(memory)
