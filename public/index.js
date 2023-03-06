@@ -136,21 +136,22 @@ function buildDeviceListItem(deviceListElem, builder) {
 
 	//
 	liElem.addEventListener('click', e => {
+		console.log('click on button')
 		deviceListElem.querySelectorAll('li').forEach(li => {
 			li.removeAttribute('data-active')
-			buttonElem.disabled = false
+			const bElem = li.querySelector('button')
+			bElem.disabled = false
 		})
 
-		liElem.setAttribute('data-active', true)
-		buttonElem.disabled = true
-
+		liElem.toggleAttribute('data-active', true)
+		 buttonElem.disabled = true
 
 
 		mainElem.querySelectorAll('section').forEach(s => s.removeAttribute('data-active'))
 
 		sectionElem.toggleAttribute('data-active', true)
 
-	}, { once: true })
+	}, { once: false })
 
 	// demolisher
 	return (device) => {
@@ -216,6 +217,7 @@ async function onContentLoaded() {
 
 	const deviceListElem = document.getElementById('deviceList')
 
+	requestUSBButton.disabled = true
 	requestUSBButton.addEventListener('click', event => {
 		const all = event?.altKey
 		const filters = all ? [] : SUPPORTED_USB_FILTER
@@ -229,9 +231,6 @@ async function onContentLoaded() {
 
 
 	}, { once: false })
-
-	//
-	requestUSBButton.disabled = false
 
 
 
@@ -296,7 +295,7 @@ async function onContentLoaded() {
 		},
 		removeUSBDevice: async device => {},
 		addHIDDevice: async hid => {
-			console.log('UI:addHID', hid.serialNumber, hid.productName)
+			console.log('UI:addHID', hid.serialNumber, hid.productName, hid)
 
 			if(hid.vendorId === MCP2221_USB_FILTER.vendorId) {
 				if(hid.productId == MCP2221_USB_FILTER.productId) {
@@ -323,7 +322,7 @@ async function onContentLoaded() {
 	await Promise.all([
 		hydrateCustomElements(),
 		hydrateSerial(requestSerialButton, ui),
-		//hydrateUSB(requestUSBButton, ui),
+		hydrateUSB(requestUSBButton, ui),
 		hydrateHID(requestHIDButton, ui),
 
 		hydrateEffects()

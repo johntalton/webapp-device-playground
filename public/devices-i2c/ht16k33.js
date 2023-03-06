@@ -713,7 +713,8 @@ function script_Matrix(device) {
 			)
 		]
 
-		const layout = AdafruitMatrixBiColor8x8.toLayout(lines)
+
+		const layout = AdafruitMatrix8x8BiColor.toLayout(lines)
 
 		device.setMemory(layout)
 			.then()
@@ -782,6 +783,8 @@ export class HT16K33Builder {
 		// await this.#device.setMemory(Adafruit4Digit7SegmentBackpack.toLayout(Font7SegmentDSEG.encode4Digit('WwMm')))
 		// await this.#device.setMemory(Adafruit4Digit14SegmentFeatherwing.toLayout(Font14SegmentBespoke.encode4Digit('AYWJ')))
 		// await this.#device.setMemory(Adafruit4Digit14SegmentFeatherwing.toLayout(FontUtil.digits4FromSegmentMap(font_caseUL_alignRight, 'PpSs')))
+
+		await this.#device.setDisplay(true, 'off')
 	}
 
 	async close() { }

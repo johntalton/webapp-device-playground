@@ -1,4 +1,4 @@
-import { MCP2221A } from '@johntalton/mcp2221'
+import { MCP2221A, VoltageOff, Divider00375 } from '@johntalton/mcp2221'
 import { I2CBusMCP2221 } from '@johntalton/i2c-bus-mcp2221'
 import { dumpHIDDevice } from '../util/hid-info.js'
 import { range } from '../util/range.js'
@@ -6,14 +6,112 @@ import { deviceGuessByAddress } from '../devices-i2c/guesses.js'
 
 const delayMs = ms => new Promise(resolve => setTimeout(resolve, ms))
 
-async function onceInputReport(hid, timeoutMs) {
-	return new Promise((resolve, reject) => {
-		const tout = setTimeout(() => reject(new Error('HID input report timedout')), timeoutMs)
-		hid.addEventListener('inputreport', e => {
-			clearTimeout(tout)
-			resolve(e)
-		}, { once: true })
-	})
+class WaitableQueue {
+	#latchResolve = () => {}
+	#dataLatch
+	#dataQ = []
+
+	constructor() {
+		this.#dataLatch = new Promise(this.#pendingLatchFor())
+	}
+
+	#pendingLatchFor() {
+		return (resolve, _reject) => {
+			this.#latchResolve = data => {
+				resolve(data)
+				this.#dataLatch = new Promise(this.#pendingLatchFor())
+			}
+		}
+	}
+
+	push(data) {
+		this.#dataQ.push(data)
+		this.#latchResolve(data)
+	}
+
+	pull() {
+		if(this.#dataQ.length > 0) {
+			return this.#dataQ.splice(0)[0] // remove from array (modifies array) and index into single result - yuk
+		}
+
+		return undefined
+	}
+
+	get waitForPull() { return this.#dataLatch }
+}
+
+class BindingFactory {
+	static from(hidDevice) {
+		const REPORT_ID = 0
+		const waitableQueue = new WaitableQueue()
+
+		hidDevice.addEventListener('inputreport', e => {
+			const { returnValue, reportId, data, device } = e
+
+			waitableQueue.push({
+				reportId, returnValue,
+				data
+			})
+		})
+
+		return {
+			read: async length => {
+				const READ_TIMEOUT_MS = 1000
+
+				const optimisticItem = waitableQueue.pull()
+				if(optimisticItem !== undefined) {
+					if(optimisticItem.data.byteOffset !== 0) { console.warn('returning buffer from view with non-zero offset') }
+					return optimisticItem.data.buffer
+				}
+
+				let timer = undefined
+				const timeoutRejectMs = (ms) => new Promise((resolve, reject) => { timer = setTimeout(reject, ms, new Error('timeout')) })
+
+				await Promise.race([timeoutRejectMs(READ_TIMEOUT_MS), waitableQueue.waitForPull])
+
+				clearTimeout(timer)
+
+				const item = waitableQueue.pull()
+				if(item === undefined) { throw new Error('no data after wait?') }
+				if(item.data.byteOffset !== 0) { console.warn('returning buffer from view with non-zero offset') }
+				return item.data.buffer
+			},
+			write: async bufferSource => {
+				// console.log('xfer', bufferSource)
+				return hidDevice.sendReport(REPORT_ID, bufferSource)
+			}
+		}
+	}
+
+	// async function onceInputReport(hid, timeoutMs) {
+	// 	return new Promise((resolve, reject) => {
+	// 		const tout = setTimeout(() => reject(new Error('HID input report timedout')), timeoutMs)
+	// 		hid.addEventListener('inputreport', e => {
+	// 			clearTimeout(tout)
+	// 			resolve(e)
+	// 		}, { once: true })
+	// 	})
+	// }
+	// const binding = {
+	// 	read: async length => {
+	// 		// console.log('usbRead', length)
+
+	// 		// this is a risky approuch as the binding to the
+	// 		// single trigger event may be added after the
+	// 		// actaully importreport event has been triggered
+	// 		// this should be more coupled with the write command
+	// 		// and, like other usb wappers, expos a transfer function
+	// 		const { returnValue, reportId, data, device } = await onceInputReport(this.#hidDevice, 5000)
+	// 		if(reportId !== 0) { throw new Error('always reprot zero') }
+	// 		if(!returnValue) { throw new Error('no return value') }
+	// 		return data.buffer
+	// 	},
+	// 	write: async bufferSource => {
+	// 		// console.log('usbWrite', bufferSource)
+	// 		await this.#hidDevice.sendReport(0, bufferSource)
+	// 		return bufferSource.bytesLength
+	// 	}
+	// }
 }
 
 export class MCP2221UIBuilder {
@@ -33,47 +131,111 @@ export class MCP2221UIBuilder {
 	get title() { return this.#hidDevice.productName }
 
 	async open() {
+
+
 		await this.#hidDevice.open()
 
-		dumpHIDDevice(this.#hidDevice)
+		//dumpHIDDevice(this.#hidDevice)
 
-		const binding = {
-			read: async length => {
-				// console.log('usbRead', length)
-
-				// this is a risky approuch as the binding to the
-				// single trigger event may be added after the
-				// actaully importreport event has been triggered
-				// this should be more coupled with the write command
-				// and, like other usb wappers, expos a transfer function
-				const { returnValue, reportId, data, device } = await onceInputReport(this.#hidDevice, 5000)
-				if(reportId !== 0) { throw new Error('always reprot zero') }
-				if(!returnValue) { throw new Error('no return value') }
-				return data.buffer
-			},
-			write: async bufferSource => {
-				// console.log('usbWrite', bufferSource)
-				await this.#hidDevice.sendReport(0, bufferSource)
-				return bufferSource.bytesLength
-			}
-		}
-
+		const binding = BindingFactory.from(this.#hidDevice)
 		this.#device = await MCP2221A.from(binding)
+
 		//await this.#device.common.reset()
 
-		// const status = await this.#device.common.status({  })
-		// console.log({ status })
+		const status = await this.#device.common.status({ })
+		console.log({ status })
+		// await delayMs(100)
 
-		// const speed = await this.#device.common.status({ i2cClock: 50 })
+		if(status.i2cState !== 0) {
+			console.log('cancle on open')
+			const result = await this.#device.common.status({ cancelI2c: true })
+			console.log({ result })
+			await delayMs(100)
+		}
+
+		// const speed = await this.#device.common.status({ opaque: '', i2cClock: 100 })
+		// console.log({ speed })
+		// await delayMs(100)
+
+
+
+
+		// const speed = await this.#device.common.status({ i2cClock: 100 })
 		// console.log({ speed })
 
 		//
-		await this.#device.sram.set({
-			inturrupt: { clear: true }
-		})
+		// await this.#device.sram.set({
+		// 	inturrupt: { clear: true }
+		// })
+
+		// await this.#device.flash.writeGPSettings({
+		// 	gpio0: {
+		// 		outputValue: 0,
+		// 		direction: 'in',
+		// 		designation: 'Gpio'
+		// 	},
+		// 	gpio1: {
+		// 		outputValue: 0,
+		// 		direction: 'in',
+		// 		designation: 'Gpio'
+		// 	},
+		// 	gpio2: {
+		// 		outputValue: 0,
+		// 		direction: 'in',
+		// 		designation: 'Gpio'
+		// 	},
+		// 	gpio3: {
+		// 		outputValue: 0,
+		// 		direction: 'in',
+		// 		designation: 'Gpio'
+		// 	}
+		// })
+
+		// await this.#device.gpio.set({
+		// 	gpio0: { direction: 'in' },
+		// 	gpio1: { direction: 'in' },
+		// 	gpio2: { direction: 'in' },
+		// 	gpio3: { direction: 'in' }
+		// })
 
 		// const sramGet = await this.#device.sram.get()
 		// console.log({ sramGet })
+
+
+		// await this.#device.flash.writeChipSettings({
+		// 	chip: {
+		// 		enabledCDCSerialEnumeration: true,
+		// 		security: 'unsecured'
+		// 	},
+		// 	gp: {
+		// 		clock: { dutyCycle: '25%', divider: Divider00375 },
+		// 		dac: { referenceVoltage: VoltageOff, referenceOptions: 'Vdd' },
+		// 		adc: { referenceVoltage: VoltageOff, referenceOptions: 'Vdd' },
+		// 		interrupt: { edge: 'Off' }
+		// 	},
+		// 	usb: {
+		// 		vendorId: 1240,
+		// 		productId: 221,
+		// 		powerAttribute: 0,
+		// 		mARequested: 0
+		// 	},
+		// 	password: ''
+		// })
+
+		// const cs = await this.#device.flash.readChipSettings()
+		// const gps = await this.#device.flash.readGPSettings()
+		// const usbM = await this.#device.flash.readUSBManufacturer()
+		// const usbP = await this.#device.flash.readUSBProduct()
+		// const usbSN = await this.#device.flash.readUSBSerialNumber()
+		// const fsn = await this.#device.flash.readFactorySerialNumber()
+
+		// const sram = await this.#device.sram.get()
+
+		// console.log({
+		// 	cs,
+		// 	gps,// usbM, usbP, usbSN, fsn,
+		// 	sram
+		// })
 	}
 
 	async close() {
@@ -87,21 +249,35 @@ export class MCP2221UIBuilder {
 	async buildCustomView() {
 		const root = document.createElement('mcp2221-config')
 
-		const resetI2CButton = document.createElement('button')
-		resetI2CButton.textContent = 'reset 📡'
-		resetI2CButton.setAttribute('slot', 'i2c-controls')
-		root.appendChild(resetI2CButton)
+		const tabs = document.createElement('div')
+		tabs.setAttribute('slot', 'i2c-tabs')
+		tabs.classList.add('tabs')
 
+		const resetI2CButton = document.createElement('button')
+		resetI2CButton.textContent = 'reset'
+		resetI2CButton.setAttribute('slot', 'i2c-controls')
+		tabs.appendChild(resetI2CButton)
+
+		const statusI2CButton = document.createElement('button')
+		statusI2CButton.textContent = 'status'
+		statusI2CButton.setAttribute('slot', 'i2c-controls')
+		tabs.appendChild(statusI2CButton)
+
+		const cancelI2CButton = document.createElement('button')
+		cancelI2CButton.textContent = 'cancel'
+		cancelI2CButton.setAttribute('slot', 'i2c-controls')
+		tabs.appendChild(cancelI2CButton)
+
+		const scanButton = document.createElement('button')
+		scanButton.textContent = 'scan'
+		scanButton.setAttribute('slot', 'i2c-controls')
+		tabs.appendChild(scanButton)
+
+		root.appendChild(tabs)
 
 		const addressElem = document.createElement('addr-display')
 		addressElem.setAttribute('slot', 'scan-display')
 		root.appendChild(addressElem)
-
-		// <button>scan </button>
-		const scanButton = document.createElement('button')
-		scanButton.textContent = 'scan 📡'
-		scanButton.setAttribute('slot', 'i2c-controls')
-		root.appendChild(scanButton)
 
 		scanButton.addEventListener('click', e => {
 			scanButton.disabled = true
@@ -112,14 +288,12 @@ export class MCP2221UIBuilder {
 				.then(async () => {
 
 
-					// const speed = await this.#device.common.status({ i2cClock: 50 })
-					// console.log({ speed })
-
-
 					const futureScans = [ ...range(0x08, 0x77) ].map(addr => {
 						return async () => {
 							const status = await this.#device.common.status({ cancelI2c: true })
+							// await delayMs(1)
 							const result = await this.#device.i2c.writeData({ address: addr, buffer: Uint8Array.from([ 0x00 ]) })
+							// await delayMs(1)
 							const statusAfter = await this.#device.common.status({ cancelI2c: false })
 							return { addr, acked: statusAfter.i2cState === 0 }
 						}
@@ -193,6 +367,7 @@ export class MCP2221UIBuilder {
 						root.appendChild(listElem)
 					})
 
+					scanButton.disabled = false
 
 					// const result = await this.#device.sram.set({
 					// 	// clock: {
@@ -319,22 +494,27 @@ export class MCP2221UIBuilder {
 			// })
 
 
-		}, { once: true })
+		}, { once: false })
 
 		resetI2CButton.addEventListener('click', e => {
 			Promise.resolve()
 				.then(async () => {
 
+					await this.#device.common.reset()
+					// await this.#hidDevice.close()
+					// await this.#hidDevice.open()
 
-					const can = await this.#device.common.status({ cancelI2c: true })
-					console.log({  can  })
+					// const can = await this.#device.common.status({ cancelI2c: true })
+					// console.log({  can  })
 					// await delayMs(100)
 
 					// const speed = await this.#device.common.status({ i2cClock: 100 })
 					// console.log({ speed })
 					// await delayMs(100)
 
-					//await this.#device.common.status({ cancelI2c: true })
+					// if(speed.i2cState !== 0) {
+					// 	await this.#device.common.status({ cancelI2c: true })
+					// }
 
 					// const wresult = await this.#device.i2c.writeData({ address: 0x77, buffer: Uint8Array.from([ 0x00 ]) })
 					// console.log(wresult)
@@ -387,6 +567,39 @@ export class MCP2221UIBuilder {
 
 				})
 		}, { once: false })
+
+		statusI2CButton.addEventListener('click', e => {
+			statusI2CButton.disabled = true
+
+			Promise.resolve()
+				.then(async () => {
+
+					const status = await this.#device.common.status({ opaque: 'status update' })
+					console.log(status)
+
+					const cs = await this.#device.flash.readChipSettings()
+					const gp = await this.#device.flash.readGPSettings()
+					const um = await this.#device.flash.readUSBManufacturer()
+					const up = await this.#device.flash.readUSBProduct()
+					const us = await this.#device.flash.readUSBSerialNumber()
+					const fsn = await this.#device.flash.readFactorySerialNumber()
+
+					statusI2CButton.disabled = false
+				})
+		})
+
+		cancelI2CButton.addEventListener('click', e => {
+			cancelI2CButton.disabled = true
+
+			Promise.resolve()
+				.then(async () => {
+
+					const status = await this.#device.common.status({ opaque: 'user cancel', cancelI2c: true })
+					console.log(status)
+
+					cancelI2CButton.disabled = false
+				})
+		})
 
 		return root
 	}

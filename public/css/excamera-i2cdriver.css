@@ -10,7 +10,7 @@ excamera-i2cdriver::part(vdexvice-guess-list) {
 excamera-i2cdriver::part(scan-display) {
   display: flex;
   align-items: flex-start;
-  flex-wrap: nowrap;
+  flex-wrap: wrap;
 }
 
 
