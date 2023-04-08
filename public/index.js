@@ -293,6 +293,9 @@ async function onContentLoaded() {
 			//
 			console.log('no driver for serial port', info)
 		},
+		addUSBDevice: async device => {
+			console.log('UI:addUSB', device)
+		},
 		removeUSBDevice: async device => {},
 		addHIDDevice: async hid => {
 			console.log('UI:addHID', hid.serialNumber, hid.productName, hid)

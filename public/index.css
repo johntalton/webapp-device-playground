@@ -3,6 +3,7 @@
 @import url('./css/ht16k33.css');
 @import url('./css/mcp2221.css');
 @import url('./css/tabs.css');
+@import url('./css/device-list.css');
 
 * {
 	box-sizing: border-box;
@@ -28,6 +29,14 @@ body {
 	--color-accent--h: 234;
 	--color-accent--s: 15%;
 	--color-accent--l: 62%;
+
+	--color-accent--h: 299;
+	--color-accent--s: 0%;
+	--color-accent--l: 46%;
+
+	--color-accent--h: 225;
+	--color-accent--s: 50%;
+	--color-accent--l: 50%;
 
 
 	--light-percentage: 20%;
@@ -87,6 +96,7 @@ body {
 		var(--color-accent--h),
 		var(--color-accent--s),
 		var(--color-accent--l));
+
 	--color-accent-text: black;
 
 	--color-hover-accent: hsl(
@@ -122,7 +132,7 @@ body {
 
 	--interactive-form-background: var(--color-accent-softer);
 	--selected-device-item-background: var(--color-accent-softer);
-	--device-item-defualt-background: var(--color-accent-soft);
+	--device-item-default-background: var(--color-accent-soft);
 }
 
 html {
@@ -243,61 +253,6 @@ aside h2 {
 	padding-inline-start: 2ch;
 
 	color: var(--color-accent--lighter, red);
-}
-
-aside ul {
-	display: flex;
-	flex-direction: column;
-	flex-grow: 1;
-
-	list-style: none;
-	margin-block-start: 1em;
-	margin-inline-start: 0.5em;
-}
-
-aside ul li {
-	background-color: var(--selected-device-item-background, green);
-	border-radius: 2em 0 0 2em;
-}
-
-aside > ul > li > button {
-	display: block;
-	cursor: pointer;
-	border: none;
-	width: 100%;
-
-	height: 4em;
-	padding: 0.25em;
-
-	color: var(--color-accent--lighter);
-	background-color: var(--device-item-defualt-background, red);
-
-}
-
-aside > ul > li > button:hover {
-	background-color: var(--color-hover-accent, red);
-	border-radius: 2em 0 0 2em;
-}
-
-aside > ul > li[data-active] {
-	border-radius: 2em 0 0 2em;
-	box-shadow: 0 0 8px rgba(0,0,0, 0.5);
-}
-
-aside > ul > li[data-active] button {
-	cursor: initial;
-	border-radius: 2em 0 0 2em;
-	color: black;
-	background-color: var(--selected-device-item-background, red);
-}
-
-
-aside > ul > li[data-active-previous-sibling] > button {
-	border-radius: 0 0 2em;
-}
-
-aside > ul > li[data-active] + li > button {
-	border-radius: 0 2em 0 0;
 }
 
 main {

@@ -722,6 +722,138 @@ function script_Matrix(device) {
 	}, 1000 * 0.125)
 }
 
+function colorFromColor(r, g, b, a) {
+	const R = r > 0.5
+	const G = g > 0.5
+	const B = b > 0.5
+
+	console.log('eval color', r, g, b, R, G, B)
+
+	if(R && G) { return 'yellow' }
+	else if(R) { return 'red' }
+	else if(G) { return 'green' }
+
+	return 'black'
+}
+
+function layoutFromImageData(imgData) {
+	const { data, height, width, colorSpace } = imgData
+
+	console.log('layout from image', height, width, colorSpace)
+
+	if(colorSpace !== 'srgb') { throw new Error('unknown color space for layout') }
+
+	const bpp = 4
+
+	const result = new Array()
+
+	for (let i = 0; i < data.length; i += bpp) {
+		const x = Math.trunc((i % (width * bpp)) / bpp)
+		const y = Math.trunc(i / (width * bpp))
+
+		const r = data[i + 0]
+		const g = data[i + 1]
+		const b = data[i + 2]
+		const a = data[i + 3]
+
+		const color = colorFromColor(r, g, b, a)
+
+		if(color !== 'black') {
+			result.push({ x, y, color })
+		}
+	}
+
+	return result
+}
+
+function script_Canvas(device, context) {
+	const data = new Uint8ClampedArray([
+		255, 0, 0, 0,
+		0, 255, 0, 0,
+		0, 0, 255, 0,
+		255, 255, 0, 0,
+		0, 0, 0, 0,
+		0, 0, 0, 0,
+		0, 0, 0, 0,
+		0, 0, 0, 0,
+
+		0, 0, 0, 0,
+		0, 0, 0, 0,
+		0, 0, 0, 0,
+		0, 0, 0, 0,
+		0, 0, 0, 0,
+		0, 0, 0, 0,
+		0, 0, 0, 0,
+		0, 0, 0, 0,
+
+		0, 0, 0, 0,
+		0, 0, 0, 0,
+		0, 0, 0, 0,
+		0, 0, 0, 0,
+		0, 0, 0, 0,
+		0, 0, 0, 0,
+		0, 0, 0, 0,
+		0, 0, 0, 0,
+
+		0, 0, 0, 0,
+		0, 0, 0, 0,
+		0, 0, 0, 0,
+		0, 0, 0, 0,
+		0, 0, 0, 0,
+		0, 0, 0, 0,
+		0, 0, 0, 0,
+		0, 0, 0, 0,
+
+		0, 0, 0, 0,
+		0, 0, 0, 0,
+		0, 0, 0, 0,
+		0, 0, 0, 0,
+		0, 0, 0, 0,
+		0, 0, 0, 0,
+		0, 0, 0, 0,
+		0, 0, 0, 0,
+
+		0, 0, 0, 0,
+		0, 0, 0, 0,
+		0, 0, 0, 0,
+		0, 0, 0, 0,
+		0, 0, 0, 0,
+		0, 0, 0, 0,
+		0, 0, 0, 0,
+		0, 0, 0, 0,
+
+		0, 0, 0, 0,
+		0, 0, 0, 0,
+		0, 0, 0, 0,
+		0, 0, 0, 0,
+		0, 0, 0, 0,
+		0, 0, 0, 0,
+		0, 0, 0, 0,
+		0, 0, 0, 0,
+
+		0, 0, 0, 0,
+		0, 0, 0, 0,
+		0, 0, 0, 0,
+		0, 0, 0, 0,
+		0, 0, 0, 0,
+		0, 0, 0, 0,
+		0, 0, 0, 0,
+		0, 0, 0, 0,
+	])
+	// const image = new ImageData(data, 8, 8, { colorSpace: 'srgb' })
+
+
+	const image = context.getImageData(0, 0, 8, 8)
+
+	const layout = AdafruitMatrix8x8BiColor.toLayout(layoutFromImageData(image))
+	console.log(layout)
+
+	device.setMemory(layout)
+			.then()
+			.catch(e => console.warn(e))
+}
+
+
 // function script_AlphaPairs(device) {
 // 	const pairOff = (accumulator, next, index, arr) => {
 // 		if(index % 2 !== 0) { return accumulator }
@@ -803,6 +935,51 @@ export class HT16K33Builder {
 		tabButtonsElem.classList.add('tabs')
 		const tabContentElem = document.createElement('div')
 		tabContentElem.classList.add('tabsContent')
+
+
+		const swatch = document.createElement('input')
+		swatch.setAttribute('type', 'color')
+		swatch.setAttribute('value', 'red')
+		tabContentElem.appendChild(swatch)
+
+
+		const canvas = document.createElement('canvas')
+		canvas.height = 8
+		canvas.width = 8
+		tabContentElem.appendChild(canvas)
+		const context = canvas.getContext('2d', {})
+		context.imageSmoothingEnabled = false
+
+
+
+		function handleDraw(event) {
+			event.preventDefault()
+			event.stopPropagation()
+
+			const { offsetX, offsetY, buttons, shiftKey, target } = event
+			const { clientWidth, clientHeight } = target
+
+			if(buttons === 0) { return }
+
+			console.log(event)
+
+			const x = Math.trunc(offsetX / clientWidth * 8)
+			const y = Math.trunc(offsetY / clientHeight * 8)
+
+			if(shiftKey) {
+				context.clearRect(x, y, 1, 1)
+				return
+			}
+
+			const selectedColor = swatch.value
+
+			context.fillStyle = selectedColor
+			context.fillRect(x, y, 1, 1)
+		}
+
+		canvas.addEventListener('mousedown', handleDraw)
+		canvas.addEventListener('mousemove', handleDraw)
+
 
 
 		const layoutSelectorElem = document.createElement('select')
@@ -906,7 +1083,7 @@ export class HT16K33Builder {
 			b1.innerText = label
 			b1.addEventListener('click', e => {
 				// b1.toggleAttribute('disabled', true)
-				b1.innerText = 'Stop'
+				// b1.innerText = 'Stop'
 				cb()
 			})
 
@@ -923,6 +1100,7 @@ export class HT16K33Builder {
 		tabButtonsElem.appendChild(buildButton('Squawk', () => script_ChannelSquawk(this.#device)))
 
 		tabButtonsElem.appendChild(buildButton('Matrix', () => script_Matrix(this.#device)))
+		tabButtonsElem.appendChild(buildButton('Canvas', () => script_Canvas(this.#device, context)))
 
 
 		return root

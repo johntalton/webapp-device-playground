@@ -45,3 +45,18 @@ ht16k33-config[font]:not([font=""]) header select[data-font] {
 	border-style: solid;
 	border-color: transparent;
 }
+
+
+
+
+/*  */
+ht16k33-config canvas {
+	display: block;
+	background-color: white;
+	border-radius: 1em;
+	margin-inline: 1em;
+
+	image-rendering: auto;
+  image-rendering: crisp-edges;
+  image-rendering: pixelated;
+}

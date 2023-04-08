@@ -1,0 +1,122 @@
+aside ul {
+  --item-radius: 2em;
+}
+
+
+aside ul {
+	display: flex;
+	flex-direction: column;
+	flex-grow: 1;
+	align-items: stretch;
+
+	list-style: none;
+	margin-block-start: 0;
+	margin-inline-start: 0.5em;
+
+  background-color: var(--selected-device-item-background, red);
+}
+
+/* Rounding Before first */
+aside ul::before {
+	--before-radius: 0;
+
+	display: block;
+	content: "";
+	padding-block-start: 2em;
+	border-radius: 0 0 var(--before-radius) 0;
+	background-color: var(--device-item-default-background, red);
+}
+
+aside ul:has(> li:first-of-type[data-active])::before {
+	--before-radius: var(--item-radius, 0);
+}
+
+
+/* Rounding After last */
+aside ul::after {
+	--after-radius: 0;
+
+	display: block;
+	content: "";
+	height: 100%;
+	border-radius: 0 var(--after-radius) 0 0;
+	background-color: var(--device-item-default-background, red);
+}
+
+aside ul:has(> li:last-of-type[data-active])::after {
+	--after-radius: var(--item-radius, 0);
+}
+
+
+
+
+
+
+/* Type I default */
+aside ul li {
+	/* background-color: var(--selected-device-item-background, red); */
+}
+
+aside > ul > li > button {
+	display: block;
+	cursor: pointer;
+	border: none;
+	width: 100%;
+
+	height: 4em;
+	padding: 0.25em;
+
+	color: var(--color-accent--lighter);
+	background-color: var(--device-item-default-background, red);
+}
+
+aside > ul > li:has(> button:hover) {
+	background-color: var(--device-item-default-background, red);
+}
+
+aside > ul > li > button:hover {
+	background-color: var(--color-hover-accent, red);
+	border-radius: var(--item-radius);
+}
+
+/* Type II before active */
+aside > ul > li:has(+ li[data-active]) {
+  /* border-radius: 0 0 var(--item-radius) 0; */
+  background-color: var(--selected-device-item-background, red);
+}
+
+aside > ul > li:has(+ li[data-active]) > button {
+  /* background-color: orange; */
+  border-radius: 0 0 var(--item-radius) 0;
+}
+
+
+/* Type III active */
+aside > ul > li[data-active] {
+  background-color: var(--device-item-default-background, red);
+}
+
+aside > ul > li[data-active] button {
+	cursor: initial;
+	color: black;
+	background-color: var(--selected-device-item-background, red);
+  border-radius: var(--item-radius) 0 0 var(--item-radius);
+  /* box-shadow: 0 0 8px rgba(0,0,0, 0.5); */
+}
+
+
+aside > ul > li[data-active-previous-sibling] > button {
+	/* border-radius: 0 0 2em; */
+}
+
+
+/* Type IV after active */
+aside > ul > li[data-active] + li {
+  background-color: var(--selected-device-item-background, red);
+}
+
+aside > ul > li[data-active] + li > button {
+	border-radius: 0 var(--item-radius) 0 0;
+
+}
+
