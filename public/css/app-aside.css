@@ -1,0 +1,25 @@
+
+aside {
+  grid-area: aside;
+
+  background-color: var(--base-accent-background-color, red);
+
+  display: flex;
+  flex-direction: column;
+
+  flex-direction: column;
+  flex-wrap: nowrap;
+  justify-content: space-between;
+  align-items: stretch;
+
+  overflow: hidden;
+  overflow-y: scroll;
+}
+
+aside h2 {
+  font-size: 2em;
+  margin-inline: auto;
+  padding-block-start: 1em;
+
+  color: var(--color-accent--lighter, red);
+}

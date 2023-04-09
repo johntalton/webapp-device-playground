@@ -1,0 +1,78 @@
+main {
+  grid-area: main;
+  height: 100%;
+
+  border-radius: 2.5em 2.5em 2.5em 2.5em;
+  padding-inline-start: 3em;
+  padding-block-start: 2em;
+
+  background-color: var(--interactive-form-background, red);
+
+  overflow-y: scroll;
+}
+
+main > section {
+  display: grid;
+
+  grid-template-areas: "controls custom";
+  grid-template-columns: max-content 1fr;
+
+  align-items: start;
+  gap: 1em;
+  height: 100%;
+  width: 100%;
+}
+
+main > section:not([data-active]) {
+  display: none;
+}
+
+main > section[data-connect] {
+
+}
+
+
+main > section[data-connected] > button {
+  align-content: space-between;
+	grid-area: controls;
+
+  font-size: 1.25em;
+
+	padding-inline: 2ch;
+	padding-block: 0.5em;
+	margin-inline-end: 0.75em;
+}
+
+
+
+
+
+main button {
+  display: block;
+  font-size: 1em;
+
+  padding-inline: 1em;
+  padding-block: 0.5em;
+  margin-inline: 0;
+  border-radius: 2.5em;
+
+  color: var(--color-accent--lighter);
+  background-color: var(--color-accent--darker, red);
+
+  border: 0;
+}
+
+main button:not([disabled]):hover {
+  color: var(--color-accent--light);
+  background-color: var(--color-accent, red);
+}
+
+main button:not([disabled]):active {
+  color: var(--color-accent--lighter);
+  background-color: var(--color-accent--darker, red);
+}
+
+main button[disabled] {
+  background-color: transparent;
+  border: 1px dashed var(--color-accent--lighter);
+}

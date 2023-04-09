@@ -1,312 +1,61 @@
-@import url('./css/addr-display.css');
-@import url('./css/excamera-i2cdriver.css');
-@import url('./css/ht16k33.css');
-@import url('./css/mcp2221.css');
-@import url('./css/tabs.css');
-@import url('./css/device-list.css');
-
-* {
-	box-sizing: border-box;
-	padding: 0;
-	margin: 0;
-	font-family: inherit;
-}
-
-html {
-	font-size: 100%;
-}
-
-body {
-	font-family: 'Tahoma';
-	/* font-family: 'Brush Script MT',cursive; */
-}
-
-:root {
-	--color-accent--h: 300;
-	--color-accent--s: 30%;
-	--color-accent--l: 60%;
-
-	--color-accent--h: 234;
-	--color-accent--s: 15%;
-	--color-accent--l: 62%;
-
-	--color-accent--h: 299;
-	--color-accent--s: 0%;
-	--color-accent--l: 46%;
-
-	--color-accent--h: 225;
-	--color-accent--s: 50%;
-	--color-accent--l: 50%;
-
-
-	--light-percentage: 20%;
-	--lighter-percentage: 30%;
-	--lightest-percentage: 35%;
-
-	--dark-percentage: 15%;
-	--darker-percentage: 20%;
-
-	--color-accent--light: hsl(
-		var(--color-accent--h),
-		var(--color-accent--s),
-		calc(var(--color-accent--l) + var(--light-percentage)));
-
-	--color-accent--lighter: hsl(
-		var(--color-accent--h),
-		var(--color-accent--s),
-		calc(var(--color-accent--l) + var(--lighter-percentage)));
-
-	--color-accent--lightest: hsl(
-		var(--color-accent--h),
-		var(--color-accent--s),
-		calc(var(--color-accent--l) + var(--lightest-percentage)));
-
-
-	--color-accent--dark: hsl(
-		var(--color-accent--h),
-		var(--color-accent--s),
-		calc(var(--color-accent--l) - var(--dark-percentage)));
-
-	--color-accent--darker: hsl(
-		var(--color-accent--h),
-		var(--color-accent--s),
-		calc(var(--color-accent--l) - var(--darker-percentage)));
-
-
-
-	--color-accent--complement: hsl(
-		calc(var(--color-accent--h) + 180),
-		var(--color-accent--s),
-		var(--color-accent--l));
-
-	--color-accent--triad1: hsl(
-		calc(var(--color-accent--h) + 120),
-		var(--color-accent--s),
-		var(--color-accent--l));
-
-	--color-accent--triad2: hsl(
-		calc(var(--color-accent--h) + 240),
-		var(--color-accent--s),
-		var(--color-accent--l));
-
-
-
-
-	--color-accent: hsl(
-		var(--color-accent--h),
-		var(--color-accent--s),
-		var(--color-accent--l));
-
-	--color-accent-text: black;
-
-	--color-hover-accent: hsl(
-		var(--color-accent--h),
-		var(--color-accent--s),
-		calc(var(--color-accent--l) - 20%));
-	--color-hover-accent-text: white;
-
-
-
-	--color-accent-soft: var(--color-accent--dark, red);
-	--color-accent-soft-text: black;
-
-	--color-accent-softer: var(--color-accent--lighter, red);
-	--color-accent-softer-text: black;
-}
-
-:root {
-	--base-accent-background-color: var(--color-accent-soft, red);
-	--base-accent-text-color: var(--color-accent-soft-text, red);
-
-	--base-page-background-color: var(--color-accent-softer, red);
-	--base-page-text-color: black;
-
-
-	--nav-background-color: var(--color-accent, red);
-	--nav-text-color: var(--color-accent-text, red);
-	--nav-hover-background-color: var(--color-hover-accent, red);
-	--nav-hover-text-color: var(--color-hover-accent-text, red);
-
-	--nav-button-background-color: transparent;
-
-
-	--interactive-form-background: var(--color-accent-softer);
-	--selected-device-item-background: var(--color-accent-softer);
-	--device-item-default-background: var(--color-accent-soft);
-}
-
-html {
-  height: 100vh;
-}
-body {
-  min-height: 100vh;
-	height: 100%;
-}
-
-body {
-	display: grid;
-
-	grid-template-areas:
-		"logo nav"
-		"aside main";
-
-	grid-template-rows: 5em 1fr;
-	grid-template-columns: minmax(300px, 20%) 1fr;
-
-	background-color: var(--base-accent-background-color, red);
-	color: var(--color-accent-soft-text, red);
-}
-
-nav {
-	grid-area: nav;
-
-	display: flex;
-	flex-direction: row-reverse;
-	width: 100%;
-
-	padding-inline-start: 2ch;
-
-	background-color: var(--nav-background-color, red);
-	color: var(--nav-text-color, red);
-
-	text-align: center;
-}
-
-h1 {
-	grid-area: logo;
-	width: 100%;
-
-	font-size: inherit;
-	display: flex;
-	flex-direction: column;
-	justify-content: center;
-
-
-	justify-self: flex-start;
-	/* display: block; */
-	background-color: transparent;
-	color: black;
-
-	text-align: center;
-
-	line-height: 2.5em;
-
-
-	background-color: var(--nav-background-color, red);
-}
-
-nav > button {
-	padding-inline: 4ch;
-
-	border: unset;
-	cursor: pointer;
-
-	background-color: var(--nav-button-background-color, red);
-	color: var(--nav-text-color, red);
-}
-
-nav > button:hover {
-	background-color: var(--nav-hover-background-color, red);
-	color: var(--nav-hover-text-color, red);
-	border-radius: 1em;
-}
-
-nav > button[disabled]:not([disabled="false"]) {
-	display: none;
-	color: rgba(0,0,0, 0.25);
-}
-
-nav > button[disabled]:not([disabled="false"]):hover {
-	background-color: transparent;
-}
-
-/* nav > button:last-child::after {
-	display: block;
-	height: 1em;
-	width: 1em;
-	background-color: green;
-	content: "";
-} */
-
-aside {
-	grid-area: aside;
-
-
-	display: flex;
-	flex-direction: column;
-
-	flex-direction: column;
-	flex-wrap: nowrap;
-	justify-content: space-between;
-	align-items: stretch;
-
-	overflow: hidden;
-	overflow-y: scroll;
-
-	/* max-height: calc(100vh - 5em); */
-}
-
-aside h2 {
-	font-size: 2em;
-	line-height: 1em;
-	padding-block-start: 1em;
-	padding-inline-start: 2ch;
-
-	color: var(--color-accent--lighter, red);
-}
-
-main {
-	grid-area: main;
-	height: 100%;
-
-	border-radius: 2.5em 2.5em 2.5em 2.5em;
-	padding-inline-start: 3em;
-	padding-block-start: 2em;
-
-	background-color: var(--interactive-form-background, red);
-
-	overflow-y: scroll;
-}
-
-main > section {
-	display: none;
-	grid-template-areas: "controls custom";
-	grid-template-columns: max-content 1fr;
-	align-items: start;
-	height: 100%;
-	width: 100%;
-}
-
-main > section[data-active] {
-	display: grid;
-}
-
-main > section[data-connect] {
+@import url('./css/layers.css');
+@import url('./css/defs.css') layer(defs);
+
+@import url('./css/addr-display.css') layer(libs);
+@import url('./css/excamera-i2cdriver.css') layer(libs);
+@import url('./css/ht16k33.css') layer(libs);
+@import url('./css/mcp2221.css') layer(libs);
+@import url('./css/device-list.css') layer(libs);
+
+
+@import url('./css/app.css') layer(app);
+@import url('./css/tabs.css') layer(app);
+
+
+@layer defs {
+	* {
+		box-sizing: border-box;
+		padding: 0;
+		margin: 0;
+	}
+
+	*:not(:where(html, body)) {
+		font-family: inherit;
+	}
+
+	html {
+		height: 100vh;
+		font-size: 100%;
+	}
+
+	body {
+		min-height: 100vh;
+		height: 100%;
+	}
 
 }
 
-main > section[data-connect] > button {
-	align-content: space-between;
-	grid-area: controls;
 
-	padding-inline: 2ch;
-	padding-block: 0.5em;
-	font-size: 1.25em;
+@layer app {
+	body {
+		font-family: 'Tahoma';
+		/* font-family: fantasy; */
+		/* font-family: 'Brush Script MT',cursive; */
+	}
 
-	/* margin-block-start: 2em; */
-	margin-inline-end: 0.75em;
+	body {
+		display: grid;
 
-	border-radius: 2.5em;
+		grid-template-areas:
+			"logo nav"
+			"aside main";
 
-	/* border: 1px solid purple; */
-	color: var(--color-accent--lighter);
-	/* background-color: rgb(163, 34, 163) */
-	background-color: var(--color-accent--darker, red);
-	border: 0;
-	/* border: 0.25em solid var(--color-accent--darker, red); */
-}
+		grid-template-rows: 5em 1fr;
+		grid-template-columns: minmax(300px, 20%) 1fr;
 
-main > section[data-connect] > button:hover {
-	background-color: var(--color-accent, red);
+		background-color: var(--base-accent-background-color, red);
+		color: var(--base-accent-text-color, red);
+	}
+
 }
 

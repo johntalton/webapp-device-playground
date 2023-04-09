@@ -93,7 +93,14 @@ function buildDeviceSection(builder) {
 
 				try {
 					const customElem = await builder.buildCustomView({ signal })
-					sectionElem.appendChild(customElem)
+					if(customElem instanceof String || typeof customElem === 'string') {
+						const stuff = (new DOMParser()).parseFromString(customElem, 'text/html')
+						sectionElem.appendChild(stuff.body.firstChild)
+					}
+					else {
+						sectionElem.appendChild(customElem)
+					}
+
 				}
 				catch(e) {
 					console.error('error buiding view', e)

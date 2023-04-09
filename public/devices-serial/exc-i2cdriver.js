@@ -97,24 +97,64 @@ export class ExcameraI2CDriverUIBuilder {
 			root.appendChild(elem)
 		}
 
+/*
+		function handelScan() { console.log('handleScan') }
+
+		function magic(cb) {
+			window.magic.uniqueName = cb
+			return `magic.uniqueName()`
+		}
+
+		window.magic = magic
+
+		return `
+			<excamera-i2cdriver>
+				<div class="tabs" slot="prefix">
+					<button data-tab="scan">Scan</button>
+					<button data-tab="capture">Capture</button>
+				</div>
+
+				<div data-for-tab="scan" class="tabsContent">
+					<button onclick="${magic(handelScan)}">Scan 🔎</button>
+
+					<addr-display>
+					</addr-display>
+
+					<ul>
+
+					</ul>
+				</div>
+
+				<div data-for-tab="capture" class="tabsContent">
+					<button>Start ▶️</button>
+				</div>
+			</excamera-i2cdriver>
+		`
+		*/
+
+
 		const root = document.createElement('excamera-i2cdriver')
+
+		const ulElem = document.createElement('ul')
+		// ulElem.setAttribute('slot', 'vdevice-guess-list')
+
 		const addressElem = document.createElement('addr-display')
-		addressElem.setAttribute('slot', 'scan-display')
+		// addressElem.setAttribute('slot', 'scan-display')
 
 		const scanButton = document.createElement('button')
-		scanButton.setAttribute('slot', 'scan-display')
+		// scanButton.setAttribute('slot', 'scan-display')
 		scanButton.textContent = 'Scan'
 
-		const resetButton = root.shadowRoot.getElementById('reset')
-		resetButton.addEventListener('click', e => {
-			Promise.resolve()
-				.then(async () => {
-					await ExcameraLabsI2CDriver.endBitbangCommand(this.#port)
-				})
-				.catch(e => {
-					console.warn(e)
-				})
-		})
+		// const resetButton = root.shadowRoot.getElementById('reset')
+		// resetButton.addEventListener('click', e => {
+		// 	Promise.resolve()
+		// 		.then(async () => {
+		// 			await ExcameraLabsI2CDriver.endBitbangCommand(this.#port)
+		// 		})
+		// 		.catch(e => {
+		// 			console.warn(e)
+		// 		})
+		// })
 
 		// const rebootElem = document.createElement('button')
 		// rebootElem.textContent = 'Reboot'
@@ -130,6 +170,7 @@ export class ExcameraI2CDriverUIBuilder {
 
 		appendChildSlot(root, 'capture-controls', captureStartElem)
 		appendChildSlot(root, 'capture-controls', captureEndElem)
+
 
 		captureStartElem.addEventListener('click', e => {
 			console.log('start capture')
@@ -239,14 +280,13 @@ export class ExcameraI2CDriverUIBuilder {
 
 						}, { once: true })
 
-						listElem.setAttribute('slot', 'vdevice-guess-list')
 						listElem.appendChild(guessSelectElem)
 
 						return { hexElem, listElem }
 					})
 					.forEach(({ hexElem, listElem }) => {
 						addressElem.appendChild(hexElem)
-						root.appendChild(listElem)
+						ulElem.appendChild(listElem)
 					})
 
 					scanButton.disabled = false
@@ -258,6 +298,7 @@ export class ExcameraI2CDriverUIBuilder {
 		}, { once: false })
 
 		root.appendChild(addressElem)
+		root.appendChild(ulElem)
 		root.appendChild(scanButton)
 		return root
 	}

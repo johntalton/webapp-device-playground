@@ -1,42 +1,50 @@
 
-.tabs {
+main .tabs {
 	display: flex;
 	gap: 0;
 	font-size: 1.25em;
 }
 
-.tabs button {
+main .tabs button {
 	font-size: inherit;
 	border: 0;
+
 	background-color: var(--color-accent--lightest, red);
+	color: black;
+
 	border-block-end: 0;
 	border-radius: 1em 1em 0 0;
 	padding-block: 0.75em;
 	padding-inline: 5ch;
 }
 
-.tabs button:hover {
+main .tabs button:hover {
 	text-decoration: underline;
 	box-shadow: 0 -2px 5px rgba(0,0,0, 0.125);
+
+	background-color: var(--color-accent--lightest, red);
+	color: black;
 }
 
-.tabs button:first-child {
+main .tabs button:first-child {
 	border-inline-start: 0;
 }
 
-.tabs button:last-child {
+main .tabs button:last-child {
 	border-inline-end: 0;
 }
 
-.tabsContent {
+main .tabsContent {
 	margin-block-start: 0;
 	flex-grow: 1;
 	background-color: var(--color-accent--lightest, red);
-	display: flex;
+	/* display: flex; */
 	border-radius: 0 2em 2em 2em;
 	/* border-inline-start: 1px solid purple; */
 	padding: 2em;
 	border: 0;
 	border-block-start: 0;
+
+	display: block;
 
 }

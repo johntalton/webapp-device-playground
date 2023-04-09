@@ -1,0 +1,22 @@
+h1 {
+  grid-area: logo;
+  width: 100%;
+
+  font-size: inherit;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+
+
+  justify-self: flex-start;
+  /* display: block; */
+  background-color: transparent;
+  color: black;
+
+  text-align: center;
+
+  line-height: 2.5em;
+
+
+  background-color: var(--nav-background-color, red);
+}

@@ -1,0 +1,112 @@
+
+html {
+	/* --color-accent--h: 300;
+	--color-accent--s: 30%;
+	--color-accent--l: 60%;
+
+	--color-accent--h: 234;
+	--color-accent--s: 15%;
+	--color-accent--l: 62%;
+
+	--color-accent--h: 299;
+	--color-accent--s: 0%;
+	--color-accent--l: 46%; */
+
+	--color-accent--h: 225;
+	--color-accent--s: 50%;
+	--color-accent--l: 50%;
+
+
+	--light-percentage: 20%;
+	--lighter-percentage: 30%;
+	--lightest-percentage: 35%;
+
+	--dark-percentage: 15%;
+	--darker-percentage: 20%;
+
+	/*  */
+	--color-accent: hsl(
+		var(--color-accent--h),
+		var(--color-accent--s),
+		var(--color-accent--l));
+	--color-accent-text: white;
+
+	--color-hover-accent: hsl(
+		var(--color-accent--h),
+		var(--color-accent--s),
+		calc(var(--color-accent--l) - 20%));
+	--color-hover-accent-text: white;
+
+	/*  */
+	--color-accent--light: hsl(
+		var(--color-accent--h),
+		var(--color-accent--s),
+		calc(var(--color-accent--l) + var(--light-percentage)));
+	--color-accent--light: black;
+
+	--color-accent--lighter: hsl(
+		var(--color-accent--h),
+		var(--color-accent--s),
+		calc(var(--color-accent--l) + var(--lighter-percentage)));
+	--color-accent--lighter-text: black;
+
+	--color-accent--lightest: hsl(
+		var(--color-accent--h),
+		var(--color-accent--s),
+		calc(var(--color-accent--l) + var(--lightest-percentage)));
+	--color-accent--lightest-text: black;
+
+	/*  */
+	--color-accent--dark: hsl(
+		var(--color-accent--h),
+		var(--color-accent--s),
+		calc(var(--color-accent--l) - var(--dark-percentage)));
+	--color-accent--dark-text: black;
+
+	--color-accent--darker: hsl(
+		var(--color-accent--h),
+		var(--color-accent--s),
+		calc(var(--color-accent--l) - var(--darker-percentage)));
+	--color-accent--darker-text: white;
+
+	/*  */
+	--color-accent-soft: var(--color-accent--dark, red);
+	--color-accent-soft-text: var(--color-accent--dark-text, red);
+
+	--color-accent-softer: var(--color-accent--lighter, red);
+	--color-accent-softer-text: var(--color-accent--lighter-text, red);
+
+	/*  */
+	--color-accent--complement: hsl(
+		calc(var(--color-accent--h) + 180),
+		var(--color-accent--s),
+		var(--color-accent--l));
+
+	--color-accent--triad1: hsl(
+		calc(var(--color-accent--h) + 120),
+		var(--color-accent--s),
+		var(--color-accent--l));
+
+	--color-accent--triad2: hsl(
+		calc(var(--color-accent--h) + 240),
+		var(--color-accent--s),
+		var(--color-accent--l));
+}
+
+html {
+	--base-accent-background-color: var(--color-accent-soft, red);
+	--base-accent-text-color: var(--color-accent-soft-text, red);
+
+	--base-page-background-color: var(--color-accent-softer, red);
+	--base-page-text-color: black;
+
+
+	--nav-background-color: var(--color-accent, red);
+	--nav-text-color: var(--color-accent-text, red);
+	--nav-hover-background-color: var(--color-accent-soft, red);
+	--nav-hover-text-color: var(--color-hover-accent-text, red);
+
+	--nav-button-background-color: transparent;
+
+	--interactive-form-background: var(--color-accent-softer);
+}
