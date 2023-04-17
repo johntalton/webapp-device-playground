@@ -97,30 +97,114 @@ export class ExcameraI2CDriverUIBuilder {
 			root.appendChild(elem)
 		}
 
-/*
-		function handelScan() { console.log('handleScan') }
+		const self = this
+		function handelScan(event, addrDisp, devList) {
+			console.log('handelScan')
+			const button = event.target
 
-		function magic(cb) {
-			window.magic.uniqueName = cb
-			return `magic.uniqueName()`
+			button.disabled = true
+
+			const existingHexs = addrDisp.querySelectorAll('hex-display')
+			existingHexs.forEach(eh => eh.remove())
+
+			const existingLis = devList.querySelectorAll('li')
+			existingLis.forEach(el => el.remove())
+
+			ExcameraLabsI2CDriver.scan(self.#port)
+				.then(results => {
+					results
+						.forEach(result => {
+							const {
+								dev: addr,
+								ack: acked,
+								to: timedout,
+								arb: arbitration
+							} = result
+
+
+
+							const text = addr.toString(16).padStart(2, '0')
+
+							const template = `
+								<hex-display slot="${addr}"
+									${acked ? 'acked' : '' }
+									${arbitration ? 'arbitration' : '' }
+									${timedout ? 'timedout' : '' }
+									>
+									${text}
+								</hex-display>
+							`
+
+							const node = (new DOMParser()).parseFromString(template, 'text/html')
+							const elem = node.body.firstChild
+
+							addrDisp.appendChild(elem)
+
+
+							//
+							const guesses = deviceGuessByAddress(addr)
+
+							const template2 = `
+								<li ${acked ? 'data-acked' : '' }>
+								${addr}
+									<select>
+										${guesses.map(guess => {
+											return `<option value="${guess.name}">${guess.name}</option>`
+										}).join('')}
+									</select>
+
+									<button>Create 🕹</button>
+								</li>
+								`
+
+							const node2 = (new DOMParser()).parseFromString(template2, 'text/html')
+							const elem2 = node2.body.firstChild
+							devList.appendChild(elem2)
+
+
+							const makeDeviceButton = elem2.querySelector('button')
+							const guessSelectElem = elem2.querySelector('select')
+
+							makeDeviceButton.addEventListener('click', event => {
+								makeDeviceButton.disabled = true
+								guessSelectElem.disabled = true
+
+								const deviceGuess = guessSelectElem.value
+
+								console.warn('allocing untracked vbus ... please cleanup hooks')
+								const vbus = VBusFactory.from({ port: self.#port })
+
+								self.#ui.addI2CDevice({
+									type: deviceGuess,
+									bus: vbus,
+									address: addr
+								})
+							}, { once: true })
+						})
+
+
+				})
+				.catch(console.warn)
+				.then(() => {
+					button.disabled = false
+				})
 		}
 
-		window.magic = magic
 
-		return `
+		const page = `
 			<excamera-i2cdriver>
 				<div class="tabs" slot="prefix">
-					<button data-tab="scan">Scan</button>
-					<button data-tab="capture">Capture</button>
+					<button data-tab="scan" data-active>Scan</button>
+					<button disabled data-tab="capture">Capture</button>
 				</div>
 
-				<div data-for-tab="scan" class="tabsContent">
-					<button onclick="${magic(handelScan)}">Scan 🔎</button>
+				<div data-for-tab="scan" class="tabsContent" data-active>
+					<button id="Scan">Scan 🔎</button>
 
 					<addr-display>
 					</addr-display>
 
-					<ul>
+					<ul data-device-list>
 
 					</ul>
 				</div>
@@ -130,7 +214,16 @@ export class ExcameraI2CDriverUIBuilder {
 				</div>
 			</excamera-i2cdriver>
 		`
-		*/
+
+		const stuff = (new DOMParser()).parseFromString(page, 'text/html')
+
+		const addrDisp = stuff.querySelector('addr-display')
+		const devList = stuff.querySelector('[data-device-list]')
+
+		const startScanButton = stuff.getElementById('Scan')
+		startScanButton.addEventListener('click', event => handelScan(event, addrDisp, devList))
+
+		return stuff.body.firstChild
 
 
 		const root = document.createElement('excamera-i2cdriver')

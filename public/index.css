@@ -2,15 +2,15 @@
 @import url('./css/defs.css') layer(defs);
 
 @import url('./css/addr-display.css') layer(libs);
-@import url('./css/excamera-i2cdriver.css') layer(libs);
+
 @import url('./css/ht16k33.css') layer(libs);
 @import url('./css/mcp2221.css') layer(libs);
 @import url('./css/device-list.css') layer(libs);
 
-
 @import url('./css/app.css') layer(app);
 @import url('./css/tabs.css') layer(app);
 
+@import url('./css/excamera-i2cdriver.css') layer(app);
 
 @layer defs {
 	* {
@@ -21,6 +21,7 @@
 
 	*:not(:where(html, body)) {
 		font-family: inherit;
+		font-size: inherit;
 	}
 
 	html {
@@ -34,28 +35,3 @@
 	}
 
 }
-
-
-@layer app {
-	body {
-		font-family: 'Tahoma';
-		/* font-family: fantasy; */
-		/* font-family: 'Brush Script MT',cursive; */
-	}
-
-	body {
-		display: grid;
-
-		grid-template-areas:
-			"logo nav"
-			"aside main";
-
-		grid-template-rows: 5em 1fr;
-		grid-template-columns: minmax(300px, 20%) 1fr;
-
-		background-color: var(--base-accent-background-color, red);
-		color: var(--base-accent-text-color, red);
-	}
-
-}
-

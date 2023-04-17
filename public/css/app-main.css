@@ -73,6 +73,6 @@ main button:not([disabled]):active {
 }
 
 main button[disabled] {
-  background-color: transparent;
   border: 1px dashed var(--color-accent--lighter);
+  background-color: var(--color-accent--lightest, red);
 }

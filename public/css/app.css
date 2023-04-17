@@ -2,3 +2,23 @@
 @import url('app-logo.css');
 @import url('app-aside.css');
 @import url('app-main.css');
+
+body {
+  font-family: 'Tahoma';
+  /* font-family: fantasy; */
+  /* font-family: 'Brush Script MT',cursive; */
+}
+
+body {
+  display: grid;
+
+  grid-template-areas:
+    "logo nav"
+    "aside main";
+
+  grid-template-rows: 5em 1fr;
+  grid-template-columns: minmax(300px, 20%) 1fr;
+
+  background-color: var(--base-accent-background-color, red);
+  color: var(--base-accent-text-color, red);
+}

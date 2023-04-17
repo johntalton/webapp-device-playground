@@ -935,13 +935,12 @@ export class HT16K33Builder {
 		tabButtonsElem.classList.add('tabs')
 		const tabContentElem = document.createElement('div')
 		tabContentElem.classList.add('tabsContent')
-
+		tabContentElem.toggleAttribute('data-active')
 
 		const swatch = document.createElement('input')
 		swatch.setAttribute('type', 'color')
 		swatch.setAttribute('value', 'red')
 		tabContentElem.appendChild(swatch)
-
 
 		const canvas = document.createElement('canvas')
 		canvas.height = 8
@@ -1084,6 +1083,9 @@ export class HT16K33Builder {
 			b1.addEventListener('click', e => {
 				// b1.toggleAttribute('disabled', true)
 				// b1.innerText = 'Stop'
+
+				b1.toggleAttribute('data-active', true)
+
 				cb()
 			})
 

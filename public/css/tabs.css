@@ -6,11 +6,16 @@ main .tabs {
 }
 
 main .tabs button {
+	position: relative;
 	font-size: inherit;
 	border: 0;
 
+	isolation: isolate;
+	z-index: 2;
+
 	background-color: var(--color-accent--lightest, red);
-	color: black;
+	color: var(--color-accent--lightest-text, red);;
+
 
 	border-block-end: 0;
 	border-radius: 1em 1em 0 0;
@@ -18,21 +23,72 @@ main .tabs button {
 	padding-inline: 5ch;
 }
 
-main .tabs button:hover {
+main .tabs button[data-active] {
+	pointer-events: none;
+	background-color: var(--color-accent--lightest, red);
+	color: black;
 	text-decoration: underline;
-	box-shadow: 0 -2px 5px rgba(0,0,0, 0.125);
+	/* border-block-start: 1px solid black; */
+	box-shadow: 0 -2px 5px rgb(0 0 0 / 0.125);
+	font-weight: bold;
+}
+
+main .tabs button[disabled] {
+	pointer-events: none;
+	background-color: transparent;
+	color: grey;
+
+	border: 1px dashed grey;
+	border-block-end-width: 0;
+
+	/* border-color: grey;
+	border-style: dashed;
+	border-block-start-width: 1px;
+	border-inline-width: 1px;
+	border-inline-start-width: 1px;
+	border-inline-end-width: 1px;
+	border-width: 1px; */
+}
+
+main .tabs button:not([disabled]):hover {
+	text-decoration: underline;
+	/* box-shadow: 0 -2px 5px rgba(0,0,0, 0.125); */
 
 	background-color: var(--color-accent--lightest, red);
 	color: black;
+
+
+	/* background-color: hotpink; */
+	/* border-radius: 1ems; */
 }
 
-main .tabs button:first-child {
+main .tabs button:not([disabled]):hover::before {
+	content: " ";
+	display: block;
+	position: absolute;
+
+	z-index: 1;
+
+	top: 0;
+	left: 0;
+	width: 100%;
+	height: 100%;
+	/* background-color: greenyellow; */
+	color: white;
+
+	pointer-events: none;
+}
+
+
+
+
+/* main .tabs button:first-child {
 	border-inline-start: 0;
 }
 
 main .tabs button:last-child {
 	border-inline-end: 0;
-}
+} */
 
 main .tabsContent {
 	margin-block-start: 0;
@@ -47,4 +103,8 @@ main .tabsContent {
 
 	display: block;
 
+}
+
+main .tabsContent:not([data-active]) {
+	display: none;
 }

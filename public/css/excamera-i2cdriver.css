@@ -17,22 +17,42 @@ excamera-i2cdriver::part(scan-display) {
 
 
 
+excamera-i2cdriver div.tabsContent {
+  display: flex;
+  align-items: flex-start;
+  justify-content: flex-start;
+  gap: 2em;
+}
 
 
-excamera-i2cdriver > ul > li {
+
+
+excamera-i2cdriver ul[data-device-list] {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25em;
+}
+
+excamera-i2cdriver ul[data-device-list] > li {
   display: none;
 }
 
 
-excamera-i2cdriver > ul > li[data-acked] {
-  display: block;
-  background-color: var(--color-accent--lightest);
+excamera-i2cdriver ul[data-device-list] > li[data-acked] {
+  display: grid;
+  grid-template-columns: 5ch 1fr max-content;
+
+  background-color: var(--color-accent--lighter);
 
   font-weight: bolder;
 
   border-radius: 2em;
   padding-inline: 2em;
   padding-block: 0.5em;
+
+  align-items: center;
+  flex-wrap: nowrap;
+
 }
 
 
@@ -47,6 +67,7 @@ excamera-i2cdriver select {
 	appearance: none;
 
   font-size: 1em;
+  min-width: 20ch;
 
   padding-inline: 1em;
   padding-block: 0.5em;
@@ -64,4 +85,9 @@ excamera-i2cdriver select:where(:active, :hover) {
 excamera-i2cdriver select:focus {
 	outline-color: var(--color-accent, red);
 	outline-width: 5px;
+}
+
+excamera-i2cdriver select::after {
+  content: "▾";
+  display: block;
 }

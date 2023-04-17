@@ -17,9 +17,9 @@ html {
 	--color-accent--l: 50%;
 
 
-	--light-percentage: 20%;
+	--light-percentage: 10%;
 	--lighter-percentage: 30%;
-	--lightest-percentage: 35%;
+	--lightest-percentage: 40%;
 
 	--dark-percentage: 15%;
 	--darker-percentage: 20%;
@@ -42,7 +42,7 @@ html {
 		var(--color-accent--h),
 		var(--color-accent--s),
 		calc(var(--color-accent--l) + var(--light-percentage)));
-	--color-accent--light: black;
+	--color-accent--light-text: black;
 
 	--color-accent--lighter: hsl(
 		var(--color-accent--h),
