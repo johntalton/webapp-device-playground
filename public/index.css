@@ -3,6 +3,9 @@
 
 @import url('./css/addr-display.css') layer(libs);
 
+@import url('./css/checkbox.css') layer(libs);
+@import url('./css/select.css') layer(libs);
+
 @import url('./css/ht16k33.css') layer(libs);
 @import url('./css/mcp2221.css') layer(libs);
 @import url('./css/device-list.css') layer(libs);
@@ -33,5 +36,29 @@
 		min-height: 100vh;
 		height: 100%;
 	}
+
+}
+
+
+
+
+:root {
+	/* --color-accent: cornflowerblue; */
+	/* --color-accent-text: darkblue; */
+
+	/* --color-accent--light: blue; */
+	/* --color-accent--light-text: darkblue; */
+
+	/* --color-accent--lighter: green; */
+	/* --color-accent--lighter-text: lime; */
+
+	/* --color-accent--lightest: darkorange; */
+	/* --color-accent--lightest-text: gold; */
+
+	/* --color-accent--dark: magenta; */
+	/* --color-accent--dark-text: plum; */
+
+	/* --color-accent--darker: yellow; */
+	/* --color-accent--darker-text: olive; */
 
 }

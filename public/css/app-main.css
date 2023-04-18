@@ -55,24 +55,25 @@ main button {
   padding-block: 0.5em;
   margin-inline: 0;
   border-radius: 2.5em;
-
-  color: var(--color-accent--lighter);
-  background-color: var(--color-accent--darker, red);
-
   border: 0;
+
+  background-color: var(--color-accent--darker, red);
+  color: var(--color-accent--darker-text);
 }
 
 main button:not([disabled]):hover {
-  color: var(--color-accent--light);
   background-color: var(--color-accent, red);
+  color: var(--color-accent-text);
 }
 
 main button:not([disabled]):active {
-  color: var(--color-accent--lighter);
   background-color: var(--color-accent--darker, red);
+  color: var(--color-accent--darker-text);
 }
 
 main button[disabled] {
   border: 1px dashed var(--color-accent--lighter);
+
   background-color: var(--color-accent--lightest, red);
+  color: var(--color-disabled, red);
 }

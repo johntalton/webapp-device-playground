@@ -1,0 +1,24 @@
+tca9548-config::part(fieldset) {
+  border: 0;
+  padding-block: 1em;
+  margin: 0;
+
+  color: var(--color-accent--lighter-text);
+}
+
+tca9548-config::part(title) {
+  font-size: 1.5em;
+  font-weight: bold;
+
+  color: var(--color-accent--lighter-text);
+}
+
+
+tca9548-config::part(inputs) {
+  accent-color: var(--color-accent--light, red);
+  /* color: var(--color-accent--light-text, red); */
+
+  display: inline-block;
+  aspect-ratio: 1;
+  width: 1.5em;
+}

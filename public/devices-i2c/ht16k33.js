@@ -614,22 +614,6 @@ function script_ChannelSquawk() {
 }
 
 function script_Matrix(device) {
-	// class Canvas {
-	// 	#path = []
-	// 	#cursor = { x: 0, y: 0 }
-	// 	#state = {
-	// 		stroke: 'black',
-	// 		fill: 'black'
-
-	// 	}
-
-	// 	moveTo(point) { this.#cursor = point }
-	// 	lineTo(point) {}
-
-	// 	strokeRect(point, w, h) {}
-	// 	fillRect(point, w, h) {}
-
-	// }
 
 	function simpleDDALine(p1, p2, c) {
 		// port of: prog1 cs470 1/6/99
@@ -924,8 +908,6 @@ export class HT16K33Builder {
 	signature() { }
 
 	async buildCustomView(selectionElem) {
-
-
 		const root = document.createElement('ht16k33-config')
 		root.setAttribute('layout', '')
 		root.setAttribute('font', '')
@@ -948,8 +930,6 @@ export class HT16K33Builder {
 		tabContentElem.appendChild(canvas)
 		const context = canvas.getContext('2d', {})
 		context.imageSmoothingEnabled = false
-
-
 
 		function handleDraw(event) {
 			event.preventDefault()
@@ -976,9 +956,17 @@ export class HT16K33Builder {
 			context.fillRect(x, y, 1, 1)
 		}
 
+		function handleDrawEnd(event, device) {
+			event.preventDefault()
+			event.stopPropagation();
+
+			script_Canvas(device, context)
+
+		}
+
 		canvas.addEventListener('mousedown', handleDraw)
 		canvas.addEventListener('mousemove', handleDraw)
-
+		canvas.addEventListener('mouseup', event => handleDrawEnd(event, this.#device))
 
 
 		const layoutSelectorElem = document.createElement('select')

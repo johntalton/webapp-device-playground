@@ -1,11 +1,14 @@
 aside ul {
   --item-radius: 2em;
 
-	--background: var(--color-accent-soft);
-	--color: var(--color-accent-soft-text);
+	--background: var(--color-accent-soft, red);
+	--color: var(--color-accent-soft-text, red);
 
-	--selected-background: var(--color-accent-softer);
-	--selected-color: var(--color-accent-softer-text);
+	--hover: var(--color-accent--light,red);
+	--hover-text: var(--color-accent--light-text, red);
+
+	--selected-background: var(--color-accent-softer, red);
+	--selected-color: var(--color-accent-softer-text, red);
 }
 
 aside ul {
@@ -19,7 +22,7 @@ aside ul {
 	margin-inline-start: 0.5em;
 
   background-color: var(--selected-background, red);
-	color: var(--color);
+	color: var(--color, red);
 }
 
 /* Rounding Before first */
@@ -66,8 +69,8 @@ aside > ul > li > button {
 	height: 4em;
 	padding: 0.25em;
 
-	color: var(--color-accent--lighter);
 	background-color: var(--background, red);
+	color: var(--color, red);
 }
 
 aside > ul > li:has(> button:hover) {
@@ -75,7 +78,9 @@ aside > ul > li:has(> button:hover) {
 }
 
 aside > ul > li > button:hover {
-	background-color: var(--color-hover-accent, red);
+	background-color: var(--hover, red);
+	color: var(--hover-text, red);
+
 	border-radius: var(--item-radius);
 }
 
@@ -105,8 +110,10 @@ aside > ul > li[data-active] {
 
 aside > ul > li[data-active] button {
 	cursor: initial;
-	color: black;
+
 	background-color: var(--selected-background, red);
+	color: var(--selected-color, red);
+
   border-radius: var(--item-radius) 0 0 var(--item-radius);
 }
 

@@ -12,41 +12,8 @@ ht16k33-config header {
 	display: flex;
 	gap: 1em;
 	margin-block-end: 2em;
-}
-
-ht16k33-config header select {
-	appearance: none;
-
 	font-size: 1.125em;
-	padding-inline: 2em;
-
-	padding-block: 0.5em;
-	border-radius: 1em;
-
-	border-style: dashed;
-	background-color: var(--color-accent--lightest, red);
 }
-
-ht16k33-config header select:where(:active, :hover) {
-	box-shadow: 0 0 5px rgba(0,0,0, 0.25);
-}
-
-ht16k33-config header select:focus {
-	outline-color: var(--color-accent, red);
-	outline-width: 5px;
-}
-
-ht16k33-config[layout]:not([layout=""]) header select[data-layout] {
-	border-style: solid;
-	border-color: transparent;
-}
-
-ht16k33-config[font]:not([font=""]) header select[data-font] {
-	border-style: solid;
-	border-color: transparent;
-}
-
-
 
 
 /*  */

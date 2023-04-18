@@ -41,8 +41,10 @@ excamera-i2cdriver ul[data-device-list] > li {
 excamera-i2cdriver ul[data-device-list] > li[data-acked] {
   display: grid;
   grid-template-columns: 5ch 1fr max-content;
+  gap: 1em;
 
-  background-color: var(--color-accent--lighter);
+  background-color: var(--color-accent--lighter, red);
+  color: var(--color-accent--lighter-text, red);
 
   font-weight: bolder;
 
@@ -53,41 +55,4 @@ excamera-i2cdriver ul[data-device-list] > li[data-acked] {
   align-items: center;
   flex-wrap: nowrap;
 
-}
-
-
-
-
-
-
-
-
-
-excamera-i2cdriver select {
-	appearance: none;
-
-  font-size: 1em;
-  min-width: 20ch;
-
-  padding-inline: 1em;
-  padding-block: 0.5em;
-  margin-inline: 1em;
-  border-radius: 2.5em;
-
-	border-style: dashed;
-	background-color: var(--color-accent--lightest, red);
-}
-
-excamera-i2cdriver select:where(:active, :hover) {
-	box-shadow: 0 0 5px rgba(0,0,0, 0.25);
-}
-
-excamera-i2cdriver select:focus {
-	outline-color: var(--color-accent, red);
-	outline-width: 5px;
-}
-
-excamera-i2cdriver select::after {
-  content: "▾";
-  display: block;
 }

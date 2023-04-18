@@ -3,6 +3,7 @@ aside {
   grid-area: aside;
 
   background-color: var(--base-accent-background-color, red);
+  color: var(--base-accent-text-color, red);
 
   display: flex;
   flex-direction: column;
@@ -20,6 +21,4 @@ aside h2 {
   font-size: 2em;
   margin-inline: auto;
   padding-block-start: 1em;
-
-  color: var(--color-accent--lighter, red);
 }

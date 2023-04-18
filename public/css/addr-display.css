@@ -1,7 +1,16 @@
 addr-display {
+  --background: black;
+  --color: rgb(100, 100, 100);
+
+  --acked-color: white;
+  --timedout-color: yellow;
+}
+
+addr-display {
   display: block;
-  background-color: black;
-  color: rgb(100, 100, 100);
+
+  background-color: var(--background, red);
+  color: var(--color, red);
 
   border-radius: 1em;
 
@@ -26,10 +35,10 @@ addr-display::part(items) {
 
 
 hex-display[acked] {
-  color: white;
+  color: var(--acked-color, red);
 }
 
 hex-display[timedout] {
-  color: yellow;
+  color: var(--timedout-color, red);
 }
 

@@ -34,6 +34,10 @@ export class TCA9548Builder {
 		const initialChannels = await this.#device.getChannels()
 		console.log({ initialChannels })
 
+		initialChannels.forEach(ch => {
+			const chElem = root.shadowRoot.getElementById(`ch${ch}`)
+			chElem.checked = true
+		})
 
 
 		root.addEventListener('change', e => {

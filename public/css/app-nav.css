@@ -1,14 +1,31 @@
 nav {
+  --nav-color: var(--color-accent, red);
+	--nav-color-text: var(--color-accent-text, red);
+
+  --controls-color: var(--color-accent--lighter, red);
+  --controls-color-text: var(--color-accent--lighter-text, red);navy;
+
+  --controls-hover-color: var(--color-accent--dark, red);
+  --controls-hover-color-text: var(--color-accent--dark-text, red);
+}
+
+nav {
   grid-area: nav;
 
   display: flex;
-  flex-direction: row-reverse;
+  flex-direction: row;
+  justify-content: flex-end;
   width: 100%;
 
   padding-inline-start: 2ch;
 
-  background-color: var(--nav-background-color, red);
-  color: var(--nav-text-color, red);
+  background-color: var(--nav-color, red);
+  color: var(--nav-color-text, red);
+
+  background: linear-gradient(
+    to right,
+    var(--nav-color, red),
+    var(--controls-color, red));
 
   text-align: center;
 }
@@ -20,21 +37,17 @@ nav > button {
   border: unset;
   cursor: pointer;
 
-  background-color: var(--nav-button-background-color, red);
-  color: var(--nav-text-color, red);
+  background-color: transparent;
+  color: var(--controls-color-text, red);
 }
 
 nav > button:hover {
-  background-color: var(--nav-hover-background-color, red);
-  color: var(--nav-hover-text-color, red);
+  background-color: var(--controls-hover-color, red);
+  color: var(--controls-hover-color-text, red);
+
   border-radius: 1em;
 }
 
 nav > button[disabled]:not([disabled="false"]) {
   display: none;
-  color: rgba(0,0,0, 0.25);
-}
-
-nav > button[disabled]:not([disabled="false"]):hover {
-  background-color: transparent;
 }

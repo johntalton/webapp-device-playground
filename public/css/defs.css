@@ -1,6 +1,5 @@
-
-html {
-	/* --color-accent--h: 300;
+:root {
+		/* --color-accent--h: 300;
 	--color-accent--s: 30%;
 	--color-accent--l: 60%;
 
@@ -23,6 +22,25 @@ html {
 
 	--dark-percentage: 15%;
 	--darker-percentage: 20%;
+}
+
+
+html {
+	/*  */
+	--color-accent--complement: hsl(
+		calc(var(--color-accent--h) + 180),
+		var(--color-accent--s),
+		var(--color-accent--l));
+
+	--color-accent--triad1: hsl(
+		calc(var(--color-accent--h) + 120),
+		var(--color-accent--s),
+		var(--color-accent--l));
+
+	--color-accent--triad2: hsl(
+		calc(var(--color-accent--h) + 240),
+		var(--color-accent--s),
+		var(--color-accent--l));
 
 	/*  */
 	--color-accent: hsl(
@@ -30,12 +48,6 @@ html {
 		var(--color-accent--s),
 		var(--color-accent--l));
 	--color-accent-text: white;
-
-	--color-hover-accent: hsl(
-		var(--color-accent--h),
-		var(--color-accent--s),
-		calc(var(--color-accent--l) - 20%));
-	--color-hover-accent-text: white;
 
 	/*  */
 	--color-accent--light: hsl(
@@ -61,7 +73,7 @@ html {
 		var(--color-accent--h),
 		var(--color-accent--s),
 		calc(var(--color-accent--l) - var(--dark-percentage)));
-	--color-accent--dark-text: black;
+	--color-accent--dark-text: white;
 
 	--color-accent--darker: hsl(
 		var(--color-accent--h),
@@ -76,22 +88,12 @@ html {
 	--color-accent-softer: var(--color-accent--lighter, red);
 	--color-accent-softer-text: var(--color-accent--lighter-text, red);
 
-	/*  */
-	--color-accent--complement: hsl(
-		calc(var(--color-accent--h) + 180),
-		var(--color-accent--s),
-		var(--color-accent--l));
-
-	--color-accent--triad1: hsl(
-		calc(var(--color-accent--h) + 120),
-		var(--color-accent--s),
-		var(--color-accent--l));
-
-	--color-accent--triad2: hsl(
-		calc(var(--color-accent--h) + 240),
-		var(--color-accent--s),
-		var(--color-accent--l));
+/*  */
+	--color-disabled: grey;
+	--color-opaque-black: rgba(50 50 50 / 0.25);
 }
+
+
 
 html {
 	--base-accent-background-color: var(--color-accent-soft, red);
@@ -101,12 +103,6 @@ html {
 	--base-page-text-color: black;
 
 
-	--nav-background-color: var(--color-accent, red);
-	--nav-text-color: var(--color-accent-text, red);
-	--nav-hover-background-color: var(--color-accent-soft, red);
-	--nav-hover-text-color: var(--color-hover-accent-text, red);
-
-	--nav-button-background-color: transparent;
 
 	--interactive-form-background: var(--color-accent-softer);
 }
