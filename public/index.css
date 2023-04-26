@@ -66,9 +66,9 @@
 	--color-accent--s: 77%;
 	--color-accent--l: 42%;
 	/* --light-percentage: 10%; */
-	--lighter-percentage: 37%;
-	--lightest-percentage: 42%;
-	--dark-percentage: 0%;
+	/* --lighter-percentage: 37%; */
+	/* --lightest-percentage: 42%; */
+	/* --dark-percentage: 0%; */
 	/* --darker-percentage: -1%; */
-	--color-accent--darker: var(--color-accent--complement);
+	/* --color-accent--darker: var(--color-accent--complement); */
 }
