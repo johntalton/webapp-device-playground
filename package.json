@@ -6,7 +6,7 @@
   },
   "dependencies": {
     "@johntalton/am2320": "^1.0.0",
-    "@johntalton/and-other-delights": "^6.0.1",
+    "@johntalton/and-other-delights": "../and-other-delights",
     "@johntalton/bitsmush": "^1.0.0",
     "@johntalton/boschieu": "^6.0.1",
     "@johntalton/ds3502": "^3.0.1",
@@ -26,6 +26,7 @@
     "@johntalton/tcs34725": "^1.1.1",
     "@johntalton/ht16k33": "../ht16k33",
     "@johntalton/ds1841": "../ds1841",
-    "@johntalton/bno08x": "../bno08x"
+    "@johntalton/bno08x": "../bno08x",
+    "@johntalton/adt7410": "../adt7410"
   }
 }
