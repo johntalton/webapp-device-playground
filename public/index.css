@@ -5,9 +5,12 @@
 
 @import url('./css/checkbox.css') layer(libs);
 @import url('./css/select.css') layer(libs);
+@import url('./css/range.css') layer(libs);
 
 @import url('./css/ht16k33.css') layer(libs);
 @import url('./css/mcp2221.css') layer(libs);
+@import url('./css/adt7410.css') layer(libs);
+
 @import url('./css/device-list.css') layer(libs);
 
 @import url('./css/app.css') layer(app);
@@ -71,4 +74,15 @@
 	/* --dark-percentage: 0%; */
 	/* --darker-percentage: -1%; */
 	/* --color-accent--darker: var(--color-accent--complement); */
+
+	--color-accent--h: 183;
+	--color-accent--s: 50%;
+	--color-accent--l: 50%;
+	--light-percentage: -4%;
+	--lighter-percentage: 42%;
+	--lightest-percentage: 33%;
+	--dark-percentage: -20%;
+	--darker-percentage: -58%;
+
+	--color-accent--darker-text: black;
 }

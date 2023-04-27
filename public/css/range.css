@@ -1,0 +1,27 @@
+
+input[type="number"] {
+
+  font-size: 1.25em;
+
+  /* margin-inline: 0; */
+  padding-inline-start: 1ch;
+
+  border-radius: .25em;
+  border-style: dashed;
+  border-style: solid;
+	border-color: transparent;
+
+  background-color: var(--color-accent--lightest, red);
+  color: var(--color-accent--lightest-text, red);
+}
+
+input[type="number"]:where(:focus-visible, :focus) {
+	outline-color: var(--color-accent, red);
+	outline-width: 5px;
+
+  background-color: white;
+}
+
+input[type="range"] {
+
+}

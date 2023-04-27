@@ -82,7 +82,8 @@ function buildDeviceSection(builder) {
 		connectButtonEleme.remove()
 
 		Promise.resolve()
-			.then(builder.open())
+			.then(() => {})
+			.then(() => builder.open())
 			.then(async () => {
 
 				const closeButton = document.createElement('button')

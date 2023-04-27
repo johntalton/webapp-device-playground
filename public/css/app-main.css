@@ -6,7 +6,8 @@ main {
   padding-inline-start: 3em;
   padding-block-start: 2em;
 
-  background-color: var(--interactive-form-background, red);
+  background-color: var(--color-accent-softer, red);
+  color: var(--color-accent-softer-text, red);
 
   overflow-y: scroll;
 }

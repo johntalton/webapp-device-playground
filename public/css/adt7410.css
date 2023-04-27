@@ -1,0 +1,19 @@
+adt7410-config {
+  display: flex;
+  flex-direction: column;
+  gap: 2.5em;
+}
+
+adt7410-config form {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+  gap: 1em;
+}
+
+adt7410-config [data-controls]  {
+  display: flex;
+  flex-direction: row;
+  gap: 1em;
+}
+

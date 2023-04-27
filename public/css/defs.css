@@ -102,7 +102,4 @@ html {
 	--base-page-background-color: var(--color-accent-softer, red);
 	--base-page-text-color: black;
 
-
-
-	--interactive-form-background: var(--color-accent-softer);
 }
