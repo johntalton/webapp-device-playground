@@ -19,11 +19,11 @@ ht16k33-config header {
 /*  */
 ht16k33-config canvas {
 	display: block;
-	background-color: white;
+	background-color: var(--color-white, red);
 	border-radius: 1em;
 	margin-inline: 1em;
 
-	height: 10em;
+	height: 15em;
 
 	image-rendering: auto;
   image-rendering: crisp-edges;

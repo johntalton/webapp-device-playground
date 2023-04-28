@@ -1,8 +1,8 @@
 addr-display {
-  --background: black;
+  --background: var(--color-black, red);
   --color: rgb(100, 100, 100);
 
-  --acked-color: white;
+  --acked-color: var(--color-white, red);
   --timedout-color: yellow;
 }
 
