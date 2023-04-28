@@ -18,6 +18,8 @@
 
 @import url('./css/excamera-i2cdriver.css') layer(app);
 
+@import url('./css/themes.css');
+
 @layer defs {
 	* {
 		box-sizing: border-box;
@@ -25,12 +27,11 @@
 		margin: 0;
 
 		/* transition: background-color 3s, color 3s; */
-		transition: --color-accent--h 3s;
 	}
 
-	:before,:after {
-		/* transition: background-color 3s, color 3s; */
-	}
+	/* :before,:after {
+		transition: background-color 3s, color 3s;
+	} */
 
 	*:not(:where(html, body)) {
 		font-family: inherit;
@@ -48,128 +49,3 @@
 	}
 
 }
-
-
-/* RED */
-[data-theme ~= "Red" i] {
-	--color-accent: red;
-	--color-accent-text: red;
-
-	--color-accent--light: red;
-	--color-accent--light-text: red;
-
-	--color-accent--lighter: red;
-	--color-accent--lighter-text: red;
-
-	--color-accent--lightest: red;
-	--color-accent--lightest-text: red;
-
-	--color-accent--dark: red;
-	--color-accent--dark-text: red;
-
-	--color-accent--darker: red;
-	--color-accent--darker-text: red;
-}
-
-/* CRAZY */
-[data-theme ~= "Crazy" i] {
-	--color-accent: cornflowerblue;
-	--color-accent-text: darkblue;
-
-	--color-accent--light: blue;
-	--color-accent--light-text: darkblue;
-
-	--color-accent--lighter: green;
-	--color-accent--lighter-text: lime;
-
-	--color-accent--lightest: darkorange;
-	--color-accent--lightest-text: gold;
-
-	--color-accent--dark: magenta;
-	--color-accent--dark-text: plum;
-
-	--color-accent--darker: yellow;
-	--color-accent--darker-text: olive;
-}
-
-/* REGULAR_BLUE */
-[data-theme ~= "Water" i] {
-	--color-accent--h: 225;
-	--color-accent--s: 50%;
-	--color-accent--l: 50%;
-
-	--light-percentage: 10%;
-	--lighter-percentage: 30%;
-	--lightest-percentage: 40%;
-
-	--dark-percentage: 15%;
-	--darker-percentage: 20%;
-}
-
-/* SLATE */
-[data-theme ~= "Slate" i] {
-	--color-accent--h: 220;
-	--color-accent--s: 20%;
-	--color-accent--l: 20%;
-
-	--light-percentage: 10%;
-	--lighter-percentage: -4%;
-	--lightest-percentage: 14%;
-
-	--dark-percentage: 0%;
-	--darker-percentage: -37%;
-
-	--color-accent--light-text: white;
-	--color-accent--lighter-text: white;
-	--color-accent--lightest-text: white;
-}
-
-/* PAPER_GREY */
-[data-theme ~= "Paper" i] {
-	--color-accent--h: 299;
-	--color-accent--s: 0%;
-	--color-accent--l: 46%;
-}
-
-/* DREAM_BLUE */
-[data-theme ~= "Dream" i] {
-	--color-accent--h: 183;
-	--color-accent--s: 50%;
-	--color-accent--l: 50%;
-	--light-percentage: -4%;
-	--lighter-percentage: 42%;
-	--lightest-percentage: 33%;
-	--dark-percentage: -20%;
-	--darker-percentage: -58%;
-	--color-accent--darker-text: black;
-}
-
-/* GOLDEN */
-[data-theme ~= "Golden" i] {
-	--color-accent--h: 37;
-	--color-accent--s: 77%;
-	--color-accent--l: 42%;
-	--light-percentage: 10%;
-	--lighter-percentage: 37%;
-	--lightest-percentage: 42%;
-	--dark-percentage: 0%;
-	--darker-percentage: -1%;
-}
-
-[data-theme ~= "Lavender" i] {
-	--color-accent--h: 300;
-	--color-accent--s: 30%;
-	--color-accent--l: 60%;
-}
-
-[data-theme ~= "Bright" i] {
-	--color-accent--h: 234;
-	--color-accent--s: 15%;
-	--color-accent--l: 62%;
-}
-
-
-
-
-
-

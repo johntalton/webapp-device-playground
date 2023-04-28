@@ -2,6 +2,9 @@ adt7410-config {
   display: flex;
   flex-direction: column;
   gap: 2.5em;
+
+  padding-inline-start: 1em;
+  padding-inline-end: 2em;
 }
 
 adt7410-config form {
@@ -9,6 +12,15 @@ adt7410-config form {
   flex-direction: row;
   flex-wrap: wrap;
   gap: 1em;
+
+  padding-inline: 1em;
+  padding-block: 2em;
+
+  border-radius: 1em;
+  border: 1px solid var(--color-accent--light, red);
+
+  /* background-color: var(--color-accent--light, red);
+  color: var(--color-accent--light-text ,red); */
 }
 
 adt7410-config [data-controls]  {
