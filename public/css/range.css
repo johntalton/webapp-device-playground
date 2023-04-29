@@ -19,7 +19,11 @@ input[type="number"]:where(:focus-visible, :focus) {
 	outline-color: var(--color-accent, red);
 	outline-width: 5px;
 
+
+  /* color override isn't -text based */
   background-color: var(--color-white, red);
+  color: var(--color-black, red);
+  /*  */
 }
 
 input[type="range"] {

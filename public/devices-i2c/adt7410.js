@@ -31,26 +31,7 @@ export class ADT7410Builder {
 		this.#device = ADT7410.from(this.#abus)
 
 		const id = await this.#device.getId()
-		const status = await this.#device.getStatus()
-		const config = await this.#device.getConfiguration()
-		const temp = await this.#device.getTemperature()
-		const setpointH = await this.#device.getSetpointHigh()
-		const setpointL = await this.#device.getSetpointLow()
-		const setpointC = await this.#device.getSetpointCritical()
-		const setpointHyst = await this.#device.getSetpointHysteria()
 
-		console.log({
-			id,
-			status,
-			config,
-			temp,
-			setpoints: {
-			  high: setpointH,
-			  low: setpointL,
-			  critical: setpointC,
-			  hysteria: setpointHyst
-			}
-		})
 
 	}
 
@@ -102,21 +83,37 @@ export class ADT7410Builder {
 			return elem
 		}
 
-		const currentConfig = await this.#device.getConfiguration()
+		// risk async
+		const profile = await Promise.all([
+			await this.#device.getConfiguration(),
+			await this.#device.getSetpointHigh(),
+			await this.#device.getSetpointLow(),
+			await this.#device.getSetpointCritical(),
+			await this.#device.getSetpointHysteria()
+		])
+		.then(([
+			config,
+			setpointH,
+			setpointL,
+			setpointC,
+			setpointHyst
+		]) => ({
+			...config,
+			setpoints: {
+			  high: setpointH,
+			  low: setpointL,
+			  critical: setpointC,
+			  hysteria: setpointHyst
+			}
+		}))
 
-		const setpoint = {
-			high: 3,
-			low: 2,
-			critical: 5,
-			hysteria: 2
-		}
 
 		const root = document.createElement('adt7410-config')
 
 		const configForm = document.createElement('form')
 		const setpointForm = document.createElement('form')
 
-		const modeElem = appendSelect(configForm, 'Mode', currentConfig.operationMode, [
+		const modeElem = appendSelect(configForm, 'Mode', profile.operationMode, [
 			{
 				value: OPERATION_MODE.CONTINUOUS,
 				label: 'Continuous'
@@ -135,7 +132,7 @@ export class ADT7410Builder {
 			}
 		])
 
-		const intctModeElem = appendSelect(configForm, 'INT/CT Mode', currentConfig.INTCTMode, [
+		const intctModeElem = appendSelect(configForm, 'INT/CT Mode', profile.INTCTMode, [
 			{
 				value: INT_CT_MODE.INTERRUPT,
 				label: 'Interrupt'
@@ -146,7 +143,7 @@ export class ADT7410Builder {
 			}
 		])
 
-    const faultElem = appendSelect(configForm, 'Fault Queue Length', currentConfig.faultQueue, [
+    const faultElem = appendSelect(configForm, 'Fault Queue Length', profile.faultQueue, [
 			{
 				value: FAULT_QUEUE_COUNT.ONE,
 				label: '1 (one)'
@@ -165,7 +162,7 @@ export class ADT7410Builder {
 			}
 		])
 
-    const resElem = appendSelect(configForm, 'Resolution', currentConfig.resolution, [
+    const resElem = appendSelect(configForm, 'Resolution', profile.resolution, [
 			{
 				value: RESOLUTION.THIRTEEN,
 				label: '13-bit - 0.0625°C'
@@ -176,10 +173,24 @@ export class ADT7410Builder {
 			}
 		])
 
-		const spHighElem = appendInputNumber(setpointForm, 'High', setpoint.high, 0, 100, 1/128)
-		const spLowElem = appendInputNumber(setpointForm, 'Low', setpoint.low, 0, 100, 1/128)
-		const spCritElem = appendInputNumber(setpointForm, 'Critical', setpoint.critical, 0, 100, 1/128)
-		const spHystElem = appendInputNumber(setpointForm, 'Hysteria', setpoint.hysteria, 0, 15, 1)
+		const spHighElem = appendInputNumber(setpointForm, 'High', profile.setpoints.high, 0, 100, .5) // 1/128
+		const spLowElem = appendInputNumber(setpointForm, 'Low', profile.setpoints.low, 0, 100, .5)
+		const spCritElem = appendInputNumber(setpointForm, 'Critical', profile.setpoints.critical, 0, 100, .5)
+		const spHystElem = appendInputNumber(setpointForm, 'Hysteria', profile.setpoints.hysteria, 0, 15, 1)
+
+		const setSetpointsButton = document.createElement('button')
+		setSetpointsButton.innerText = 'Set'
+		setpointForm.appendChild(setSetpointsButton)
+
+		setSetpointsButton.addEventListener('click', event => {
+			setSetpointsButton.disabled = true
+
+			this.#device.setSetpointHigh()
+		})
+
+		setpointForm.addEventListener('change', event => {
+
+		})
 
 		configForm.addEventListener('change', event => {
 			const operationMode = Number.parseInt(modeElem.value)
