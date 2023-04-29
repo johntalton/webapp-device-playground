@@ -284,7 +284,7 @@ async function onContentLoaded() {
 
 
 	const ui = {
-		addSerialPort: async port => {
+		addSerialPort: async (port, signal) => {
 			console.log('addSerialPort')
 
 			const info =  port.getInfo()
@@ -298,10 +298,15 @@ async function onContentLoaded() {
 				const builder = await ExcameraI2CDriverUIBuilder.builder(port, ui)
 				const demolisher = buildDeviceListItem(deviceListElem, builder)
 
-				port.addEventListener('disconnect', event => {
-					console.log('Excamera device disconnect - demo time', this)
+				signal.addEventListener('abort', event => {
+					console.log('signal said: abort - demo time')
 					demolisher()
 				})
+
+				// port.addEventListener('disconnect', event => {
+				// 	console.log('Excamera device disconnect - demo time', this)
+				// 	demolisher()
+				// })
 			}
 
 			//

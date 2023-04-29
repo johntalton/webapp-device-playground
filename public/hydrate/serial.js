@@ -6,11 +6,16 @@ export const SUPPORTED_SERIAL_FILTER = [
 ]
 
 const handleSerialPortConnect = e => console.log('port connect', e)
-const handleSerialPortDisconnect = e => console.log('port disconnect', e)
+function build_handleSerialPortDisconnect(controller) {
+	return e => {
+		console.log('port disconnect', e)
+		controller.abort()
+	}
+}
 
-async function hydrateSerialPortEvents(port) {
+async function hydrateSerialPortEvents(port, controller) {
 	// port.addEventListener('connect', handleSerialPortConnect)
-	// port.addEventListener('disconnect', handleSerialPortDisconnect)
+	port.addEventListener('disconnect', build_handleSerialPortDisconnect(controller))
 }
 
 async function addSerialPort(ui, port, portList) {
@@ -22,12 +27,15 @@ async function addSerialPort(ui, port, portList) {
 	console.log('new underlineing port')
 	portList.push(port)
 
-	await hydrateSerialPortEvents(port)
+	const controller = new AbortController()
+	const { signal } = controller
+
+	await hydrateSerialPortEvents(port, controller)
 
 	// const channel = new MessageChannel()
 	// const serialPort = channel.port1
 	// postMessage({ type: 'serial-added', info: {}, port: serialPort }, { transfer: [ serialPort ]})
-	await ui.addSerialPort(port)
+	await ui.addSerialPort(port, signal)
 }
 
 async function requestSerialDevice(filters) {

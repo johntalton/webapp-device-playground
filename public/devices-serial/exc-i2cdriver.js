@@ -66,9 +66,9 @@ export class ExcameraI2CDriverUIBuilder {
 	async open() {
 		console.log('opening excamera labs port')
 
-		this.#port.addEventListener('disconnect', event => {
-			console.log('Excamera device disconnect - post open', this)
-		})
+		// this.#port.addEventListener('disconnect', event => {
+		// 	console.log('Excamera device disconnect - post open', this)
+		// })
 
 		// at 1M baud, 8 bits, no parity, 1 stop bit (1000000 8N1).
 		await this.#port.open({
