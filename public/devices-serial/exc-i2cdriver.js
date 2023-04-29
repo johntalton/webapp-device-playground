@@ -65,6 +65,11 @@ export class ExcameraI2CDriverUIBuilder {
 
 	async open() {
 		console.log('opening excamera labs port')
+
+		this.#port.addEventListener('disconnect', event => {
+			console.log('Excamera device disconnect - post open', this)
+		})
+
 		// at 1M baud, 8 bits, no parity, 1 stop bit (1000000 8N1).
 		await this.#port.open({
 			baudRate: 1000000,
@@ -175,6 +180,7 @@ export class ExcameraI2CDriverUIBuilder {
 								const vbus = VBusFactory.from({ port: self.#port })
 
 								self.#ui.addI2CDevice({
+									port: self.#port,
 									type: deviceGuess,
 									bus: vbus,
 									address: addr

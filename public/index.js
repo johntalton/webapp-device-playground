@@ -144,7 +144,6 @@ function buildDeviceListItem(deviceListElem, builder) {
 
 	//
 	liElem.addEventListener('click', e => {
-		console.log('click on button')
 		deviceListElem.querySelectorAll('li').forEach(li => {
 			li.removeAttribute('data-active')
 			const bElem = li.querySelector('button')
@@ -152,8 +151,7 @@ function buildDeviceListItem(deviceListElem, builder) {
 		})
 
 		liElem.toggleAttribute('data-active', true)
-		 buttonElem.disabled = true
-
+		buttonElem.disabled = true
 
 		mainElem.querySelectorAll('section').forEach(s => s.removeAttribute('data-active'))
 
@@ -162,10 +160,13 @@ function buildDeviceListItem(deviceListElem, builder) {
 	}, { once: false })
 
 	// demolisher
-	return (device) => {
-		liElem.removeEventListener('click')
-		liElem.remove()
+	return () => {
 
+		// virtualDevices.forEach(vdev => {
+		// 	console.log(vdev)
+		// })
+
+		liElem.remove()
 		sectionElem.remove()
 	}
 }
@@ -295,8 +296,12 @@ async function onContentLoaded() {
 				console.log('adding excamera i2cdriver', port)
 
 				const builder = await ExcameraI2CDriverUIBuilder.builder(port, ui)
-				buildDeviceListItem(deviceListElem, builder)
-				return
+				const demolisher = buildDeviceListItem(deviceListElem, builder)
+
+				port.addEventListener('disconnect', event => {
+					console.log('Excamera device disconnect - demo time', this)
+					demolisher()
+				})
 			}
 
 			//
@@ -323,7 +328,13 @@ async function onContentLoaded() {
 		addI2CDevice: async definition => {
 			console.log('i2c device to list', definition)
 			const builder = await I2CDeviceBuilderFactory.from(definition, ui)
-			buildDeviceListItem(deviceListElem, builder)
+			const demolisher = buildDeviceListItem(deviceListElem, builder)
+
+			definition.port.addEventListener('disconnect', event => {
+				console.log('I²C device disconnect - demo time', this)
+				demolisher()
+			})
+
 			return
 		}
 	}

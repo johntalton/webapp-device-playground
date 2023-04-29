@@ -9,8 +9,8 @@ const handleSerialPortConnect = e => console.log('port connect', e)
 const handleSerialPortDisconnect = e => console.log('port disconnect', e)
 
 async function hydrateSerialPortEvents(port) {
-	port.addEventListener('connect', handleSerialPortConnect)
-	port.addEventListener('disconnect', handleSerialPortDisconnect)
+	// port.addEventListener('connect', handleSerialPortConnect)
+	// port.addEventListener('disconnect', handleSerialPortDisconnect)
 }
 
 async function addSerialPort(ui, port, portList) {
@@ -23,6 +23,10 @@ async function addSerialPort(ui, port, portList) {
 	portList.push(port)
 
 	await hydrateSerialPortEvents(port)
+
+	// const channel = new MessageChannel()
+	// const serialPort = channel.port1
+	// postMessage({ type: 'serial-added', info: {}, port: serialPort }, { transfer: [ serialPort ]})
 	await ui.addSerialPort(port)
 }
 
