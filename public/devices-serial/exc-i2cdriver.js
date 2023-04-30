@@ -35,6 +35,8 @@ async function initScript(port) {
 		// console.log({ echoByte, result })
 		if(echoByte !== result) { console.warn('EchoByte miss-match')}
 	}
+
+	// await ExcameraLabsI2CDriver.setSpeed(port, 100)
 }
 
 class VBusFactory {
@@ -97,6 +99,25 @@ export class ExcameraI2CDriverUIBuilder {
 	}
 
 	async buildCustomView(sectionElem) {
+
+		const status = await ExcameraLabsI2CDriver.transmitStatusInfo(this.#port)
+
+		const {
+			identifier,
+			serial,
+			uptime,
+			voltage,
+			current,
+			temperature,
+			mode,
+			sda,
+			scl,
+			speed,
+			pullups,
+			crc
+		} = status
+
+
 		function appendChildSlot(root, name, elem) {
 			elem.setAttribute('slot', name)
 			root.appendChild(elem)
@@ -197,14 +218,31 @@ export class ExcameraI2CDriverUIBuilder {
 		}
 
 
+		function pullupOptions(value) {
+			const selected = v => v === value ? 'selected' : ''
+			return `
+				<option value="0" ${selected(0)}>0 K(no pull-up)</option>
+				<option value="1" ${selected(1)}>2.2 K</option>
+				<option value="2" ${selected(2)}>4.3 K</option>
+				<option value="3" ${selected(3)}>1.5 K</option>
+				<option value="4" ${selected(4)}>4.7 K</option>
+				<option value="5" ${selected(5)}>1.5 K</option>
+				<option value="6" ${selected(6)}>2.2 K</option>
+				<option value="7" ${selected(7)}>1.1 K</option>
+				`
+			}
+
 		const page = `
 			<excamera-i2cdriver>
+
 				<div class="tabs" slot="prefix">
-					<button data-tab="scan" data-active>Scan</button>
+					<button data-tab="settings" data-active>Settings</button>
+					<button data-tab="scan">Scan</button>
 					<button disabled data-tab="capture">Capture</button>
+					<button disabled data-tab="bitbang">Bitbang</button>
 				</div>
 
-				<div data-for-tab="scan" class="tabsContent" data-active>
+				<div data-for-tab="scan" class="tabsContent">
 					<button id="Scan">Scan 🔎</button>
 
 					<addr-display>
@@ -218,10 +256,92 @@ export class ExcameraI2CDriverUIBuilder {
 				<div data-for-tab="capture" class="tabsContent">
 					<button>Start ▶️</button>
 				</div>
+
+				<div data-for-tab="settings" class="tabsContent" data-active>
+					<form data-config>
+						<label for="">Mode</label>
+						<select id="">
+							<option name="" value="">I²C Host</option>
+							<option name="" value="">Bitbang</option>
+							<option name="" value="">Monitor</option>
+							<option name="" value="">Capture</option>
+						</select>
+
+
+						<label>Speed</label>
+						<select name="speed">
+							<option value="100" ${speed === 100 ? 'selected' : ''}>100kHz</option>
+							<option value="400" ${speed === 400 ? 'selected' : ''}>400kHz</option>
+						</select>
+
+						<label>Pullups SDA</label>
+						<select id="" name="">
+							${pullupOptions(pullups.sdaValue)}
+						</select>
+
+						<label for="pullupSCL">Pullups SCL</label>
+						<select id="" name="pullupSCL">
+							${pullupOptions(pullups.sclValue)}
+						</select>
+					</form>
+
+					<form data-info>
+						<label>Model</label>
+						<output name="model">${identifier}</output>
+
+						<label>Serial</label>
+						<output name="serial">${serial}</output>
+
+						<label>Uptime (S)</label>
+						<output name="uptime">${uptime}</output>
+
+						<label>Voltage (mA)</label>
+						<output name="voltage">${voltage}</output>
+
+						<label>Current (V)</label>
+						<output name="current">${current}</output>
+
+						<label>Temperature (°C)</label>
+						<output name="temperature">${temperature}</output>
+
+						<label>SDA</label>
+						<output name="sda">${sda === 1 ? 'Idle' : 'Active' }</output>
+
+						<label>SCL</label>
+						<output name="scl">${scl === 1 ? 'Idle' : 'Active' }</output>
+
+						<button>Update</button>
+					</form>
+				</div>
 			</excamera-i2cdriver>
 		`
 
 		const stuff = (new DOMParser()).parseFromString(page, 'text/html')
+
+		const foo = stuff.querySelector('button[data-tab="scan"]')
+		foo.addEventListener('click', event => {
+			const tabScanButton = document.querySelector('button[data-tab="scan"]')
+			tabScanButton.disabled = true
+
+			// remove content active
+			const activeOthers = document.querySelectorAll('excamera-i2cdriver .tabsContent[data-active]')
+			activeOthers.forEach(ao => ao.toggleAttribute('data-active', false))
+
+			// remove tab button active
+			const activeOthersTabsButtons = document.querySelectorAll('excamera-i2cdriver button[data-tab]')
+			activeOthersTabsButtons.forEach(ao => ao.toggleAttribute('data-active', false))
+
+			// set content active
+			const tabContentElem = document.querySelector('[data-for-tab="scan"]')
+			tabContentElem.toggleAttribute('data-active', true)
+
+			// set tab button active
+			tabScanButton.toggleAttribute('data-active', true)
+
+			tabScanButton.disabled = false
+		})
+
+
 
 		const addrDisp = stuff.querySelector('addr-display')
 		const devList = stuff.querySelector('[data-device-list]')

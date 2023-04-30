@@ -27,6 +27,7 @@
     "@johntalton/ht16k33": "../ht16k33",
     "@johntalton/ds1841": "../ds1841",
     "@johntalton/bno08x": "../bno08x",
-    "@johntalton/adt7410": "../adt7410"
+    "@johntalton/adt7410": "../adt7410",
+    "@johntalton/ags02ma": "../ags02ma"
   }
 }

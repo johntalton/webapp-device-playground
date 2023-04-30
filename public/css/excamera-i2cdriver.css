@@ -2,6 +2,7 @@ excamera-i2cdriver {
   display: flex;
 
   flex-direction: column;
+  height: 100%;
 }
 
 /* excamera-i2cdriver::part(vdexvice-guess-list) {
@@ -17,15 +18,63 @@ excamera-i2cdriver::part(scan-display) {
 
 
 
+
+
+
+excamera-i2cdriver form[data-config] {
+  display: flex;
+  flex-grow: 1;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 1em;
+
+  padding-inline: 1em;
+  padding-block: 1em;
+  border-radius: 1em;
+  margin-block-start: 1em;
+
+
+  background-color: var(--color-accent-softer,, red);
+  color: var(--color-accent-softer-text, red);
+}
+
+/* excamera-i2cdriver div.tabsContent select {
+  background-color: pink;
+  color: black;
+} */
+
+
+
+
+
+
+
+
+excamera-i2cdriver form[data-info] {
+  display: grid;
+  grid-template-columns: minmax(20ch, 1fr) 1fr;
+  /* grid-template-rows: repeat(auto-fill, 10px); */
+  gap: 1em;
+}
+
+
 excamera-i2cdriver div.tabsContent {
   display: flex;
   align-items: flex-start;
   justify-content: flex-start;
-  gap: 2em;
+  gap: 3em;
   flex-wrap: wrap;
 }
 
 
+excamera-i2cdriver div.tabsContent[data-for-tab="settings"] {
+  /* display: flex; */
+  flex-direction: row;
+  align-content: flex-start;
+  overflow-y: scroll;
+  height: 0;
+}
 
 
 excamera-i2cdriver ul[data-device-list] {

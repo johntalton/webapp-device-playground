@@ -15,9 +15,9 @@ main .tabs button {
 	isolation: isolate;
 	z-index: 2;
 
-	background-color: var(--color-accent--lightest, red);
+	background-color: var(--color-accent--lighter, red);
 	color: var(--color-accent--lightest-text, red);
-
+	border-block-start: 1px solid var(--color-accent--lightest, red);
 
 	border-block-end: 0;
 	border-radius: 1em 1em 0 0;
@@ -25,11 +25,16 @@ main .tabs button {
 	padding-inline: 5ch;
 }
 
+main .tabs button:first-child {
+	border-inline-start: 1px solid var(--color-accent--lightest, red);
+}
+
 main .tabs button[data-active] {
 	pointer-events: none;
 
 	background-color: var(--color-accent--lightest, red);
 	color: var(--color-accent--lightest-text, red);
+	border: 0;
 
 	text-decoration: underline;
 	box-shadow: 0 -2px 2px var(--color-opaque-black, red);

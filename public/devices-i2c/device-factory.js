@@ -9,6 +9,7 @@ import { PCA9536Builder} from './pca9536.js'
 import { PCF8574Builder } from './pcf8574.js'
 import { HT16K33Builder } from './ht16k33.js'
 import { ADT7410Builder } from './adt7410.js'
+import { AGS02MABuilder } from './ags02ma.js'
 
 import {
 	HT16K33_INFO,
@@ -20,9 +21,9 @@ import {
 	SSD1306_INFO,
 	PCA_9536_INFO,
 	PCF_8574_INFO,
-	ADT7410_INFO
+	ADT7410_INFO,
+	AGS02MA_INFO
 } from './guesses.js'
-
 
 const BY_NAME = {
 	[PCA_9536_INFO.name]: (definition, ui) => PCA9536Builder.builder(definition, ui),
@@ -35,6 +36,7 @@ const BY_NAME = {
 	[HT16K33_INFO.name]: (definition, ui) => HT16K33Builder.builder(definition, ui),
 	[DS1841_INFO.name]: (definition, ui) => DS1841Builder.builder(definition, ui),
 	[ADT7410_INFO.name]: (definition, ui) => ADT7410Builder.builder(definition, ui),
+	[AGS02MA_INFO.name]: (definition, ui) => AGS02MABuilder.builder(definition, ui),
 }
 
 export class I2CDeviceBuilderFactory {

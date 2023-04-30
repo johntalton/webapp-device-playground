@@ -173,19 +173,36 @@ export class ADT7410Builder {
 			}
 		])
 
-		const spHighElem = appendInputNumber(setpointForm, 'High', profile.setpoints.high, 0, 100, .5) // 1/128
-		const spLowElem = appendInputNumber(setpointForm, 'Low', profile.setpoints.low, 0, 100, .5)
-		const spCritElem = appendInputNumber(setpointForm, 'Critical', profile.setpoints.critical, 0, 100, .5)
-		const spHystElem = appendInputNumber(setpointForm, 'Hysteria', profile.setpoints.hysteria, 0, 15, 1)
+		const fieldsetElem = document.createElement('fieldset')
+
+		const spHighElem = appendInputNumber(fieldsetElem, 'High', profile.setpoints.high, 0, 100, .5) // 1/128
+		const spLowElem = appendInputNumber(fieldsetElem, 'Low', profile.setpoints.low, 0, 100, .5)
+		const spCritElem = appendInputNumber(fieldsetElem, 'Critical', profile.setpoints.critical, 0, 100, .5)
+		const spHystElem = appendInputNumber(fieldsetElem, 'Hysteria', profile.setpoints.hysteria, 0, 15, 1)
 
 		const setSetpointsButton = document.createElement('button')
 		setSetpointsButton.innerText = 'Set'
+
+		setpointForm.appendChild(fieldsetElem)
 		setpointForm.appendChild(setSetpointsButton)
 
 		setSetpointsButton.addEventListener('click', event => {
 			setSetpointsButton.disabled = true
 
-			this.#device.setSetpointHigh()
+			const spH = spHighElem.value
+			const spL = spLowElem.value
+			const spC = spCritElem.value
+			const spHyst = spHystElem.value
+
+			Promise.resolve()
+				.then(() => this.#device.setSetpointHigh(spH))
+				.then(() => this.#device.setSetpointLow(spL))
+				.then(() => this.#device.setSetpointCritical(spC))
+				.then(() => this.#device.setSetpointHysteria(spHyst))
+				.then(() => {
+					setSetpointsButton.disabled = false
+				})
+				.catch(e => console.warn(e))
 		})
 
 		setpointForm.addEventListener('change', event => {
