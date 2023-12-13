@@ -1,8 +1,10 @@
 import { EXCAMERA_LABS_USB_FILTER } from '../devices-serial/exc-i2cdriver.js'
+import { MASH_USB_FILTER } from '../devices-serial/mash.js'
 
 export const SUPPORTED_SERIAL_FILTER = [
 	EXCAMERA_LABS_USB_FILTER,
-	//FT232H_USB_FILTER
+	//FT232H_USB_FILTER,
+	MASH_USB_FILTER
 ]
 
 const handleSerialPortConnect = e => console.log('port connect', e)

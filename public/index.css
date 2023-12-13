@@ -10,6 +10,7 @@
 @import url('./css/ht16k33.css') layer(libs);
 @import url('./css/mcp2221.css') layer(libs);
 @import url('./css/adt7410.css') layer(libs);
+@import url('./css/tcs34725-config.css') layer(libs);
 
 @import url('./css/device-list.css') layer(libs);
 
@@ -17,6 +18,7 @@
 @import url('./css/tabs.css') layer(app);
 
 @import url('./css/excamera-i2cdriver.css') layer(app);
+@import url('./css/mash-mash.css') layer(app);
 
 @import url('./css/themes.css');
 

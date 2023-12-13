@@ -44,6 +44,13 @@ export const PCF_8574_INFO = {
 	addresses: [ 0x20, 0x21 ], name: 'pcf8574'
 }
 
+export const TCS_34725_INFO = {
+	addresses: [ 0x29 ], name: 'tcs34725'
+}
+
+export const MCP23_INFO = {
+	addresses: [ ...range(0x20, 0x27) ], name: 'mcp23'
+}
 
 export const I2C_GUESSES = [
 	// 0x00
@@ -51,11 +58,12 @@ export const I2C_GUESSES = [
 	{ addresses: [ ...range(0x18, 0x1F) ], name: 'mcp9808' },
 	// 0x20
 	PCF_8574_INFO,
-	{ addresses: [ ...range(0x20, 0x27) ], name: 'mcp23xxx' },
+	MCP23_INFO,
 	{ addresses: [ 0x29 ], name: 'tcs34725' },
 	DS1841_INFO,
 	DS3502_INFO,
 	{ addresses: [ 0x2d, 0x53, 0x57 ], name: 'st25dv16k' },
+	TCS_34725_INFO,
 	// 0x30
 	{ addresses: [ 0x30 ], name: 'Trust M' },
 	SSD1306_INFO,

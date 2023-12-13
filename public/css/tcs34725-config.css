@@ -1,0 +1,8 @@
+
+
+tcs34725-config div[data-sensor-color] {
+	--sensor-color: yellow;
+	background-color: var(--sensor-color);
+	width: 200px;
+	height: 200px;
+}

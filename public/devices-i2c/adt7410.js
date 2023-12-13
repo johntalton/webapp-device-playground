@@ -31,7 +31,7 @@ export class ADT7410Builder {
 		this.#device = ADT7410.from(this.#abus)
 
 		const id = await this.#device.getId()
-
+		console.log(id)
 
 	}
 
@@ -181,12 +181,15 @@ export class ADT7410Builder {
 		const spHystElem = appendInputNumber(fieldsetElem, 'Hysteria', profile.setpoints.hysteria, 0, 15, 1)
 
 		const setSetpointsButton = document.createElement('button')
-		setSetpointsButton.innerText = 'Set'
+		setSetpointsButton.innerText = 'Set 🌡'
 
 		setpointForm.appendChild(fieldsetElem)
 		setpointForm.appendChild(setSetpointsButton)
 
 		setSetpointsButton.addEventListener('click', event => {
+			event.stopPropagation()
+			event.preventDefault()
+
 			setSetpointsButton.disabled = true
 
 			const spH = spHighElem.value

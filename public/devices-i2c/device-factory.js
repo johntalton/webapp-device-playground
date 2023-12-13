@@ -10,6 +10,8 @@ import { PCF8574Builder } from './pcf8574.js'
 import { HT16K33Builder } from './ht16k33.js'
 import { ADT7410Builder } from './adt7410.js'
 import { AGS02MABuilder } from './ags02ma.js'
+import { TCS34725Builder } from './tcs34725.js'
+import { MCP23Builder } from './mcp23.js'
 
 import {
 	HT16K33_INFO,
@@ -22,7 +24,9 @@ import {
 	PCA_9536_INFO,
 	PCF_8574_INFO,
 	ADT7410_INFO,
-	AGS02MA_INFO
+	AGS02MA_INFO,
+	TCS_34725_INFO,
+	MCP23_INFO
 } from './guesses.js'
 
 const BY_NAME = {
@@ -37,6 +41,8 @@ const BY_NAME = {
 	[DS1841_INFO.name]: (definition, ui) => DS1841Builder.builder(definition, ui),
 	[ADT7410_INFO.name]: (definition, ui) => ADT7410Builder.builder(definition, ui),
 	[AGS02MA_INFO.name]: (definition, ui) => AGS02MABuilder.builder(definition, ui),
+	[TCS_34725_INFO.name]: (definition, ui) => TCS34725Builder.builder(definition, ui),
+	[MCP23_INFO.name]: (definition, ui) => MCP23Builder.builder(definition, ui),
 }
 
 export class I2CDeviceBuilderFactory {
@@ -44,7 +50,7 @@ export class I2CDeviceBuilderFactory {
 		const { type } = definition
 
 		const builderFn = BY_NAME[type]
-		if(builderFn === undefined) { throw new Error('unknown i2c devcie type: ' + type) }
+		if(builderFn === undefined) { throw new Error('unknown i2c device type: ' + type) }
 
 		return builderFn(definition, ui)
 	}

@@ -12,11 +12,14 @@ export class HTMLImportElement extends HTMLElement {
 		})
 			.then(result => result.text())
 			.then(result => {
-				const parser = new DOMParser()
-				const stuff = parser.parseFromString(result, 'text/html')
+				this.innerHTML = result
 
-				this.appendChild(stuff.head.firstChild)
+				this.dispatchEvent(new CustomEvent('loaded'))
 
+				// const parser = new DOMParser()
+				// const stuff = parser.parseFromString(result, 'text/html')
+
+				// this.appendChild(stuff.head.firstChild)
 			})
 			.catch(console.warn)
 	}

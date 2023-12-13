@@ -19,9 +19,10 @@ async function initScript(port) {
 	// exit and return to i2x mode if not in it already
 	await ExcameraLabsI2CDriver.endBitbangCommand(port)
 	await ExcameraLabsI2CDriver.exitMonitorMode(port)
-	// await ExcameraLabsI2CDriver.resetBus(port)
+
+	await ExcameraLabsI2CDriver.resetBus(port)
 	// await ExcameraLabsI2CDriver.reboot(port)
-	// await ExcameraLabsI2CDriver.setSpeed(port, 400)
+	await ExcameraLabsI2CDriver.setSpeed(port, 400)
 
 	// end more (64) bytes of @ to flush the connection
 	// ?
@@ -83,9 +84,9 @@ export class ExcameraI2CDriverUIBuilder {
 		// device author provided init script
 		await initScript(this.#port)
 
-		console.log('check status info')
-		const info = await ExcameraLabsI2CDriver.transmitStatusInfo(this.#port)
-		console.log(info)
+		// console.log('check status info')
+		// const info = await ExcameraLabsI2CDriver.transmitStatusInfo(this.#port)
+		// console.log(info)
 	}
 
 	async close() {
@@ -143,7 +144,7 @@ export class ExcameraI2CDriverUIBuilder {
 							const {
 								dev: addr,
 								ack: acked,
-								to: timedout,
+								to: timeout,
 								arb: arbitration
 							} = result
 
@@ -155,7 +156,7 @@ export class ExcameraI2CDriverUIBuilder {
 								<hex-display slot="${addr}"
 									${acked ? 'acked' : '' }
 									${arbitration ? 'arbitration' : '' }
-									${timedout ? 'timedout' : '' }
+									${timeout ? 'timeout' : '' }
 									>
 									${text}
 								</hex-display>
@@ -260,13 +261,12 @@ export class ExcameraI2CDriverUIBuilder {
 				<div data-for-tab="settings" class="tabsContent" data-active>
 					<form data-config>
 						<label for="">Mode</label>
-						<select id="">
-							<option name="" value="">I²C Host</option>
-							<option name="" value="">Bitbang</option>
-							<option name="" value="">Monitor</option>
-							<option name="" value="">Capture</option>
+						<select name="mode">
+							<option value="0">I²C Host</option>
+							<option value="1">Bitbang</option>
+							<option value="2">Monitor</option>
+							<option value="3">Capture</option>
 						</select>
-
 
 						<label>Speed</label>
 						<select name="speed">
@@ -275,12 +275,12 @@ export class ExcameraI2CDriverUIBuilder {
 						</select>
 
 						<label>Pullups SDA</label>
-						<select id="" name="">
+						<select name="pullupSDA">
 							${pullupOptions(pullups.sdaValue)}
 						</select>
 
 						<label for="pullupSCL">Pullups SCL</label>
-						<select id="" name="pullupSCL">
+						<select name="pullupSCL">
 							${pullupOptions(pullups.sclValue)}
 						</select>
 					</form>
@@ -295,50 +295,285 @@ export class ExcameraI2CDriverUIBuilder {
 						<label>Uptime (S)</label>
 						<output name="uptime">${uptime}</output>
 
-						<label>Voltage (mA)</label>
+						<label>Voltage (V)</label>
 						<output name="voltage">${voltage}</output>
 
-						<label>Current (V)</label>
+						<label>Current (mA)</label>
 						<output name="current">${current}</output>
 
 						<label>Temperature (°C)</label>
 						<output name="temperature">${temperature}</output>
 
 						<label>SDA</label>
-						<output name="sda">${sda === 1 ? 'Idle' : 'Active' }</output>
+						<output name="sda"></output>
 
 						<label>SCL</label>
-						<output name="scl">${scl === 1 ? 'Idle' : 'Active' }</output>
+						<output name="scl"></output>
 
-						<button>Update</button>
+						<button id="updateConfigInfo">Update</button>
 					</form>
+
+
 				</div>
+				<div data-for-tab="bitbang" class="tabsContent">
+					<form data-bitbang>
+						:)
+						<button id="sendBitbang">Go</button>
+					</form>
 			</excamera-i2cdriver>
 		`
 
 		const stuff = (new DOMParser()).parseFromString(page, 'text/html')
 
-		const foo = stuff.querySelector('button[data-tab="scan"]')
-		foo.addEventListener('click', event => {
-			const tabScanButton = document.querySelector('button[data-tab="scan"]')
-			tabScanButton.disabled = true
+
+		const configForm = stuff.querySelector('[data-config]')
+		// configForm.addEventListener('submit', event => {
+		// 	console.log('submt form', event)
+		// })
+
+		configForm.addEventListener('change', event => {
+			Promise.resolve()
+				.then(async () => {
+					// const data = new FormData(event.target.form)
+
+					// for (const [key, value] of data) {
+					// 	console.log(key, value)
+					// }
+
+					const form = event.target.form
+					const modeElem = form.querySelector('select[name="mode"]')
+					const mode = parseInt(modeElem.value, 10)
+
+					console.log(mode, modeElem)
+
+					if(mode === 0) {
+						// return to i2c
+						console.log('exit bitbang/monitor')
+						await ExcameraLabsI2CDriver.exitBitbangMode(this.#port)
+						await ExcameraLabsI2CDriver.exitMonitorMode(this.#port)
+						await ExcameraLabsI2CDriver.resetBus(this.#port)
+						await ExcameraLabsI2CDriver.setSpeed(this.#port, 400)
+					}
+					else if(mode === 1)
+					{
+						// bitbang
+						console.log('enter bitbang')
+						await ExcameraLabsI2CDriver.enterBitbangMode(this.#port)
+					}
+					else if(mode === 2)
+					{
+						// monitor
+						console.log('enter monitor')
+						await ExcameraLabsI2CDriver.enterMonitorMode(this.#port)
+					}
+					else if(mode === 3)
+					{
+						// capture
+						console.log('enter cpature')
+					}
+
+
+				})
+				.catch(e => console.warn(e))
+		})
+
+		const setnBBButton = stuff.getElementById('sendBitbang')
+		setnBBButton.addEventListener('click', event => {
+			event.preventDefault()
+			event.stopPropagation()
+
+			Promise.resolve()
+				.then(async () => {
+
+					await ExcameraLabsI2CDriver.enterBitbangMode(this.#port)
+
+					const delayMs = ms => new Promise(resolve => setTimeout(resolve, ms))
+
+					function encodeBB(options) {
+						function encodePin(pin) {
+							if(pin === 0) { return 0b01 } // output assert 0
+							if(pin === 1) { return 0b11 } // output assert 1
+							if(pin === undefined) { return 0b10 } // input float
+
+							throw new Error('ping state invalid')
+						}
+
+						const { sda, scl, report } = options
+						return (report === true ? 0b000_1_00_00 : 0)
+							| encodePin(sda) | (encodePin(scl) << 2)
+					}
+
+					function parseBB(value) {
+						const sda = value & 0b1
+						const scl = (value >> 1) & 0b1
+
+						return { sda, scl }
+					}
+
+					function assertBB(value, expected) {
+						if ((value.sda === expected.sda) && (value.scl === expected.scl)) {
+							return true
+						}
+
+						console.log('assertBB false', value, expected)
+						return false
+					}
+
+					// console.log('check bus free')
+					// const a = await ExcameraLabsI2CDriver.sendBitbangCommand(this.#port, [ encodeBB({ report: true }) ])
+					// assertBB(parseBB(a), { sda: 1, scl: 1 })
+
+
+					// console.log('assert data start')
+					// const b = await ExcameraLabsI2CDriver.sendBitbangCommand(this.#port, [ encodeBB({ sda: 0, report: true }) ])
+					// assertBB(parseBB(b), { sda: 0, scl: 1 })
+
+					// await delayMs(500)
+
+					// console.log('assert clock start')
+					// const c = await ExcameraLabsI2CDriver.sendBitbangCommand(this.#port, [ encodeBB({ sda: 0, scl: 0, report: true }) ])
+					// assertBB(parseBB(c), { sda: 0, scl: 0 })
+
+					// await delayMs(500)
+
+					// console.log('send data')
+					const data = 0x48
+					const rw = 0
+					// const f = await ExcameraLabsI2CDriver.sendBitbangCommand(this.#port, [
+					// 	encodeBB({ sda: ((data >> 6) & 0b1), scl: 1 }), encodeBB({ sda: 0, scl: 0 }),
+					// 	encodeBB({ sda: ((data >> 5) & 0b1), scl: 1 }), encodeBB({ sda: 0, scl: 0 }),
+					// 	encodeBB({ sda: ((data >> 4) & 0b1), scl: 1 }), encodeBB({ sda: 0, scl: 0 }),
+					// 	encodeBB({ sda: ((data >> 3) & 0b1), scl: 1 }), encodeBB({ sda: 0, scl: 0 }),
+					// 	encodeBB({ sda: ((data >> 2) & 0b1), scl: 1 }), encodeBB({ sda: 0, scl: 0 }),
+					// 	encodeBB({ sda: ((data >> 1) & 0b1), scl: 1 }), encodeBB({ sda: 0, scl: 0 }),
+					// 	encodeBB({ sda: ((data >> 0) & 0b1), scl: 1 }), encodeBB({ sda: 0, scl: 0 }),
+
+					// 	encodeBB({ sda: rw, scl: 1 }), encodeBB({ sda: 0, scl: 0 }),
+
+					// 	encodeBB({ sda: 1, scl: 1, report: true })
+					// ])
+					// assertBB(parseBB(f), { sda: 1, scl: 1 })
+
+					// console.log('send data done')
+					// const g = await ExcameraLabsI2CDriver.sendBitbangCommand(this.#port, [ encodeBB({ sda: 0, scl: 0, report: true }) ])
+					// assertBB(parseBB(g), { sda: 0, scl: 0 })
+
+					// await delayMs(500)
+
+					// console.log('assert data stop')
+					// const h = await ExcameraLabsI2CDriver.sendBitbangCommand(this.#port, [ encodeBB({ sda: 0, scl: 1 }), encodeBB({ sda: 1, scl: 1, report: true }) ])
+					// assertBB(parseBB(h), { sda: 1, scl: 1 })
+
+
+
+
+					await ExcameraLabsI2CDriver.sendBitbangCommand(this.#port, [
+						encodeBB({ sda: 0 }),
+						encodeBB({ sda: 0, scl: 0 }),
+						encodeBB({ sda: ((data >> 6) & 0b1), scl: 1 }), encodeBB({ sda: 0, scl: 0 }),
+						encodeBB({ sda: ((data >> 5) & 0b1), scl: 1 }), encodeBB({ sda: 0, scl: 0 }),
+						encodeBB({ sda: ((data >> 4) & 0b1), scl: 1 }), encodeBB({ sda: 0, scl: 0 }),
+						encodeBB({ sda: ((data >> 3) & 0b1), scl: 1 }), encodeBB({ sda: 0, scl: 0 }),
+						encodeBB({ sda: ((data >> 2) & 0b1), scl: 1 }), encodeBB({ sda: 0, scl: 0 }),
+						encodeBB({ sda: ((data >> 1) & 0b1), scl: 1 }), encodeBB({ sda: 0, scl: 0 }),
+						encodeBB({ sda: ((data >> 0) & 0b1), scl: 1 }), encodeBB({ sda: 0, scl: 0 }),
+						encodeBB({ sda: rw, scl: 1 }), encodeBB({ sda: 0, scl: 0 }),
+						encodeBB({ sda: 1, scl: 1 }),
+						encodeBB({ sda: 0, scl: 0 }),
+						encodeBB({ sda: 0, scl: 1 }), encodeBB({ sda: 1, scl: 1 })
+					])
+
+
+					await ExcameraLabsI2CDriver.exitBitbangMode(this.#port)
+
+					// await initScript(this.#port)
+
+					console.log('inited')
+
+				})
+				.catch(e => console.warn(e))
+		})
+
+		const updateButton = stuff.getElementById('updateConfigInfo')
+		updateButton.addEventListener('click', event => {
+			updateButton.disabled = true
+			Promise.resolve()
+				.then(async () => {
+
+					const status = await ExcameraLabsI2CDriver.transmitStatusInfo(this.#port)
+
+					const {
+						identifier,
+						serial,
+						uptime,
+						voltage,
+						current,
+						temperature,
+						mode,
+						sda,
+						scl,
+						speed,
+						pullups,
+						crc
+					} = status
+
+
+					const out = name => document.querySelector(`[data-info] output[name=${name}]`)
+
+					out('model').innerText = identifier
+					out('serial').innerText = serial
+					out('uptime').innerText = uptime
+					out('voltage').innerText = voltage
+					out('current').innerText = current
+					out('temperature').innerText = temperature
+					out('sda').innerText = `${sda} (${sda === 1 ? 'Idle' : 'Active'})`
+					out('scl').innerText = `${scl} (${scl === 1 ? 'Idle' : 'Active'})`
+
+					updateButton.disabled = false
+				})
+				.catch(e => console.warn(e))
+		})
+
+
+		function selectTab(name, buttonElem) {
+			const driverDoc = buttonElem.closest('excamera-i2cdriver')
+
+			const tabButton = driverDoc.querySelector(`button[data-tab="${name}"]`)
+			tabButton.disabled = true
 
 			// remove content active
-			const activeOthers = document.querySelectorAll('excamera-i2cdriver .tabsContent[data-active]')
+			const activeOthers = driverDoc.querySelectorAll('.tabsContent[data-active]')
 			activeOthers.forEach(ao => ao.toggleAttribute('data-active', false))
 
 			// remove tab button active
-			const activeOthersTabsButtons = document.querySelectorAll('excamera-i2cdriver button[data-tab]')
+			const activeOthersTabsButtons = driverDoc.querySelectorAll('button[data-tab]')
 			activeOthersTabsButtons.forEach(ao => ao.toggleAttribute('data-active', false))
 
 			// set content active
-			const tabContentElem = document.querySelector('[data-for-tab="scan"]')
+			const tabContentElem = driverDoc.querySelector(`[data-for-tab="${name}"]`)
 			tabContentElem.toggleAttribute('data-active', true)
 
 			// set tab button active
-			tabScanButton.toggleAttribute('data-active', true)
+			tabButton.toggleAttribute('data-active', true)
 
-			tabScanButton.disabled = false
+			tabButton.disabled = false
+		}
+
+		const tabBitbang = stuff.querySelector('button[data-tab="bitbang"]')
+		tabBitbang.disabled = false
+		tabBitbang.addEventListener('click', event => {
+			selectTab('bitbang', event.target)
+		})
+
+		const tabSettings = stuff.querySelector('button[data-tab="settings"]')
+		tabSettings.addEventListener('click', event => {
+			selectTab('settings', event.target)
+		})
+
+
+		const foo = stuff.querySelector('button[data-tab="scan"]')
+		foo.addEventListener('click', event => {
+			selectTab('scan', event.target)
 		})
 
 
@@ -447,7 +682,7 @@ export class ExcameraI2CDriverUIBuilder {
 						const {
 							dev: addr,
 							ack: acked,
-							to: timedout,
+							to: timeout,
 							arb: arbitration
 						} = result
 
@@ -457,7 +692,7 @@ export class ExcameraI2CDriverUIBuilder {
 
 						hexElem.toggleAttribute('acked', acked)
 						hexElem.toggleAttribute('arbitration', arbitration)
-						hexElem.toggleAttribute('timedout', timedout)
+						hexElem.toggleAttribute('timeout', timeout)
 
 						hexElem.textContent = addr.toString(16).padStart(2, '0')
 
@@ -466,7 +701,7 @@ export class ExcameraI2CDriverUIBuilder {
 
 						listElem.toggleAttribute('data-acked', acked)
 						listElem.toggleAttribute('data-arbitration', arbitration)
-						listElem.toggleAttribute('data-timedout', timedout)
+						listElem.toggleAttribute('data-timeout', timeout)
 
 						const guesses = deviceGuessByAddress(addr)
 						const guessSelectElem = document.createElement('select')

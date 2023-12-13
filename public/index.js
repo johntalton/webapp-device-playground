@@ -15,6 +15,7 @@ import { DS3502ConfigElement } from './custom-elements/ds3502-config.js'
 import { ExcameraI2CDriverUIBuilder } from './devices-serial/exc-i2cdriver.js'
 import { MCP2221UIBuilder } from './devices-hid/mcp2221.js'
 import { FT232H_PRODUCT_ID, FT232H_VENDOR_ID, FT232HUIBuilder } from './devices-usb/ft232h.js'
+import { MashUIBuilder } from './devices-serial/mash.js'
 
 //
 import { I2CDeviceBuilderFactory } from './devices-i2c/device-factory.js'
@@ -173,17 +174,30 @@ function buildDeviceListItem(deviceListElem, builder) {
 
 function hydrateCustomeElementTemplateImport(importElemId, name, konstructor) {
 	const callback = (mutations, observer) => {
+		console.log('installing html', name)
 		konstructor.template = element.firstChild
 		customElements.define(name, konstructor)
 		observer.disconnect()
 	}
-	const config = { attributes: false, childList: true, subtree: false }
+
+
+	const config = { attributes: false, childList: true, subtree: true }
 	const observer = new MutationObserver(callback)
 	const element = document.getElementById(importElemId)
 	observer.observe(element, config)
+
+	element.addEventListener('loaded', event => {
+		console.log('installing html', name)
+		konstructor.template = element.firstChild
+		customElements.define(name, konstructor)
+		observer.disconnect()
+	})
+
+	console.log('hydrateCustomElement', importElemId, name, element)
 }
 
 async function hydrateCustomElements() {
+	console.log('hydrateCustomelements')
 	customElements.define('html-import', HTMLImportElement)
 
 	hydrateCustomeElementTemplateImport('capture-event', 'capture-event', CaptureEventElement)
@@ -276,6 +290,11 @@ async function onContentLoaded() {
 			}
 
 			//const liElem = makeListItem()
+			Promise.resolve()
+				.then(async () => {
+					const builder = await FT232HUIBuilder.builder(port, ui)
+					const demolisher = buildDeviceListItem(deviceListElem, builder)
+				})
 		}
 	}
 
@@ -309,8 +328,22 @@ async function onContentLoaded() {
 				// })
 			}
 
+			else if(true) {
+				console.log('Assuming MASH fallback - for testing for now?')
+				const builder = await MashUIBuilder.builder(port, ui)
+				const demolisher = buildDeviceListItem(deviceListElem, builder)
+
+				signal.addEventListener('abort', event => {
+					console.log('signal said: abort - demo time')
+					demolisher()
+				})
+			}
+
+
 			//
-			console.log('no driver for serial port', info)
+			else {
+				console.log('no driver for serial port', info)
+			}
 		},
 		addUSBDevice: async device => {
 			console.log('UI:addUSB', device)
@@ -353,7 +386,9 @@ async function onContentLoaded() {
 		hydrateUSB(requestUSBButton, ui),
 		hydrateHID(requestHIDButton, ui),
 
-		hydrateEffects()
+		hydrateEffects(),
+
+		//ui.addI2CDevice({ type: 'mcp23', address: 0x00, bus: undefined })
 	])
 }
 

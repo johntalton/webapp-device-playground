@@ -9,7 +9,7 @@ main {
   background-color: var(--color-accent-softer, red);
   color: var(--color-accent-softer-text, red);
 
-  overflow-y: scroll;
+  /* overflow-y: scroll; */
 }
 
 main > section {
@@ -57,6 +57,8 @@ main button {
   margin-inline: 0;
   border-radius: 2.5em;
   border: 0;
+
+  white-space: nowrap;
 
   background-color: var(--color-accent--darker, red);
   color: var(--color-accent--darker-text);
