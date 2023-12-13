@@ -26,6 +26,7 @@
     "@johntalton/mcp23": "../mcp23",
     "@johntalton/pca9536": "../pca9536",
     "@johntalton/pcf8574": "^1.0.7",
+    "@johntalton/pcf8523": "../pcf8523",
     "@johntalton/ssd1306": "../ssd1306",
     "@johntalton/tca9548a": "^5.0.0",
     "@johntalton/tcs34725": "../tcs34725"

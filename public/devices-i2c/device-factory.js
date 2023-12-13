@@ -7,6 +7,7 @@ import { BNO08XBuilder } from './bno08x.js'
 import { SSD1306Builder } from './ssd1306.js'
 import { PCA9536Builder} from './pca9536.js'
 import { PCF8574Builder } from './pcf8574.js'
+import { PCF8523Builder } from './pcf8523.js'
 import { HT16K33Builder } from './ht16k33.js'
 import { ADT7410Builder } from './adt7410.js'
 import { AGS02MABuilder } from './ags02ma.js'
@@ -23,6 +24,7 @@ import {
 	SSD1306_INFO,
 	PCA_9536_INFO,
 	PCF_8574_INFO,
+	PCF_8523_INFO,
 	ADT7410_INFO,
 	AGS02MA_INFO,
 	TCS_34725_INFO,
@@ -37,6 +39,7 @@ const BY_NAME = {
 	[BNO_08X_INFO.name]: (definition, ui) => BNO08XBuilder.builder(definition, ui),
 	[SSD1306_INFO.name]: (definition, ui) => SSD1306Builder.builder(definition, ui),
 	[PCF_8574_INFO.name]: (definition, ui) => PCF8574Builder.builder(definition, ui),
+	[PCF_8523_INFO.name]: (definition, ui) => PCF8523Builder.builder(definition, ui),
 	[HT16K33_INFO.name]: (definition, ui) => HT16K33Builder.builder(definition, ui),
 	[DS1841_INFO.name]: (definition, ui) => DS1841Builder.builder(definition, ui),
 	[ADT7410_INFO.name]: (definition, ui) => ADT7410Builder.builder(definition, ui),

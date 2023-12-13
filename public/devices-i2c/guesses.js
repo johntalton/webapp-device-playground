@@ -44,6 +44,10 @@ export const PCF_8574_INFO = {
 	addresses: [ 0x20, 0x21 ], name: 'pcf8574'
 }
 
+export const PCF_8523_INFO = {
+	addresses: [ 0x68 ], name: 'pcf8523'
+}
+
 export const TCS_34725_INFO = {
 	addresses: [ 0x29 ], name: 'tcs34725'
 }
@@ -81,7 +85,7 @@ export const I2C_GUESSES = [
 	{ addresses: [ ...range(0x50, 0x57) ], name: 'mb85rc' },
 	// 0x60
 	{ addresses: [ 0x62, 0x63 ], name: 'mcp4725a1'},
-	{ addresses: [ 0x68 ], name: 'pcf8523'},
+	PCF_8523_INFO,
 	// 0x70
 	TCA9548_INFO,
 	BOSCH_IEU_INFO,
