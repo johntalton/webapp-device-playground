@@ -92,7 +92,7 @@ export class PCF8523Builder {
 					<label>Countdown Timer B Interrupt Enabled</label>
 					<input type="checkbox" disabled checked></input>
 
-					<button data-refresh-control2>refresh</button>
+					<button data-refresh-control2>refresh (and clear watchdog)</button>
 					<button disabled>save</button>
 				</form>
 			</details>
@@ -108,16 +108,16 @@ export class PCF8523Builder {
 					</output>
 
 					<label>Battery Switchover Interrupt</label>
-					<output>false</output>
+					<output data-battery-switchover-flag>false</output>
 
 					<label>Battery Status Low Interrupt</label>
-					<output>false</output>
+					<output data-battery-low-flag>false🏴🏳️</output>
 
 					<label>Battery Switchover Interrupt Enabled</label>
-					<input type="checkbox" disabled></input>
+					<input type="checkbox" disabled data-switchover-enable></input>
 
 					<label>Battery Status Low Interrupt Enabled</label>
-					<input type="checkbox" disabled></input>
+					<input type="checkbox" disabled data-status-low-enable></input>
 
 					<button data-refresh-control3>refresh</button>
 					<button disable3d>save</button>
@@ -157,7 +157,8 @@ export class PCF8523Builder {
 				<form method="dialog">
 					<button data-poll-time>⏱️ Poll Time</button>
 					<button data-reset>⚡️ Reset</button>
-					<button>Stop Oscillator</button>
+					<button data-toggle-oscillator--start>Start Oscillator</button>
+					<button data-toggle-oscillator--stop>Stop Oscillator</button>
 					<button data-set-time-now>Set Time Now</button>
 					<button data-on-battery-mode>Enable Battery and Monitor</button>
 				</form>
@@ -174,6 +175,32 @@ export class PCF8523Builder {
 
 		const century = BASE_CENTURY_Y2K
 
+
+
+
+		const startOscillator = root.querySelector('button[data-toggle-oscillator--start]')
+		startOscillator.addEventListener('click', event => {
+			console.warn('transaction implied not explicit') // / TODO use .transaction
+			this.#device.getControl1().then(async ctrl => {
+				return this.#device.setControl1({
+					...ctrl,
+					STOP: false
+				})
+			})
+			.catch(e => console.warn(e))
+		})
+
+		const stopOscillator = root.querySelector('button[data-toggle-oscillator--stop]')
+		stopOscillator.addEventListener('click', event => {
+			console.warn('transaction implied not explicit') // / TODO use .transaction
+			this.#device.getControl1().then(async ctrl => {
+				return this.#device.setControl1({
+					...ctrl,
+					STOP: true
+				})
+			})
+			.catch(e => console.warn(e))
+		})
 
 
 		const refresh1Button = root.querySelector('button[data-refresh-control1]')
@@ -194,6 +221,18 @@ export class PCF8523Builder {
 		refresh3Button.addEventListener('click', event => {
 			this.#device.getControl3().then(ctrl => {
 				console.log(ctrl)
+
+				const batteryLowFlag = root.querySelector('output[data-battery-low-flag]')
+				const batterySwitchoverFlag = root.querySelector('output[data-battery-switchover-flag]')
+
+				batteryLowFlag.value = ctrl.BATTERY_STATUS_LOW ? '⚠️🔔' : '🔕'
+				batterySwitchoverFlag.value = ctrl.BATTERY_SWITCHOVER_FLAG ? '⚠️🔔' : '🔕'
+
+				const switchoverEnabled = root.querySelector('input[data-switchover-enable]')
+				const statusLowEnabled = root.querySelector('input[data-status-low-enable]')
+
+				switchoverEnabled.checked = ctrl.BATTERY_SWITCHOVER_INTERRUPT_ENABLED
+				statusLowEnabled.checked = ctrl.BATTER_STATUS_LOW_INTERRUPT_ENABLED
 			})
 		})
 
