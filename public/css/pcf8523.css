@@ -1,0 +1,27 @@
+
+[data-pcf8523] {
+
+
+	& > details > summary {
+		display: block;
+		cursor: pointer;
+
+		font-size: 1.5em;
+		margin-block: .5em;
+	}
+
+	& > details > form {
+		display: grid;
+		grid-template-columns: 1fr 1fr;
+		gap: 0.5em;
+
+		border-radius: 1em;
+		margin-block-end: 0.5em;
+		margin-inline-end: 1em;
+		padding-inline: 1em;
+		padding-block: 1em;
+
+		background-color: var(--color-accent--light, red);
+  	color: var(--color-accent--light-text, red);
+	}
+}

@@ -35,7 +35,7 @@ excamera-i2cdriver form[data-config] {
   margin-block-start: 1em;
 
 
-  background-color: var(--color-accent-softer,, red);
+  background-color: var(--color-accent-softer, red);
   color: var(--color-accent-softer-text, red);
 }
 
