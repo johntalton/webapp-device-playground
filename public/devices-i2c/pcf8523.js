@@ -1,6 +1,8 @@
 import { I2CAddressedBus } from '@johntalton/and-other-delights'
 import { PCF8523, BASE_CENTURY_Y2K } from '@johntalton/pcf8523'
 
+import { PCF8523ConfigElement } from '../custom-elements/pcf8523-config.js'
+
 export class PCF8523Builder {
 	#abus
 	#device
@@ -27,285 +29,149 @@ export class PCF8523Builder {
 	signature() { }
 
 	async buildCustomView(selectionElem) {
-		const root = document.createElement('div')
-		root.toggleAttribute('data-pcf8523', true)
+		const preRoot = document.createElement('pcf8523-config')
+		preRoot.toggleAttribute('data-pcf8523', true)
 
-		const page = `
-			<details>
-				<summary>Control (1) Settings</summary>
+		// background task // TODO is there a case for a fallback if never defined?
+		customElements.whenDefined('pcf8523-config')
+		// Promise.resolve()
+			.then(() => {
+				const { content } = PCF8523ConfigElement.template
+				const view = content.cloneNode(true)
+				preRoot.append(view)
 
-				<form method="dialog">
-					<label>Capacitor Selection</label>
-					<select disabled>
-						<option>7 pF</option>
-					</select>
+				const century = BASE_CENTURY_Y2K
 
-					<label>Status</label>
-					<output>Running</output>
-
-					<label>Mode</label>
-					<select disabled>
-						<option>12 hour mode (AM/PM)</option>
-						<option>24 hour mode</option>
-					</select>
-
-					<label>Second Interrupt Enabled</label>
-					<input type="checkbox" disabled checked></input>
-
-					<label>Alarm Interrupt Enabled</label>
-					<input type="checkbox" disabled></input>
-
-					<label>Correction Interrupt Enabled</label>
-					<input type="checkbox" disabled></input>
-
-					<button data-refresh-control1>refresh</button>
-					<button disabled>save</button>
-				</form>
-			</details>
-
-			<details>
-				<summary>Control (2) Settings</summary>
-
-				<form method="dialog">
-					<label>Watchdog Timer A Interrupt</label>
-					<output>true</output>
-
-					<label>Countdown Timer A Interrupt</label>
-					<output>false</output>
-
-					<label>Countdown Timer B Interrupt</label>
-					<output>false</output>
-
-					<label>Second Interrupt</label>
-					<output>false</output>
-
-					<label>Alarm Interrupt</label>
-					<output>false</output>
-
-
-					<label>Watchdog Timer A Interrupt Enabled</label>
-					<input type="checkbox" disabled checked></input>
-
-					<label>Countdown Timer A Interrupt Enabled</label>
-					<input type="checkbox" disabled checked></input>
-
-					<label>Countdown Timer B Interrupt Enabled</label>
-					<input type="checkbox" disabled checked></input>
-
-					<button data-refresh-control2>refresh (and clear watchdog)</button>
-					<button disabled>save</button>
-				</form>
-			</details>
-
-			<details>
-				<summary>Control (3) Settings</summary>
-
-				<form method="dialog">
-					<label>Power Mode</label>
-					<output>
-						battery switch-over function is enabled in standard mode;
-						battery low detection function is enabled
-					</output>
-
-					<label>Battery Switchover Interrupt</label>
-					<output data-battery-switchover-flag>false</output>
-
-					<label>Battery Status Low Interrupt</label>
-					<output data-battery-low-flag>false🏴🏳️</output>
-
-					<label>Battery Switchover Interrupt Enabled</label>
-					<input type="checkbox" disabled data-switchover-enable></input>
-
-					<label>Battery Status Low Interrupt Enabled</label>
-					<input type="checkbox" disabled data-status-low-enable></input>
-
-					<button data-refresh-control3>refresh</button>
-					<button disable3d>save</button>
-				</form>
-			</details>
-
-			<details>
-				<summary>Offset Settings</summary>
-
-				<form method="dialog">
-					<button>refresh</button>
-					<button disabled>save</button>
-				</form>
-			</details>
-
-			<details>
-				<summary>Alarm Settings</summary>
-
-				<form method="dialog">
-					<button>refresh</button>
-					<button disabled>save</button>
-				</form>
-			</details>
-
-			<details>
-				<summary>Timer Settings</summary>
-
-				<form method="dialog">
-					<button>refresh</button>
-					<button disabled>save</button>
-				</form>
-			</details>
-
-			<details>
-				<summary>Utilities</summary>
-
-				<form method="dialog">
-					<button data-poll-time>⏱️ Poll Time</button>
-					<button data-reset>⚡️ Reset</button>
-					<button data-toggle-oscillator--start>Start Oscillator</button>
-					<button data-toggle-oscillator--stop>Stop Oscillator</button>
-					<button data-set-time-now>Set Time Now</button>
-					<button data-on-battery-mode>Enable Battery and Monitor</button>
-				</form>
-			</details>
-
-			<form method="dialog">
-				<output data-display-integrity></output>
-				<output data-display-time></output>
-			</form>
-		`
-
-		const pageDOM = (new DOMParser).parseFromString(page, 'text/html')
-		root.append(...pageDOM.body.children)
-
-		const century = BASE_CENTURY_Y2K
-
-
-
-
-		const startOscillator = root.querySelector('button[data-toggle-oscillator--start]')
-		startOscillator.addEventListener('click', event => {
-			console.warn('transaction implied not explicit') // / TODO use .transaction
-			this.#device.getControl1().then(async ctrl => {
-				return this.#device.setControl1({
-					...ctrl,
-					STOP: false
+				const startOscillator = preRoot.querySelector('button[data-toggle-oscillator--start]')
+				startOscillator.addEventListener('click', event => {
+					console.warn('transaction implied not explicit') // / TODO use .transaction
+					this.#device.getControl1().then(async ctrl => {
+						return this.#device.setControl1({
+							...ctrl,
+							STOP: false
+						})
+					})
+						.catch(e => console.warn(e))
 				})
-			})
-			.catch(e => console.warn(e))
-		})
 
-		const stopOscillator = root.querySelector('button[data-toggle-oscillator--stop]')
-		stopOscillator.addEventListener('click', event => {
-			console.warn('transaction implied not explicit') // / TODO use .transaction
-			this.#device.getControl1().then(async ctrl => {
-				return this.#device.setControl1({
-					...ctrl,
-					STOP: true
+				const stopOscillator = preRoot.querySelector('button[data-toggle-oscillator--stop]')
+				stopOscillator.addEventListener('click', event => {
+					console.warn('transaction implied not explicit') // / TODO use .transaction
+					this.#device.getControl1().then(async ctrl => {
+						return this.#device.setControl1({
+							...ctrl,
+							STOP: true
+						})
+					})
+						.catch(e => console.warn(e))
 				})
-			})
-			.catch(e => console.warn(e))
-		})
 
 
-		const refresh1Button = root.querySelector('button[data-refresh-control1]')
-		refresh1Button.addEventListener('click', event => {
-			this.#device.getControl1().then(ctrl => {
-				console.log(ctrl)
-			})
-		})
-
-		const refresh2Button = root.querySelector('button[data-refresh-control2]')
-		refresh2Button.addEventListener('click', event => {
-			this.#device.getControl2().then(ctrl => {
-				console.log(ctrl)
-			})
-		})
-
-		const refresh3Button = root.querySelector('button[data-refresh-control3]')
-		refresh3Button.addEventListener('click', event => {
-			this.#device.getControl3().then(ctrl => {
-				console.log(ctrl)
-
-				const batteryLowFlag = root.querySelector('output[data-battery-low-flag]')
-				const batterySwitchoverFlag = root.querySelector('output[data-battery-switchover-flag]')
-
-				batteryLowFlag.value = ctrl.BATTERY_STATUS_LOW ? '⚠️🔔' : '🔕'
-				batterySwitchoverFlag.value = ctrl.BATTERY_SWITCHOVER_FLAG ? '⚠️🔔' : '🔕'
-
-				const switchoverEnabled = root.querySelector('input[data-switchover-enable]')
-				const statusLowEnabled = root.querySelector('input[data-status-low-enable]')
-
-				switchoverEnabled.checked = ctrl.BATTERY_SWITCHOVER_INTERRUPT_ENABLED
-				statusLowEnabled.checked = ctrl.BATTER_STATUS_LOW_INTERRUPT_ENABLED
-			})
-		})
-
-		const batteryModeButton = root.querySelector('button[data-on-battery-mode]')
-		batteryModeButton.addEventListener('click', event => {
-			Promise.resolve()
-				.then(async () => {
-					await this.#device.setControl3({
-					  pmBatteryLowDetectionEnabled: true,
-						pmSwitchoverEnabled: true,
-						pmDirectSwitchingEnabled: false,
-
-						clearBatterSwitchoverFlag: false,
-						switchoverEnabled: true,
-						batteryLowEnabled: true
+				const refresh1Button = preRoot.querySelector('button[data-refresh-control1]')
+				refresh1Button.addEventListener('click', event => {
+					this.#device.getControl1().then(ctrl => {
+						console.log(ctrl)
 					})
 				})
-				.catch(e => console.warn(e))
-		})
 
-		const setTimeNowButton = root.querySelector('button[data-set-time-now]')
-		setTimeNowButton.addEventListener('click', event => {
-			Promise.resolve()
-				.then(async () => {
-					const now = new Date(Date.now())
-
-					const seconds = now.getUTCSeconds()
-					const minutes = now.getUTCMinutes()
-					const hours = now.getUTCHours()
-
-					const day = now.getUTCDate()
-					const month = now.getUTCMonth() + 1
-					const year = now.getUTCFullYear() - century
-
-					await this.#device.setTime(
-						seconds, minutes, hours,
-						day, month, year,
-						false, century
-					)
+				const refresh2Button = preRoot.querySelector('button[data-refresh-control2]')
+				refresh2Button.addEventListener('click', event => {
+					this.#device.getControl2().then(ctrl => {
+						console.log(ctrl)
+					})
 				})
-				.catch(e => console.warn(e))
-		})
 
-		const resetButton = root.querySelector('button[data-reset]')
-		resetButton.addEventListener('click', event => {
-			this.#device.softReset()
-				.catch(e => console.warn(e))
-		})
+				const refresh3Button = preRoot.querySelector('button[data-refresh-control3]')
+				refresh3Button.addEventListener('click', event => {
+					this.#device.getControl3().then(ctrl => {
+						console.log(ctrl)
 
-		const pollTimeButton = root.querySelector('button[data-poll-time]')
-		pollTimeButton.addEventListener('click', async event => {
-			const time = await this.#device.getTime(false, century)
+						const batteryLowFlag = preRoot.querySelector('output[data-battery-low-flag]')
+						const batterySwitchoverFlag = preRoot.querySelector('output[data-battery-switchover-flag]')
 
-			const { year, month, monthsValue, day, hour, minute, second, weekday } = time
+						batteryLowFlag.value = ctrl.BATTERY_STATUS_LOW ? '⚠️🔔' : '🔕'
+						batterySwitchoverFlag.value = ctrl.BATTERY_SWITCHOVER_FLAG ? '⚠️🔔' : '🔕'
 
-			//
-			const date = new Date(Date.UTC(
-				year,
-				monthsValue - 1,
-				day,
-				hour, minute, second))
+						const switchoverEnabled = preRoot.querySelector('input[data-switchover-enable]')
+						const statusLowEnabled = preRoot.querySelector('input[data-status-low-enable]')
 
-			console.log(time.integrity ? '👍' : '👎', date)
+						switchoverEnabled.checked = ctrl.BATTERY_SWITCHOVER_INTERRUPT_ENABLED
+						statusLowEnabled.checked = ctrl.BATTER_STATUS_LOW_INTERRUPT_ENABLED
+					})
+				})
 
-			const outputIntegrity = root.querySelector('output[data-display-integrity]')
-			outputIntegrity.value = time.integrity ? '👍' : '👎'
+				const batteryModeButton = preRoot.querySelector('button[data-on-battery-mode]')
+				batteryModeButton.addEventListener('click', event => {
+					Promise.resolve()
+						.then(async () => {
+							await this.#device.setControl3({
+								pmBatteryLowDetectionEnabled: true,
+								pmSwitchoverEnabled: true,
+								pmDirectSwitchingEnabled: false,
 
-			const outputTime = root.querySelector('output[data-display-time]')
-			outputTime.value = date.toString() // date.toLocaleString('en-US')
+								clearBatterSwitchoverFlag: false,
+								switchoverEnabled: true,
+								batteryLowEnabled: true
+							})
+						})
+						.catch(e => console.warn(e))
+				})
 
-		})
+				const setTimeNowButton = preRoot.querySelector('button[data-set-time-now]')
+				setTimeNowButton.addEventListener('click', event => {
+					Promise.resolve()
+						.then(async () => {
+							const now = new Date(Date.now())
 
-		return root
+							const seconds = now.getUTCSeconds()
+							const minutes = now.getUTCMinutes()
+							const hours = now.getUTCHours()
+
+							const day = now.getUTCDate()
+							const month = now.getUTCMonth() + 1
+							const year = now.getUTCFullYear() - century
+
+							await this.#device.setTime(
+								seconds, minutes, hours,
+								day, month, year,
+								false, century
+							)
+						})
+						.catch(e => console.warn(e))
+				})
+
+				const resetButton = preRoot.querySelector('button[data-reset]')
+				resetButton.addEventListener('click', event => {
+					this.#device.softReset()
+						.catch(e => console.warn(e))
+				})
+
+				const pollTimeButton = preRoot.querySelector('button[data-poll-time]')
+				pollTimeButton.addEventListener('click', async event => {
+					const time = await this.#device.getTime(false, century)
+
+					const { year, month, monthsValue, day, hour, minute, second, weekday } = time
+
+					//
+					const date = new Date(Date.UTC(
+						year,
+						monthsValue - 1,
+						day,
+						hour, minute, second))
+
+					console.log(time.integrity ? '👍' : '👎', date)
+
+					const outputIntegrity = preRoot.querySelector('output[data-display-integrity]')
+					outputIntegrity.value = time.integrity ? '👍' : '👎'
+
+					const outputTime = preRoot.querySelector('output[data-display-time]')
+					outputTime.value = date.toString() // date.toLocaleString('en-US')
+
+				})
+			})
+			.catch(e => console.warn(e))
+
+		return preRoot
 	}
 }
 

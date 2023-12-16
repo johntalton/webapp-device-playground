@@ -1,3 +1,5 @@
+"use strict";
+
 import { hydrateSerial } from './hydrate/serial.js'
 import { hydrateUSB } from './hydrate/usb.js'
 import { hydrateHID } from './hydrate/hid.js'
@@ -10,6 +12,7 @@ import { MCP2221ConfigElement } from './custom-elements/mcp2221-config.js'
 import { CaptureEventElement } from './custom-elements/capture-event.js'
 import { TCA9548ConfigElement } from './custom-elements/tca9548-config.js'
 import { DS3502ConfigElement } from './custom-elements/ds3502-config.js'
+import { PCF8523ConfigElement } from './custom-elements/pcf8523-config.js'
 
 //
 import { ExcameraI2CDriverUIBuilder } from './devices-serial/exc-i2cdriver.js'
@@ -105,7 +108,7 @@ function buildDeviceSection(builder) {
 
 				}
 				catch(e) {
-					console.error('error buiding view', e)
+					console.error('error building view', e)
 				}
 
 				closeButton.addEventListener('click', e => {
@@ -173,21 +176,22 @@ function buildDeviceListItem(deviceListElem, builder) {
 }
 
 function hydrateCustomeElementTemplateImport(importElemId, name, konstructor) {
+	const element = document.getElementById(importElemId)
+
 	const callback = (mutations, observer) => {
-		console.log('installing html', name)
+		console.log('installing html (observed)', name)
 		konstructor.template = element.firstChild
 		customElements.define(name, konstructor)
 		observer.disconnect()
 	}
 
-
-	const config = { attributes: false, childList: true, subtree: true }
 	const observer = new MutationObserver(callback)
-	const element = document.getElementById(importElemId)
+	const config = { attributes: false, childList: true, subtree: true }
 	observer.observe(element, config)
 
+
 	element.addEventListener('loaded', event => {
-		console.log('installing html', name)
+		console.log('installing html (loaded)', name)
 		konstructor.template = element.firstChild
 		customElements.define(name, konstructor)
 		observer.disconnect()
@@ -206,6 +210,7 @@ async function hydrateCustomElements() {
 	hydrateCustomeElementTemplateImport('excamera-i2cdriver', 'excamera-i2cdriver', ExcameraI2CDriverElement)
 	hydrateCustomeElementTemplateImport('tca9548-config', 'tca9548-config', TCA9548ConfigElement)
 	hydrateCustomeElementTemplateImport('ds3502-config', 'ds3502-config', DS3502ConfigElement)
+	hydrateCustomeElementTemplateImport('pcf8523-config', 'pcf8523-config', PCF8523ConfigElement)
 }
 
 async function hydrateEffects() {

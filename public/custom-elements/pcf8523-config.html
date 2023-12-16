@@ -1,0 +1,142 @@
+<template lang="us-EN">
+	<details>
+		<summary part="summary">Control (1) Settings</summary>
+
+		<form method="dialog" part="form">
+			<slot>
+				<label>Capacitor Selection</label>
+				<select disabled>
+					<option>7 pF</option>
+				</select>
+			</slot>
+
+			<label>Status</label>
+			<output>Running</output>
+
+			<label>Mode</label>
+			<select disabled>
+				<option>12 hour mode (AM/PM)</option>
+				<option>24 hour mode</option>
+			</select>
+
+			<label>Second Interrupt Enabled</label>
+			<input type="checkbox" disabled checked></input>
+
+			<label>Alarm Interrupt Enabled</label>
+			<input type="checkbox" disabled></input>
+
+			<label>Correction Interrupt Enabled</label>
+			<input type="checkbox" disabled></input>
+
+			<button data-refresh-control1>refresh</button>
+			<button disabled>save</button>
+		</form>
+	</details>
+
+	<details>
+		<summary part="summary">Control (2) Settings</summary>
+
+		<form method="dialog" part="form">
+			<label>Watchdog Timer A Interrupt</label>
+			<output>true</output>
+
+			<label>Countdown Timer A Interrupt</label>
+			<output>false</output>
+
+			<label>Countdown Timer B Interrupt</label>
+			<output>false</output>
+
+			<label>Second Interrupt</label>
+			<output>false</output>
+
+			<label>Alarm Interrupt</label>
+			<output>false</output>
+
+
+			<label>Watchdog Timer A Interrupt Enabled</label>
+			<input type="checkbox" disabled checked></input>
+
+			<label>Countdown Timer A Interrupt Enabled</label>
+			<input type="checkbox" disabled checked></input>
+
+			<label>Countdown Timer B Interrupt Enabled</label>
+			<input type="checkbox" disabled checked></input>
+
+			<button data-refresh-control2>refresh (and clear watchdog)</button>
+			<button disabled>save</button>
+		</form>
+	</details>
+
+	<details>
+		<summary part="summary">Control (3) Settings</summary>
+
+		<form method="dialog" part="form">
+			<label>Power Mode</label>
+			<output>
+				battery switch-over function is enabled in standard mode;
+				battery low detection function is enabled
+			</output>
+
+			<label>Battery Switchover Interrupt</label>
+			<output data-battery-switchover-flag>false</output>
+
+			<label>Battery Status Low Interrupt</label>
+			<output data-battery-low-flag>false🏴🏳️</output>
+
+			<label>Battery Switchover Interrupt Enabled</label>
+			<input type="checkbox" disabled data-switchover-enable></input>
+
+			<label>Battery Status Low Interrupt Enabled</label>
+			<input type="checkbox" disabled data-status-low-enable></input>
+
+			<button data-refresh-control3>refresh</button>
+			<button disable3d>save</button>
+		</form>
+	</details>
+
+	<details>
+		<summary part="summary">Offset Settings</summary>
+
+		<form method="dialog" part="form">
+			<button>refresh</button>
+			<button disabled>save</button>
+		</form>
+	</details>
+
+	<details>
+		<summary part="summary">Alarm Settings</summary>
+
+		<form method="dialog" part="form">
+			<button>refresh</button>
+			<button disabled>save</button>
+		</form>
+	</details>
+
+	<details>
+		<summary part="summary">Timer Settings</summary>
+
+		<form method="dialog" part="form">
+			<button>refresh</button>
+			<button disabled>save</button>
+		</form>
+	</details>
+
+	<details>
+		<summary part="summary">Utilities</summary>
+
+		<form method="dialog" part="form">
+			<button data-poll-time>⏱️ Poll Time</button>
+			<button data-reset>⚡️ Reset</button>
+			<button data-toggle-oscillator--start>Start Oscillator</button>
+			<button data-toggle-oscillator--stop>Stop Oscillator</button>
+			<button data-set-time-now>Set Time Now</button>
+			<button data-on-battery-mode>Enable Battery and Monitor</button>
+		</form>
+	</details>
+
+	<form method="dialog">
+		<output data-display-integrity></output>
+		<output data-display-time></output>
+	</form>
+
+</template>
