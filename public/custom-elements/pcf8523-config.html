@@ -5,28 +5,29 @@
 		<form method="dialog" part="form">
 			<slot>
 				<label>Capacitor Selection</label>
-				<select disabled>
-					<option>7 pF</option>
+				<select data-capacitor-selection disabled>
+					<option value="7pF">7 pF</option>
+					<option value="12.5pF">12.5 pF</option>
 				</select>
 			</slot>
 
-			<label>Status</label>
-			<output>Running</output>
+			<label>Oscillator Status</label>
+			<output data-stop>Running</output>
 
 			<label>Mode</label>
-			<select disabled>
-				<option>12 hour mode (AM/PM)</option>
-				<option>24 hour mode</option>
+			<select data-ampm disabled>
+				<option name="twelve" value="12">12 hour mode (AM/PM)</option>
+				<option name="twentyFour" value="24">24 hour mode</option>
 			</select>
 
 			<label>Second Interrupt Enabled</label>
-			<input type="checkbox" disabled checked></input>
+			<input data-second-interrupt-enabled type="checkbox" disabled></input>
 
 			<label>Alarm Interrupt Enabled</label>
-			<input type="checkbox" disabled></input>
+			<input data-alarm-interrupt-enabled type="checkbox" disabled></input>
 
 			<label>Correction Interrupt Enabled</label>
-			<input type="checkbox" disabled></input>
+			<input data-correction-interrupt-enabled type="checkbox" disabled></input>
 
 			<button data-refresh-control1>refresh</button>
 			<button disabled>save</button>
@@ -38,29 +39,29 @@
 
 		<form method="dialog" part="form">
 			<label>Watchdog Timer A Interrupt</label>
-			<output>true</output>
+			<output data-watchdog-flag></output>
 
 			<label>Countdown Timer A Interrupt</label>
-			<output>false</output>
+			<output data-countdownA-flag></output>
 
 			<label>Countdown Timer B Interrupt</label>
-			<output>false</output>
+			<output data-countdownB-flag></output>
 
 			<label>Second Interrupt</label>
-			<output>false</output>
+			<output data-second-flag></output>
 
 			<label>Alarm Interrupt</label>
-			<output>false</output>
+			<output data-alarm-flag></output>
 
 
 			<label>Watchdog Timer A Interrupt Enabled</label>
-			<input type="checkbox" disabled checked></input>
+			<input data-watchdog-enabled type="checkbox" disabled></input>
 
 			<label>Countdown Timer A Interrupt Enabled</label>
-			<input type="checkbox" disabled checked></input>
+			<input data-countdownA-enabled type="checkbox" disabled></input>
 
 			<label>Countdown Timer B Interrupt Enabled</label>
-			<input type="checkbox" disabled checked></input>
+			<input data-countdownB-enabled type="checkbox" disabled></input>
 
 			<button data-refresh-control2>refresh (and clear watchdog)</button>
 			<button disabled>save</button>
@@ -72,10 +73,22 @@
 
 		<form method="dialog" part="form">
 			<label>Power Mode</label>
-			<output>
-				battery switch-over function is enabled in standard mode;
-				battery low detection function is enabled
-			</output>
+
+			<fieldset>
+				<select disabled>
+					<option>switch-over enabled</option>
+					<option>switch-over disabled</option>
+				</select>
+				<select disabled>
+					<option>standard-mode</option>
+					<option>direct-mode</option>
+				</select>
+				<select disabled>
+					<option>detection enabled</option>
+					<option>detection disabled</option>
+				</select>
+			</fieldset>
+
 
 			<label>Battery Switchover Interrupt</label>
 			<output data-battery-switchover-flag>false</output>
@@ -90,7 +103,7 @@
 			<input type="checkbox" disabled data-status-low-enable></input>
 
 			<button data-refresh-control3>refresh</button>
-			<button disable3d>save</button>
+			<button disabled>save</button>
 		</form>
 	</details>
 

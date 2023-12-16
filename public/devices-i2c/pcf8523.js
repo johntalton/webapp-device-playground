@@ -48,7 +48,7 @@ export class PCF8523Builder {
 					this.#device.getControl1().then(async ctrl => {
 						return this.#device.setControl1({
 							...ctrl,
-							STOP: false
+							stop: false
 						})
 					})
 						.catch(e => console.warn(e))
@@ -60,17 +60,41 @@ export class PCF8523Builder {
 					this.#device.getControl1().then(async ctrl => {
 						return this.#device.setControl1({
 							...ctrl,
-							STOP: true
+							stop: true
 						})
 					})
 						.catch(e => console.warn(e))
 				})
 
-
 				const refresh1Button = preRoot.querySelector('button[data-refresh-control1]')
 				refresh1Button.addEventListener('click', event => {
 					this.#device.getControl1().then(ctrl => {
 						console.log(ctrl)
+
+						const {
+							capacitorSelection,
+							stop, ampm,
+							secondInterruptEnabled, alarmInterruptEnabled, correctionInterruptEnabled
+						} = ctrl
+
+						const capSelElem = preRoot.querySelector('select[data-capacitor-selection]')
+						capSelElem.value = capacitorSelection
+
+						const stopElem = preRoot.querySelector('output[data-stop]')
+						stopElem.value = stop ? 'Stopped' : 'Running'
+
+						const ampmElem = preRoot.querySelector('select[data-ampm]')
+						ampmElem.value = ampm ? '12' : '24'
+
+
+						const secondEnabled = preRoot.querySelector('input[data-second-interrupt-enabled]')
+						secondEnabled.value = secondInterruptEnabled
+
+						const alarmEnabled = preRoot.querySelector('input[data-alarm-interrupt-enabled]')
+						alarmEnabled.value = alarmInterruptEnabled
+
+						const correctionEnabled = preRoot.querySelector('input[data-correction-interrupt-enabled]')
+						correctionEnabled.value = correctionInterruptEnabled
 					})
 				})
 
@@ -78,6 +102,38 @@ export class PCF8523Builder {
 				refresh2Button.addEventListener('click', event => {
 					this.#device.getControl2().then(ctrl => {
 						console.log(ctrl)
+
+						const {
+							watchdogAFlag,
+							countdownAFlag,
+							countdownBFlag,
+							secondFlag,
+							alarmFlag,
+
+							watchdogAInterruptEnabled,
+							countdownAInterruptEnabled,
+							countdownBInterruptEnabled
+						} = ctrl
+
+						const watchdogAFlagElem = preRoot.querySelector('output[data-watchdog-flag]')
+						const countdownAFlagElem = preRoot.querySelector('output[data-countdownA-flag]')
+						const countdownBFlagElem = preRoot.querySelector('output[data-countdownB-flag]')
+						const secondFlagElem = preRoot.querySelector('output[data-second-flag]')
+						const alarmFlagElem = preRoot.querySelector('output[data-alarm-flag]')
+
+						watchdogAFlagElem.value = watchdogAFlag ? '🔔' : '🔕'
+						countdownAFlagElem.value = countdownAFlag ? '🔔' : '🔕'
+						countdownBFlagElem.value = countdownBFlag ? '🔔' : '🔕'
+						secondFlagElem.value = secondFlag ? '🔔' : '🔕'
+						alarmFlagElem.value = alarmFlag ? '🔔' : '🔕'
+
+						const watchdogEnabledElem = preRoot.querySelector('input[data-watchdog-enabled]')
+						const countdownAEnabledElem = preRoot.querySelector('input[data-countdownA-enabled]')
+						const countdownBEnabledElem = preRoot.querySelector('input[data-countdownB-enabled]')
+
+						watchdogEnabledElem.checked = watchdogAInterruptEnabled
+						countdownAEnabledElem.checked = countdownAInterruptEnabled
+						countdownBEnabledElem.checked = countdownBInterruptEnabled
 					})
 				})
 
@@ -89,14 +145,14 @@ export class PCF8523Builder {
 						const batteryLowFlag = preRoot.querySelector('output[data-battery-low-flag]')
 						const batterySwitchoverFlag = preRoot.querySelector('output[data-battery-switchover-flag]')
 
-						batteryLowFlag.value = ctrl.BATTERY_STATUS_LOW ? '⚠️🔔' : '🔕'
-						batterySwitchoverFlag.value = ctrl.BATTERY_SWITCHOVER_FLAG ? '⚠️🔔' : '🔕'
+						batteryLowFlag.value = ctrl.batteryLowFlag ? '🔔' : '🔕'
+						batterySwitchoverFlag.value = ctrl.batterySwitchoverFlag ? '🔔' : '🔕'
 
 						const switchoverEnabled = preRoot.querySelector('input[data-switchover-enable]')
 						const statusLowEnabled = preRoot.querySelector('input[data-status-low-enable]')
 
-						switchoverEnabled.checked = ctrl.BATTERY_SWITCHOVER_INTERRUPT_ENABLED
-						statusLowEnabled.checked = ctrl.BATTER_STATUS_LOW_INTERRUPT_ENABLED
+						switchoverEnabled.checked = ctrl.batterySwitchoverInterruptEnabled
+						statusLowEnabled.checked = ctrl.batteryLowInterruptEnabled
 					})
 				})
 
@@ -109,9 +165,10 @@ export class PCF8523Builder {
 								pmSwitchoverEnabled: true,
 								pmDirectSwitchingEnabled: false,
 
-								clearBatterSwitchoverFlag: false,
-								switchoverEnabled: true,
-								batteryLowEnabled: true
+								clearBatterSwitchoverFlag: true,
+
+								batterySwitchoverInterruptEnabled: true,
+								batteryLowInterruptEnabled: true,
 							})
 						})
 						.catch(e => console.warn(e))

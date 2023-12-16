@@ -21,4 +21,12 @@ pcf8523-config {
 		background-color: var(--color-accent--light, red);
   	color: var(--color-accent--light-text, red);
 	}
+
+	& fieldset {
+		display: flex;
+		flex-direction: row;
+		gap: 1em;
+		justify-content: space-between;
+		border: none;
+	}
 }
