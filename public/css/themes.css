@@ -82,6 +82,13 @@
 	--color-accent--l: 46%;
 }
 
+/* TODAYS_BLUE */
+[data-theme ~= "TodaysBlue" i] {
+	--color-accent--h: 222;
+	--color-accent--s: 42%;
+	--color-accent--l: 42%;
+}
+
 /* DREAM_BLUE */
 [data-theme ~= "Dream" i] {
 	--color-accent--h: 183;
@@ -123,18 +130,26 @@
 
 /*  */
 [data-theme ~= "Plum" i] {
-	--color-accent: #ce7fce;
-	--color-accent-text: white;
-	--color-accent--light: #0000004f;
-	--color-accent--light-text: white;
-	--color-accent--lighter: #ffffff73;
-	--color-accent--lighter-text: black;
-	--color-accent--lightest: #0000001c;
-	--color-accent--lightest-text: black;
+	/* hsl(300deg 44.63% 65.29%); */
+	--color-accent--h: 300;
+	--color-accent--s: 44%;
+	--color-accent--l: 65%;
+
+	--lighter-percentage: 20%;
+
+	/* --color-accent: #ce7fce; */
+	/* --color-accent-text: white; */
+
+	/* --color-accent--light: red; */
+	/* --color-accent--light-text: white; */
+	/* --color-accent--lighter: transparent; */
+	/* --color-accent--lighter-text: black; */
+	/* --color-accent--lightest: red; */
+	/* --color-accent--lightest-text: black; */
 	--color-accent--dark: plum;
-	--color-accent--dark-text: black;
-	--color-accent--darker: #03030324;
-	--color-accent--darker-text: black;
+	/* --color-accent--dark-text: black; */
+	/* --color-accent--darker: #03030324; */
+	/* --color-accent--darker-text: black; */
 }
 
 

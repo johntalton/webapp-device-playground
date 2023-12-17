@@ -2,35 +2,35 @@
 	<details>
 		<summary part="summary">Control (1) Settings</summary>
 
-		<form method="dialog" part="form">
+		<form data-control1-form method="dialog" part="form">
 			<slot>
 				<label>Capacitor Selection</label>
-				<select data-capacitor-selection disabled>
+				<select name="capacitorSelection" data-capacitor-selection readonly>
 					<option value="7pF">7 pF</option>
 					<option value="12.5pF">12.5 pF</option>
 				</select>
 			</slot>
 
 			<label>Oscillator Status</label>
-			<output data-stop>Running</output>
+			<output data-stop></output>
 
 			<label>Mode</label>
-			<select data-ampm disabled>
+			<select name="ampm" data-ampm>
 				<option name="twelve" value="12">12 hour mode (AM/PM)</option>
 				<option name="twentyFour" value="24">24 hour mode</option>
 			</select>
 
 			<label>Second Interrupt Enabled</label>
-			<input data-second-interrupt-enabled type="checkbox" disabled></input>
+			<input name="secondInterruptEnabled" data-second-interrupt-enabled type="checkbox" />
 
 			<label>Alarm Interrupt Enabled</label>
-			<input data-alarm-interrupt-enabled type="checkbox" disabled></input>
+			<input name="alarmInterruptEnabled" data-alarm-interrupt-enabled type="checkbox"></input>
 
 			<label>Correction Interrupt Enabled</label>
-			<input data-correction-interrupt-enabled type="checkbox" disabled></input>
+			<input name="correctionInterruptEnabled" data-correction-interrupt-enabled type="checkbox"></input>
 
-			<button data-refresh-control1>refresh</button>
-			<button disabled>save</button>
+			<button data-refresh-control1 type="button">refresh</button>
+			<button data-save-control1 type="submit" disabled>save</button>
 		</form>
 	</details>
 
@@ -91,10 +91,10 @@
 
 
 			<label>Battery Switchover Interrupt</label>
-			<output data-battery-switchover-flag>false</output>
+			<output data-battery-switchover-flag></output>
 
 			<label>Battery Status Low Interrupt</label>
-			<output data-battery-low-flag>false🏴🏳️</output>
+			<output data-battery-low-flag></output>
 
 			<label>Battery Switchover Interrupt Enabled</label>
 			<input type="checkbox" disabled data-switchover-enable></input>
@@ -129,12 +129,12 @@
 		<summary part="summary">Timer Settings</summary>
 
 		<form method="dialog" part="form">
-			<button>refresh</button>
+			<button data-refresh-timer>refresh</button>
 			<button disabled>save</button>
 		</form>
 	</details>
 
-	<details>
+	<details open>
 		<summary part="summary">Utilities</summary>
 
 		<form method="dialog" part="form">
