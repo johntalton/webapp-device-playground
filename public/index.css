@@ -20,6 +20,7 @@
 @import url('./css/excamera-i2cdriver.css') layer(app);
 @import url('./css/mash-mash.css') layer(app);
 @import url('./css/pcf8523.css') layer(app);
+@import url('./css/eeprom.css') layer(app);
 
 @import url('./css/themes.css');
 

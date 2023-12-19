@@ -1,0 +1,49 @@
+eeprom-config {
+	display: flex;
+	flex-direction: column;
+	margin-inline-end: 2em;
+	gap: 1em;
+
+	& fieldset {
+		padding: 1em;
+		display: flex;
+		gap: 1em;
+		align-items: center;
+		flex-wrap: wrap;
+	}
+}
+
+
+[data-memory-map] {
+	display: flex;
+	flex-wrap: wrap;
+
+	margin-block-start: 1em;
+
+	& > span {
+		display: block;
+		height: 1em;
+		width: 1em;
+
+		background-color: transparent;
+		border: 1px solid rgb(0 0 0 / 0.125);
+
+		&[data-free] {
+			background-color: lightslategrey;
+		}
+
+		&[data-reserved] {
+			background-color: olivedrab;
+		}
+
+		&[data-head] {
+			background-color: darkslategray;
+		}
+
+		&[data-selected] {
+			border: 1px solid rgb(255 255 255 / 0.5);;
+			box-shadow: 0px 0px 15px black;
+			z-index: 1;
+		}
+	}
+}

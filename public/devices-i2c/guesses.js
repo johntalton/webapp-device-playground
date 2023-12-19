@@ -56,6 +56,10 @@ export const MCP23_INFO = {
 	addresses: [ ...range(0x20, 0x27) ], name: 'mcp23'
 }
 
+export const EEPROM_INFO = {
+	addresses: [ ...range(0x50, 0x57) ], name: 'Generic EEPROM'
+}
+
 export const I2C_GUESSES = [
 	// 0x00
 	// 0x10
@@ -81,6 +85,8 @@ export const I2C_GUESSES = [
 	// 0x50
 	{ addresses: [ 0x5c ], name: 'am2320' },
 	{ addresses: [ 0x5c ], name: 'am2315' },
+
+	EEPROM_INFO,
 	{ addresses: [ ...range(0x50, 0x57) ], name: 'Adafruit 24LC32' },
 	{ addresses: [ ...range(0x50, 0x57) ], name: 'mb85rc' },
 	// 0x60

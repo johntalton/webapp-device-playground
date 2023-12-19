@@ -89,6 +89,22 @@
 	--color-accent--l: 42%;
 }
 
+[data-theme ~= "DeepOcean" i]
+{
+	--color-accent: oklch(0.36 0.07 199.78);
+	--color-accent-text: white;
+	--color-accent--light: oklch(0.37 0.07 198.5);
+	--color-accent--light-text: white;
+	--color-accent--lighter: oklch(0.42 0.09 189.58);
+	--color-accent--lighter-text: white;
+	--color-accent--lightest: oklch(0.34 0.07 198.84);
+	--color-accent--lightest-text: white;
+	--color-accent--dark: oklch(0.27 0.05 207.51);
+	--color-accent--dark-text: white;
+	--color-accent--darker: oklch(0.47 0.12 175.09);
+	--color-accent--darker-text: white;
+}
+
 /* DREAM_BLUE */
 [data-theme ~= "Dream" i] {
 	--color-accent--h: 183;
@@ -136,6 +152,7 @@
 	--color-accent--l: 65%;
 
 	--lighter-percentage: 20%;
+	--lightest-percentage: 25%;
 
 	/* --color-accent: #ce7fce; */
 	/* --color-accent-text: white; */
@@ -146,7 +163,7 @@
 	/* --color-accent--lighter-text: black; */
 	/* --color-accent--lightest: red; */
 	/* --color-accent--lightest-text: black; */
-	--color-accent--dark: plum;
+	/* --color-accent--dark: plum; */
 	/* --color-accent--dark-text: black; */
 	/* --color-accent--darker: #03030324; */
 	/* --color-accent--darker-text: black; */

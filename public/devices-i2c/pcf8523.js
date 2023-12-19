@@ -131,42 +131,74 @@ export class PCF8523Builder {
 					.catch(e => console.warn(e))
 				})
 
+
+				const watchdogAFlagElem = preRoot.querySelector('output[data-watchdog-flag]')
+				const countdownAFlagElem = preRoot.querySelector('output[data-countdownA-flag]')
+				const countdownBFlagElem = preRoot.querySelector('output[data-countdownB-flag]')
+				const secondFlagElem = preRoot.querySelector('output[data-second-flag]')
+				const alarmFlagElem = preRoot.querySelector('output[data-alarm-flag]')
+
+				const watchdogEnabledElem = preRoot.querySelector('input[data-watchdog-enabled]')
+				const countdownAEnabledElem = preRoot.querySelector('input[data-countdownA-enabled]')
+				const countdownBEnabledElem = preRoot.querySelector('input[data-countdownB-enabled]')
+
+				function UIUpdateControl2(profile) {
+					const {
+						watchdogAFlag,
+						countdownAFlag,
+						countdownBFlag,
+						secondFlag,
+						alarmFlag,
+
+						watchdogAInterruptEnabled,
+						countdownAInterruptEnabled,
+						countdownBInterruptEnabled
+					} = profile
+
+					watchdogAFlagElem.value = watchdogAFlag ? '🔔' : '🔕'
+					countdownAFlagElem.value = countdownAFlag ? '🔔' : '🔕'
+					countdownBFlagElem.value = countdownBFlag ? '🔔' : '🔕'
+					secondFlagElem.value = secondFlag ? '🔔' : '🔕'
+					alarmFlagElem.value = alarmFlag ? '🔔' : '🔕'
+
+					watchdogEnabledElem.checked = watchdogAInterruptEnabled
+					countdownAEnabledElem.checked = countdownAInterruptEnabled
+					countdownBEnabledElem.checked = countdownBInterruptEnabled
+				}
+
+				const saveControl2Elem = preRoot.querySelector('button[data-save-control2]')
+				saveControl2Elem.disabled = false
+
+				const formControl2 = preRoot.querySelector('form[data-control2-form]')
+				formControl2.addEventListener('submit', event => {
+					saveControl2Elem.disabled = true
+					Promise.resolve()
+						.then(async () => {
+							await this.#device.setControl2({
+								clearCountdownAFlag: false,
+								clearCountdownBFlag: false,
+								clearSecondFlag: false,
+								clearAlarmFlag: false,
+
+								watchdogInterruptEnabled: watchdogEnabledElem.checked,
+								countdownAInterruptEnabled: countdownAEnabledElem.checked,
+								countdownBInterruptEnabled: countdownBEnabledElem.checked,
+							})
+
+							const result = await this.#device.getControl2()
+							UIUpdateControl2(result)
+
+							saveControl2Elem.disabled = false
+						})
+						.catch(e => console.warn(e))
+				})
+
 				const refresh2Button = preRoot.querySelector('button[data-refresh-control2]')
 				refresh2Button.addEventListener('click', event => {
 					this.#device.getControl2().then(ctrl => {
 						console.log(ctrl)
 
-						const {
-							watchdogAFlag,
-							countdownAFlag,
-							countdownBFlag,
-							secondFlag,
-							alarmFlag,
-
-							watchdogAInterruptEnabled,
-							countdownAInterruptEnabled,
-							countdownBInterruptEnabled
-						} = ctrl
-
-						const watchdogAFlagElem = preRoot.querySelector('output[data-watchdog-flag]')
-						const countdownAFlagElem = preRoot.querySelector('output[data-countdownA-flag]')
-						const countdownBFlagElem = preRoot.querySelector('output[data-countdownB-flag]')
-						const secondFlagElem = preRoot.querySelector('output[data-second-flag]')
-						const alarmFlagElem = preRoot.querySelector('output[data-alarm-flag]')
-
-						watchdogAFlagElem.value = watchdogAFlag ? '🔔' : '🔕'
-						countdownAFlagElem.value = countdownAFlag ? '🔔' : '🔕'
-						countdownBFlagElem.value = countdownBFlag ? '🔔' : '🔕'
-						secondFlagElem.value = secondFlag ? '🔔' : '🔕'
-						alarmFlagElem.value = alarmFlag ? '🔔' : '🔕'
-
-						const watchdogEnabledElem = preRoot.querySelector('input[data-watchdog-enabled]')
-						const countdownAEnabledElem = preRoot.querySelector('input[data-countdownA-enabled]')
-						const countdownBEnabledElem = preRoot.querySelector('input[data-countdownB-enabled]')
-
-						watchdogEnabledElem.checked = watchdogAInterruptEnabled
-						countdownAEnabledElem.checked = countdownAInterruptEnabled
-						countdownBEnabledElem.checked = countdownBInterruptEnabled
+						UIUpdateControl2(ctrl)
 					})
 					.catch(e => console.warn(e))
 				})

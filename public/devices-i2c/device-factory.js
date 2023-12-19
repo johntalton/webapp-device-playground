@@ -13,6 +13,7 @@ import { ADT7410Builder } from './adt7410.js'
 import { AGS02MABuilder } from './ags02ma.js'
 import { TCS34725Builder } from './tcs34725.js'
 import { MCP23Builder } from './mcp23.js'
+import { EEPROMBuilder } from './eeprom.js'
 
 import {
 	HT16K33_INFO,
@@ -28,10 +29,12 @@ import {
 	ADT7410_INFO,
 	AGS02MA_INFO,
 	TCS_34725_INFO,
-	MCP23_INFO
+	MCP23_INFO,
+	EEPROM_INFO
 } from './guesses.js'
 
 const BY_NAME = {
+	'Adafruit 24LC32':  (definition, ui) => EEPROMBuilder.builder(definition, ui),
 	[PCA_9536_INFO.name]: (definition, ui) => PCA9536Builder.builder(definition, ui),
 	[TCA9548_INFO.name]: (definition, ui) => TCA9548Builder.builder(definition, ui),
 	[DS3502_INFO.name]: (definition, ui) => DS3502Builder.builder(definition, ui),
@@ -46,6 +49,7 @@ const BY_NAME = {
 	[AGS02MA_INFO.name]: (definition, ui) => AGS02MABuilder.builder(definition, ui),
 	[TCS_34725_INFO.name]: (definition, ui) => TCS34725Builder.builder(definition, ui),
 	[MCP23_INFO.name]: (definition, ui) => MCP23Builder.builder(definition, ui),
+	[EEPROM_INFO.name]: (definition, ui) => EEPROMBuilder.builder(definition, ui),
 }
 
 export class I2CDeviceBuilderFactory {

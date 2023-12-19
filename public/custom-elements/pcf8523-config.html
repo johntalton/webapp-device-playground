@@ -37,7 +37,7 @@
 	<details>
 		<summary part="summary">Control (2) Settings</summary>
 
-		<form method="dialog" part="form">
+		<form data-control2-form method="dialog" part="form">
 			<label>Watchdog Timer A Interrupt</label>
 			<output data-watchdog-flag></output>
 
@@ -55,16 +55,16 @@
 
 
 			<label>Watchdog Timer A Interrupt Enabled</label>
-			<input data-watchdog-enabled type="checkbox" disabled></input>
+			<input data-watchdog-enabled type="checkbox"></input>
 
 			<label>Countdown Timer A Interrupt Enabled</label>
-			<input data-countdownA-enabled type="checkbox" disabled></input>
+			<input data-countdownA-enabled type="checkbox"></input>
 
 			<label>Countdown Timer B Interrupt Enabled</label>
-			<input data-countdownB-enabled type="checkbox" disabled></input>
+			<input data-countdownB-enabled type="checkbox"></input>
 
-			<button data-refresh-control2>refresh (and clear watchdog)</button>
-			<button disabled>save</button>
+			<button data-refresh-control2 type="button">refresh (and clear watchdog)</button>
+			<button data-save-control2 disabled type="submit">save</button>
 		</form>
 	</details>
 
