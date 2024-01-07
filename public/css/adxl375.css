@@ -1,0 +1,7 @@
+adxl375-config {
+
+  & canvas {
+    border: 1px solid black;
+    background-color: white;
+  }
+}

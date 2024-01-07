@@ -26,29 +26,34 @@ export class AHT20Builder {
 	signature() { }
 
 	async buildCustomView() {
-		const root = document.createElement('div')
+		const root = document.createElement('aht20-config')
 
 		root.innerHTML = `
-			<button data-reset>Reset</button>
-			<button data-state>State</button>
-			<button data-init>Init</button>
-			<button data-trigger>Trigger</button>
-			<button data-measurement>Measurement</button>
+			<form data-form-buttons method="dialog">
+				<button type="button" data-reset>Reset</button>
+				<button data-state>State</button>
+				<button data-init disabled>Init</button>
+				<button data-trigger>Trigger</button>
+				<button data-measurement>Measurement</button>
+			</form>
 
 			<label>Initialized</label>
 			<output data-state-initialized>-</output>
 
-			<label>Busy</label>
-			<output data-state-busy>-</output>
+			<label>Ready</label>
+			<output data-state-ready>-</output>
 
 			<label>Calibrated</label>
 			<output data-state-calibrated>-</output>
 
-			<label>Measurement Humidity</label>
+			<label>Measurement Humidity (RH%)</label>
 			<output data-measurement-humidity>-</output>
 
-			<label>Measurement Temperature</label>
+			<label>Measurement Temperature (°C)</label>
 			<output data-measurement-temperature>-</output>
+
+			<label>Measurement CRC</label>
+			<output data-measurement-crc>-</output>
 		`
 
 		const buttonReset = root.querySelector('button[data-reset]')
@@ -58,10 +63,11 @@ export class AHT20Builder {
 		const buttonMeasurement = root.querySelector('button[data-measurement]')
 
 		const outInit = root.querySelector('output[data-state-initialized]')
-		const outBusy = root.querySelector('output[data-state-busy]')
+		const outReady = root.querySelector('output[data-state-ready]')
 		const outCali = root.querySelector('output[data-state-calibrated]')
 		const outHumi = root.querySelector('output[data-measurement-humidity]')
 		const outTemp = root.querySelector('output[data-measurement-temperature]')
+		const outCRC = root.querySelector('output[data-measurement-crc]')
 
 		buttonReset.addEventListener('click', async e => { // async into the void
 			await this.#device.reset()
@@ -71,7 +77,7 @@ export class AHT20Builder {
 			const state = await this.#device.getState()
 
 			outInit.innerText = state.initialized ? '👍' : '👎'
-			outBusy.innerText = state.busy ? '👎' : '👍'
+			outReady.innerText = state.busy ? '👎' : '👍'
 			outCali.innerText = state.calibrated ? '👍' : '👎'
 		})
 
@@ -86,8 +92,15 @@ export class AHT20Builder {
 		buttonMeasurement.addEventListener('click', async e => { // async into the void
 			const result = await this.#device.getMeasurement()
 
-			outHumi.innerText = result.humidityRH
-			outTemp.innerText = result.temperatureC
+			if(true) {
+				outInit.innerText = result.initialized ? '(👍)' : '(👎)'
+				outReady.innerText = result.busy ? '(👎)' : '(👍)'
+				outCali.innerText = result.calibrated ? '(👍)' : '(👎)'
+			}
+
+			outHumi.innerText = Math.trunc(result.humidityRH * 100) / 100
+			outTemp.innerText = Math.trunc(result.temperatureC * 100) / 100
+			outCRC.innerText = result.validCRC ? '👍' : '👎'
 		})
 
 		return root
