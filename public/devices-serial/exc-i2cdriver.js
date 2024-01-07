@@ -1,4 +1,4 @@
-
+import { I2CTransactionBus } from '@johntalton/and-other-delights'
 import {
 	ExcameraLabsI2CDriver,
 	EXCAMERA_LABS_VENDOR_ID,
@@ -40,18 +40,10 @@ async function initScript(port) {
 	// await ExcameraLabsI2CDriver.setSpeed(port, 100)
 }
 
-class VBusFactory {
-	static from({ port }) {
-		// console.log('make driver over port', port)
-		const I2CAPI = ExcameraLabsI2CDriver.from({ port })
-		const vbus = I2CBusExcameraI2CDriver.from(I2CAPI)
-		return vbus
-	}
-}
-
 export class ExcameraI2CDriverUIBuilder {
 	#port
 	#ui
+	#vbus
 
 	static async builder(port, ui) {
 		return new ExcameraI2CDriverUIBuilder(port, ui)
@@ -87,6 +79,13 @@ export class ExcameraI2CDriverUIBuilder {
 		// console.log('check status info')
 		// const info = await ExcameraLabsI2CDriver.transmitStatusInfo(this.#port)
 		// console.log(info)
+
+		console.warn('allocing untracked vbus ... please cleanup hooks')
+		// const vbus = VBusFactory.from({ port: self.#port })
+		const I2CAPI = ExcameraLabsI2CDriver.from({ port: this.#port })
+		const exbus = I2CBusExcameraI2CDriver.from(I2CAPI)
+		this.#vbus = I2CTransactionBus.from(exbus)
+
 	}
 
 	async close() {
@@ -198,13 +197,10 @@ export class ExcameraI2CDriverUIBuilder {
 
 								const deviceGuess = guessSelectElem.value
 
-								console.warn('allocing untracked vbus ... please cleanup hooks')
-								const vbus = VBusFactory.from({ port: self.#port })
-
 								self.#ui.addI2CDevice({
 									port: self.#port,
 									type: deviceGuess,
-									bus: vbus,
+									bus: self.#vbus,
 									address: addr
 								})
 							}, { once: true })

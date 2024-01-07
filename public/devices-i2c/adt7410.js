@@ -30,8 +30,10 @@ export class ADT7410Builder {
 	async open() {
 		this.#device = ADT7410.from(this.#abus)
 
-		const id = await this.#device.getId()
-		console.log(id)
+		const spH = await this.#device.getSetpointHigh()
+		const spL = await this.#device.getSetpointLow()
+		const spC = await this.#device.getSetpointCritical()
+		console.log({ spH, spL, spC })
 
 	}
 
@@ -197,6 +199,8 @@ export class ADT7410Builder {
 			const spC = spCritElem.value
 			const spHyst = spHystElem.value
 
+			console.log('setting setpoints', { spH, spL, spC, spHyst })
+
 			Promise.resolve()
 				.then(() => this.#device.setSetpointHigh(spH))
 				.then(() => this.#device.setSetpointLow(spL))
@@ -269,6 +273,15 @@ export class ADT7410Builder {
 		const pollButton = document.createElement('button')
 		pollButton.innerText = 'poll 💈'
 		pollButton.addEventListener('click', event => {
+
+			Promise.resolve()
+				.then(async () => {
+					const status = await this.#device.getStatus()
+					const temp = await this.#device.getTemperature()
+
+					console.log({ status, temp })
+				})
+				.catch(e => console.warn(e))
 		})
 		controlsElem.appendChild(pollButton)
 

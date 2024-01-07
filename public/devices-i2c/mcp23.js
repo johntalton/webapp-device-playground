@@ -32,6 +32,10 @@ export class MCP23Builder {
 	async buildCustomView(selectionElem) {
 		const root = document.createElement('mcp23-config')
 
+		const result = await this.#device.profile()
+		console.log(result)
+		root.innerText = ':)'
+
 
 		return root
 	}

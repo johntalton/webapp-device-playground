@@ -60,6 +60,12 @@ export const EEPROM_INFO = {
 	addresses: [ ...range(0x50, 0x57) ], name: 'Generic EEPROM'
 }
 
+export const ADXL375_INFO = {
+	addresses: [ 0x53 ], name: 'ADXL375 (Accelerometer)'
+}
+
+export const AHT20_INFO = { addresses: [ 0x38 ], name: 'AHT20' }
+
 export const I2C_GUESSES = [
 	// 0x00
 	// 0x10
@@ -76,13 +82,14 @@ export const I2C_GUESSES = [
 	{ addresses: [ 0x30 ], name: 'Trust M' },
 	SSD1306_INFO,
 	{ addresses: [ 0x3c, 0x3d ], name: 'adxl375' },
-	{ addresses: [ 0x38 ], name: 'AHT20' },
+	AHT20_INFO,
 	// 0x40
 	PCA_9536_INFO,
 	{ addresses: [ ...range(0x48, 0x4b) ], name: 'ads1115' },
 	BNO_08X_INFO,
 	{ addresses: [ ...range(0x40,  0x4f), ], name: 'ina219' },
 	// 0x50
+	ADXL375_INFO,
 	{ addresses: [ 0x5c ], name: 'am2320' },
 	{ addresses: [ 0x5c ], name: 'am2315' },
 

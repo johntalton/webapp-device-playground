@@ -349,13 +349,15 @@ export class MCP2221UIBuilder {
 						makeDeviceButton.addEventListener('click', e => {
 
 							//
+							console.log('making Virtual Bus from MCP2221')
 							const deviceGuess = guessSelectElem.value
 							const vbus = I2CBusMCP2221.from(this.#device, {})
 
 							this.#ui.addI2CDevice({
 								type: deviceGuess,
 								bus: vbus,
-								address: addr
+								address: addr,
+								port: undefined
 							})
 
 

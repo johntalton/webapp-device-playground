@@ -188,7 +188,7 @@ cycles: 1,000,000
 			</section>
 		`
 
-		const scanFSElem = root.querySelector('button[dat-scan-fs')
+		const scanFSElem = root.querySelector('button[data-scan-fs')
 		scanFSElem.addEventListener('click', event => {
 			Promise.resolve()
 				.then(async () => {

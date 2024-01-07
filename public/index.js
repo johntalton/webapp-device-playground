@@ -87,7 +87,7 @@ function buildDeviceSection(builder) {
 
 		Promise.resolve()
 			.then(() => {})
-			.then(() => builder.open())
+			.then(async () => builder.open())
 			.then(async () => {
 
 				const closeButton = document.createElement('button')
@@ -123,7 +123,7 @@ function buildDeviceSection(builder) {
 
 				}, { once: true })
 			})
-			.catch(console.warn)
+			.catch(e => console.warn(e))
 
 
 	}, { once: true })
@@ -373,7 +373,7 @@ async function onContentLoaded() {
 			const builder = await I2CDeviceBuilderFactory.from(definition, ui)
 			const demolisher = buildDeviceListItem(deviceListElem, builder)
 
-			definition.port.addEventListener('disconnect', event => {
+			definition.port?.addEventListener('disconnect', event => {
 				console.log('I²C device disconnect - demo time', this)
 				demolisher()
 			})

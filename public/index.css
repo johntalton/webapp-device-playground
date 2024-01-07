@@ -21,6 +21,7 @@
 @import url('./css/mash-mash.css') layer(app);
 @import url('./css/pcf8523.css') layer(app);
 @import url('./css/eeprom.css') layer(app);
+@import url('./css/adxl375.css') layer(app);
 
 @import url('./css/themes.css');
 
