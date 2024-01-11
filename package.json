@@ -6,9 +6,9 @@
   },
   "dependencies": {
     "@johntalton/adt7410": "../adt7410",
-    "@johntalton/aht20": "../aht20",
     "@johntalton/adxl375": "../adxl375",
     "@johntalton/ags02ma": "../ags02ma",
+    "@johntalton/aht20": "^1.1.0",
     "@johntalton/am2320": "^1.0.0",
     "@johntalton/and-other-delights": "../and-other-delights",
     "@johntalton/bitsmush": "^1.0.0",

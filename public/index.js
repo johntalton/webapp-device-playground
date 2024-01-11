@@ -148,19 +148,20 @@ function buildDeviceListItem(deviceListElem, builder) {
 
 	//
 	liElem.addEventListener('click', e => {
-		deviceListElem.querySelectorAll('li').forEach(li => {
-			li.removeAttribute('data-active')
-			const bElem = li.querySelector('button')
-			bElem.disabled = false
+		const transition = document.startViewTransition(() => {
+			deviceListElem.querySelectorAll('li').forEach(li => {
+				li.removeAttribute('data-active')
+				const bElem = li.querySelector('button')
+				bElem.disabled = false
+			})
+
+			liElem.toggleAttribute('data-active', true)
+			buttonElem.disabled = true
+
+			mainElem.querySelectorAll('section').forEach(s => s.removeAttribute('data-active'))
+
+			sectionElem.toggleAttribute('data-active', true)
 		})
-
-		liElem.toggleAttribute('data-active', true)
-		buttonElem.disabled = true
-
-		mainElem.querySelectorAll('section').forEach(s => s.removeAttribute('data-active'))
-
-		sectionElem.toggleAttribute('data-active', true)
-
 	}, { once: false })
 
 	// demolisher
@@ -169,6 +170,10 @@ function buildDeviceListItem(deviceListElem, builder) {
 		// virtualDevices.forEach(vdev => {
 		// 	console.log(vdev)
 		// })
+
+		builder.close()
+			.catch(e => console.warn(e))
+
 
 		liElem.remove()
 		sectionElem.remove()

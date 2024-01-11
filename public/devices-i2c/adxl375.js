@@ -3,6 +3,8 @@ import { ADXL375 } from '@johntalton/adxl375'
 
 const delayMs = ms => new Promise(resolve => setTimeout(resolve, ms))
 
+let going = false
+
 export class ADXL375Builder {
 	#abus
 	#device
@@ -60,7 +62,9 @@ export class ADXL375Builder {
 
 	}
 
-	async close() { }
+	async close() {
+		going = false
+	}
 
 	signature() { }
 
@@ -140,9 +144,11 @@ export class ADXL375Builder {
 			}
 
 
+
 			Promise.resolve().then(async () => {
-				while(true) {
-					await delayMs(100)
+				going = true
+				while(going) {
+					// await delayMs(10)
 
 					const { entries } = await this.#device.getFIFOStatus()
 					console.log('fetch', entries)

@@ -197,6 +197,7 @@ export class ExcameraI2CDriverUIBuilder {
 
 								const deviceGuess = guessSelectElem.value
 
+								// todo change over to newer post message style
 								self.#ui.addI2CDevice({
 									port: self.#port,
 									type: deviceGuess,
@@ -281,7 +282,7 @@ export class ExcameraI2CDriverUIBuilder {
 						</select>
 					</form>
 
-					<form data-info>
+					<form data-info method="dialog">
 						<label>Model</label>
 						<output name="model">${identifier}</output>
 
@@ -306,7 +307,7 @@ export class ExcameraI2CDriverUIBuilder {
 						<label>SCL</label>
 						<output name="scl"></output>
 
-						<button id="updateConfigInfo">Update</button>
+						<button id="updateConfigInfo" type="button">Update</button>
 					</form>
 
 
@@ -492,6 +493,8 @@ export class ExcameraI2CDriverUIBuilder {
 
 		const updateButton = stuff.getElementById('updateConfigInfo')
 		updateButton.addEventListener('click', event => {
+			event.preventDefault()
+
 			updateButton.disabled = true
 			Promise.resolve()
 				.then(async () => {
@@ -527,7 +530,10 @@ export class ExcameraI2CDriverUIBuilder {
 
 					updateButton.disabled = false
 				})
-				.catch(e => console.warn(e))
+				.catch(e => {
+					updateButton.disabled = false
+					console.warn(e)
+				})
 		})
 
 
