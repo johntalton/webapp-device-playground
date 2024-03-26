@@ -34,7 +34,8 @@ export class ADXL375Builder {
 
 		await this.#device.setBitrateAndPowerMode({
 			reducedPowerMode: false,
-			rate: 0b1100
+			// rate: 0b0100 // 1Hz
+			rate: 7 // 12HZ
 		})
 
 
@@ -77,9 +78,9 @@ export class ADXL375Builder {
 		const body = `
 			<button type="button">Go ⚡️</button>
 
-			<canvas data-X width="200" height="200"></canvas>
-			<canvas data-Y width="200" height="200"></canvas>
-			<canvas data-Z width="200" height="200"></canvas>
+			<canvas data-X width="300" height="300"></canvas>
+			<canvas data-Y width="300" height="300"></canvas>
+			<canvas data-Z width="300" height="300"></canvas>
 		`
 
 		const node = (new DOMParser()).parseFromString(body, 'text/html')
@@ -151,11 +152,11 @@ export class ADXL375Builder {
 					// await delayMs(10)
 
 					const { entries } = await this.#device.getFIFOStatus()
-					console.log('fetch', entries)
+					// console.log('fetch', entries)
 
 					if(entries === 0) {
-						console.log('delay')
-						await delayMs(100)
+						// console.log('delay')
+						await delayMs(1)
 						continue
 					}
 

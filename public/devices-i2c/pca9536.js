@@ -34,6 +34,8 @@ export class PCA9536Builder {
 		const root = document.createElement('pca9536-config')
 
 
+
+
 		// await this.#device.setConfiguration({
 		// 	gpio0: SET,
 		// 	gpio1: SET,
@@ -43,6 +45,8 @@ export class PCA9536Builder {
 
 		const config = await this.#device.getConfiguration()
 		console.log({ config })
+
+		root.innerHTML = Object.entries(config).map(({ key, value }) => `<gpio-config direction="${value === SET ? 'in' : 'out'}"></gpio-config>`).join('')
 
 		//await delayMs(10)
 

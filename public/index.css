@@ -24,6 +24,8 @@
 @import url('./css/adxl375.css') layer(app);
 @import url('./css/aht20.css') layer(app);
 
+@import url('./css/gpio.css') layer(app);
+
 @import url('./css/themes.css');
 
 @layer defs {

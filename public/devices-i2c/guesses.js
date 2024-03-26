@@ -66,6 +66,8 @@ export const ADXL375_INFO = {
 
 export const AHT20_INFO = { addresses: [ 0x38 ], name: 'AHT20' }
 
+export const DRV2605_INFO = { addresses: [ 0x5a ], name: 'DRV2605' }
+
 export const I2C_GUESSES = [
 	// 0x00
 	// 0x10
@@ -104,7 +106,8 @@ export const I2C_GUESSES = [
 	BOSCH_IEU_INFO,
 	HT16K33_INFO,
 	ADT7410_INFO,
-	AGS02MA_INFO
+	AGS02MA_INFO,
+	DRV2605_INFO
 ]
 
 export function deviceGuessByAddress(address) {

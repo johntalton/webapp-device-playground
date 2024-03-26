@@ -40,6 +40,7 @@ async function addSerialPort(ui, port, portList) {
 	await ui.addSerialPort(port, signal)
 }
 
+/** @returns {SerialPort} */
 async function requestSerialDevice(filters) {
 	return navigator.serial.requestPort({ filters })
 }

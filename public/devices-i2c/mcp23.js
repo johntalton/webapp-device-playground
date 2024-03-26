@@ -1,6 +1,6 @@
 
 import { MCP23 } from '@johntalton/mcp23'
-import { I2CAddressedBus } from '@johntalton/and-other-delights'
+import { I2CAddressedTransactionBus } from '@johntalton/and-other-delights'
 
 export class MCP23Builder {
 	#abus
@@ -13,7 +13,7 @@ export class MCP23Builder {
 	constructor(definition, ui) {
 		const { bus, address } = definition
 
-		this.#abus = new I2CAddressedBus(bus, address)
+		this.#abus = new I2CAddressedTransactionBus(bus, address)
 		this.#device = new MCP23(this.#abus)
 	}
 
