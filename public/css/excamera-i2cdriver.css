@@ -1,108 +1,100 @@
-excamera-i2cdriver {
+excamera-i2cdriver  {
   display: flex;
 
   flex-direction: column;
   height: 100%;
-}
 
-/* excamera-i2cdriver::part(vdexvice-guess-list) {
-  display: block;
-  list-style: none;
-}
+  & form[data-config] {
+    display: flex;
+    flex-grow: 1;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 1em;
 
-excamera-i2cdriver::part(scan-display) {
-  display: flex;
-  align-items: flex-start;
-  flex-wrap: wrap;
-} */
-
-
-
+    padding-inline: 1em;
+    padding-block: 1em;
+    border-radius: 1em;
+    margin-block-start: 1em;
 
 
+    background-color: var(--color-accent-softer, red);
+    color: var(--color-accent-softer-text, red);
+  }
 
-excamera-i2cdriver form[data-config] {
-  display: flex;
-  flex-grow: 1;
-  justify-content: space-between;
-  align-items: center;
-  flex-wrap: wrap;
-  gap: 1em;
+  /* & div.tabsContent select {
+    background-color: pink;
+    color: black;
+  } */
 
-  padding-inline: 1em;
-  padding-block: 1em;
-  border-radius: 1em;
-  margin-block-start: 1em;
-
-
-  background-color: var(--color-accent-softer, red);
-  color: var(--color-accent-softer-text, red);
-}
-
-/* excamera-i2cdriver div.tabsContent select {
-  background-color: pink;
-  color: black;
-} */
+  & form[data-info] {
+    display: grid;
+    grid-template-columns: minmax(20ch, 1fr) 1fr;
+    /* grid-template-rows: repeat(auto-fill, 10px); */
+    gap: 1em;
+  }
 
 
+  & div.tabsContent {
+    display: flex;
+    align-items: flex-start;
+    justify-content: flex-start;
+    gap: 3em;
+    flex-wrap: wrap;
+  }
 
 
+  & div.tabsContent[data-for-tab="settings"] {
+    /* display: flex; */
+    flex-direction: row;
+    align-content: flex-start;
+    overflow-y: scroll;
+    height: 0;
+  }
 
 
+  & ul[data-device-list] {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25em;
+  }
+
+  & ul[data-device-list] > li {
+    display: none;
+  }
 
 
-excamera-i2cdriver form[data-info] {
-  display: grid;
-  grid-template-columns: minmax(20ch, 1fr) 1fr;
-  /* grid-template-rows: repeat(auto-fill, 10px); */
-  gap: 1em;
-}
+  & ul[data-device-list] > li[data-acked] {
+    display: grid;
+    grid-template-columns: 5ch 1fr max-content;
+    gap: 1em;
 
+    background-color: var(--color-accent--lighter, red);
+    color: var(--color-accent--lighter-text, red);
 
-excamera-i2cdriver div.tabsContent {
-  display: flex;
-  align-items: flex-start;
-  justify-content: flex-start;
-  gap: 3em;
-  flex-wrap: wrap;
-}
+    font-weight: bolder;
 
+    border-radius: 2em;
+    padding-inline: 2em;
+    padding-block: 0.5em;
 
-excamera-i2cdriver div.tabsContent[data-for-tab="settings"] {
-  /* display: flex; */
-  flex-direction: row;
-  align-content: flex-start;
-  overflow-y: scroll;
-  height: 0;
-}
+    align-items: center;
+    flex-wrap: nowrap;
 
+  }
 
-excamera-i2cdriver ul[data-device-list] {
-  display: flex;
-  flex-direction: column;
-  gap: 0.25em;
-}
+  & form[data-manual-add-form] {
+    display: grid;
+    grid-template-columns: 5ch 1fr max-content;
+    gap: 1em;
 
-excamera-i2cdriver ul[data-device-list] > li {
-  display: none;
-}
+    background-color: var(--color-accent--lighter, red);
+    color: var(--color-accent--lighter-text, red);
 
+    border-radius: 2em;
+    padding-inline: 2em;
+    padding-block: 0.5em;
 
-excamera-i2cdriver ul[data-device-list] > li[data-acked] {
-  display: grid;
-  grid-template-columns: 5ch 1fr max-content;
-  gap: 1em;
-
-  background-color: var(--color-accent--lighter, red);
-  color: var(--color-accent--lighter-text, red);
-
-  font-weight: bolder;
-
-  border-radius: 2em;
-  padding-inline: 2em;
-  padding-block: 0.5em;
-
-  align-items: center;
-  flex-wrap: nowrap;
-
+    align-items: center;
+  }
 }

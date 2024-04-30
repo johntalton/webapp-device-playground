@@ -5,7 +5,7 @@ import { DS1841Builder } from './ds1841.js'
 import { BoschIEUBuilder } from './boschieu.js'
 // import { BNO08XBuilder } from './bno08x.js'
 // import { SSD1306Builder } from './ssd1306.js'
-// import { PCA9536Builder} from './pca9536.js'
+import { PCA9536Builder} from './pca9536.js'
 import { PCF8574Builder } from './pcf8574.js'
 import { PCF8523Builder } from './pcf8523.js'
 import { HT16K33Builder } from './ht16k33.js'
@@ -16,6 +16,8 @@ import { MCP23Builder } from './mcp23.js'
 import { EEPROMBuilder } from './eeprom.js'
 import { ADXL375Builder } from './adxl375.js'
 import { AHT20Builder } from './aht20.js'
+import { DRV2605Builder } from './drv2605.js'
+import { DS3231Builder } from './ds3231.js'
 
 import {
 	HT16K33_INFO,
@@ -34,12 +36,14 @@ import {
 	MCP23_INFO,
 	EEPROM_INFO,
 	ADXL375_INFO,
-	AHT20_INFO
+	AHT20_INFO,
+	DRV2605_INFO,
+	DS3231_INFO
 } from './guesses.js'
 
 const BY_NAME = {
 	'Adafruit 24LC32':  (definition, ui) => EEPROMBuilder.builder(definition, ui),
-	// [PCA_9536_INFO.name]: (definition, ui) => PCA9536Builder.builder(definition, ui),
+	[PCA_9536_INFO.name]: (definition, ui) => PCA9536Builder.builder(definition, ui),
 	[TCA9548_INFO.name]: (definition, ui) => TCA9548Builder.builder(definition, ui),
 	[DS3502_INFO.name]: (definition, ui) => DS3502Builder.builder(definition, ui),
 	[BOSCH_IEU_INFO.name]: (definition, ui) => BoschIEUBuilder.builder(definition, ui),
@@ -56,6 +60,8 @@ const BY_NAME = {
 	[EEPROM_INFO.name]: (definition, ui) => EEPROMBuilder.builder(definition, ui),
 	[ADXL375_INFO.name]: (definition, ui) => ADXL375Builder.builder(definition, ui),
 	[AHT20_INFO.name]: (definition, ui) => AHT20Builder.builder(definition, ui),
+	[DRV2605_INFO.name]: (definition, ui) => DRV2605Builder.builder(definition, ui),
+	[DS3231_INFO.name]: (definition, ui) => DS3231Builder.builder(definition, ui)
 }
 
 export class I2CDeviceBuilderFactory {

@@ -64,6 +64,10 @@ export const ADXL375_INFO = {
 	addresses: [ 0x53 ], name: 'ADXL375 (Accelerometer)'
 }
 
+export const DS3231_INFO = {
+	addresses: [ 0x68 ], name: 'DS3231 (RTC)'
+}
+
 export const AHT20_INFO = { addresses: [ 0x38 ], name: 'AHT20' }
 
 export const DRV2605_INFO = { addresses: [ 0x5a ], name: 'DRV2605' }
@@ -100,6 +104,7 @@ export const I2C_GUESSES = [
 	{ addresses: [ ...range(0x50, 0x57) ], name: 'mb85rc' },
 	// 0x60
 	{ addresses: [ 0x62, 0x63 ], name: 'mcp4725a1'},
+	DS3231_INFO,
 	PCF_8523_INFO,
 	// 0x70
 	TCA9548_INFO,

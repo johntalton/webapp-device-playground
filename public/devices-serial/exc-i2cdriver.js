@@ -7,7 +7,7 @@ import {
 
 import { 	eventStreamFromReader } from '@johntalton/excamera-i2cdriver/capture'
 
-import { deviceGuessByAddress } from '../devices-i2c/guesses.js'
+import { deviceGuessByAddress, I2C_GUESSES } from '../devices-i2c/guesses.js'
 
 import { I2CBusExcameraI2CDriver } from '@johntalton/i2c-bus-excamera-i2cdriver'
 
@@ -247,8 +247,24 @@ export class ExcameraI2CDriverUIBuilder {
 					</addr-display>
 
 					<ul data-device-list>
-
 					</ul>
+
+					<form data-manual-add-form>
+						<label>Address</label>
+						<input type="number" />
+
+						<label>Device</label>
+						<select name="">
+							${I2C_GUESSES.map(({ name }) => {
+								return `<option value="${name}">${name}</option>`
+							}).join('')}
+						</select>
+
+						<button>Create 🕹</button>
+
+						<button id="ManualAdd">Add +</button>
+
+					</form>
 				</div>
 
 				<div data-for-tab="capture" class="tabsContent">
@@ -582,9 +598,24 @@ export class ExcameraI2CDriverUIBuilder {
 
 		const addrDisp = stuff.querySelector('addr-display')
 		const devList = stuff.querySelector('[data-device-list]')
+		const addDevice = stuff.getElementById('ManualAdd')
 
 		const startScanButton = stuff.getElementById('Scan')
 		startScanButton.addEventListener('click', event => handelScan(event, addrDisp, devList))
+
+
+		addDevice.addEventListener('click', event => {
+
+
+
+			// todo change over to newer post message style
+			self.#ui.addI2CDevice({
+				port: self.#port,
+				type: deviceGuess,
+				bus: self.#vbus,
+				address: addr
+			})
+		})
 
 		return stuff.body.firstChild
 
