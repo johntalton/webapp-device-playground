@@ -1,0 +1,50 @@
+ds3231-config {
+  display: flex;
+  flex-direction: column;
+  gap: 1em;
+  margin-inline-end: 2em;
+
+  & > form input[type="checkbox"] {
+    justify-self: start;
+  }
+
+  & > form:first-child {
+    display: flex;
+    gap: 1em;
+    align-items: center;
+  }
+
+  & > form:not(:first-child) {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1em;
+    align-items: center;
+
+    border-radius: 1em;
+    background-color: var(--color-accent--light, red);
+    /* background-color: var(--color-accent--lighter, red); */
+    /* color: var(--color-accent--lighter-text, red); */
+
+    padding-block: 1.5em;
+    padding-inline: 1.5em;
+  }
+
+  & > form > fieldset {
+    grid-column: 1 / span 2;
+
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1em;
+    align-items: center;
+
+    padding-block: 1em;
+    padding-inline: 1em;
+
+    border-radius: 1em;
+
+    & > legend {
+      font-weight: bold;
+      padding-inline: 1ch;
+    }
+  }
+}

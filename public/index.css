@@ -23,6 +23,7 @@
 @import url('./css/eeprom.css') layer(app);
 @import url('./css/adxl375.css') layer(app);
 @import url('./css/aht20.css') layer(app);
+@import url('./css/ds3231.css') layer(app);
 
 @import url('./css/gpio.css') layer(app);
 
