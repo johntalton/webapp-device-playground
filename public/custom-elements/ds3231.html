@@ -1,0 +1,118 @@
+
+<ds3231-config>
+
+
+  <div class="tabs">
+    <button data-tab="actions" data-active>Actions</button>
+    <button data-tab="settings">Settings</button>
+    <button data-tab="alarms">Alarms</button>
+  </div>
+
+	<form data-active data-for-tab="actions" data-actions class="tabsContent">
+		<button data-set-time>Set Now</button>
+		<button data-trigger-temperature>Trigger Temperature Conversion</button>
+		<button data-refresh>Refresh</button>
+		<button data-clear-all-flags>Clear Flags</button>
+	</form>
+
+	<form data-for-tab="storage" data-time-storage class="tabsContent">
+		<label>Time Storage Mode</label>
+		<select>
+			<option value="12">12 hour (am / pm)</option>
+			<option value="24" selected>24 hour</option>
+		</select>
+	</form>
+
+	<form data-for-tab="settings" data-control class="tabsContent">
+		<label>Alarm1</label>
+		<input name="enableAlarm1" type="checkbox" />
+
+		<label>Alarm2</label>
+		<input name="enableAlarm2" type="checkbox" />
+
+		<label>Square Wave (disable interrupt)</label>
+		<input name="enableSquareWave" type="checkbox" />
+
+		<label>Square Wave Frequency</label>
+		<select name="squareWaveFrequency" disabled>
+			<option value="1">1</option>
+			<option value="1.024">1.024</option>
+			<option value="4.096">4.096</option>
+			<option value="8.192">8.192</option>
+		</select>
+
+		<fieldset>
+			<legend>Battery Backup</legend>
+
+			<label>Oscillator</label>
+			<input name="enableBatteryOscillator" type="checkbox" />
+
+			<label>Square Wave</label>
+			<input name="enableBatterySquareWave" type="checkbox" />
+		</fieldset>
+	</form>
+
+  <form data-for-tab="alarms" data-alarms class="tabsContent">
+    <fieldset>
+      <legend>Alarm 1</legend>
+
+			<label>Seconds</label>
+			<select>
+				<option value="any">(any)</option>
+			</select>
+
+			<label>Minutes</label>
+			<select>
+				<option value="any">(any)</option>
+			</select>
+
+			<label>Hours</label>
+			<select>
+				<option value="any">(any)</option>
+			</select>
+
+			<label>Period</label>
+			<select>
+				<option value="dow">Day of Week</option>
+				<option value="dom">Day of Month</option>
+			</select>
+
+			<label>Date</label>
+			<select>
+				<option value="any">(any)</option>
+			</select>
+
+			<label>Day</label>
+			<select>
+				<option value="any">(any)</option>
+			</select>
+
+    </fieldset>
+
+    <fieldset>
+      <legend>Alarm 2</legend>
+
+
+    </fieldset>
+  </form>
+
+  <form data-output>
+		<label>Temperature</label>
+		<output data-temperature></output>
+
+		<label>Time</label>
+		<output data-time></output>
+
+		<label>Oscillator Stopped</label>
+		<output data-oscillator-stopped-flag></output>
+
+		<label>Busy</label>
+		<output data-busy-flag></output>
+
+		<label>Alarm1</label>
+		<output data-alarm1-flag></output>
+
+		<label>Alarm2</label>
+		<output data-alarm2-flag></output>
+	</form>
+</ds3231-config>

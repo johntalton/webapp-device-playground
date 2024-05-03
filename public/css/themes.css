@@ -89,8 +89,7 @@
 	--color-accent--l: 42%;
 }
 
-[data-theme ~= "DeepOcean" i]
-{
+[data-theme ~= "DeepOcean" i] {
 	--color-accent: oklch(0.36 0.07 199.78);
 	--color-accent-text: white;
 	--color-accent--light: oklch(0.37 0.07 198.5);

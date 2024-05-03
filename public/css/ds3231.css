@@ -1,32 +1,29 @@
 ds3231-config {
   display: flex;
   flex-direction: column;
-  gap: 1em;
   margin-inline-end: 2em;
 
   & > form input[type="checkbox"] {
     justify-self: start;
   }
 
-  & > form:first-child {
-    display: flex;
-    gap: 1em;
-    align-items: center;
+  & > form[data-output] {
+    font-size: smaller;
+    margin-block-end: 1em;
   }
 
-  & > form:not(:first-child) {
+  & > form {
     display: grid;
     grid-template-columns: 1fr 1fr;
     gap: 1em;
     align-items: center;
 
-    border-radius: 1em;
-    background-color: var(--color-accent--light, red);
-    /* background-color: var(--color-accent--lighter, red); */
-    /* color: var(--color-accent--lighter-text, red); */
-
     padding-block: 1.5em;
     padding-inline: 1.5em;
+  }
+
+  & > form select {
+    background-color: var(--color-accent--lighter, red);
   }
 
   & > form > fieldset {
@@ -41,10 +38,13 @@ ds3231-config {
     padding-inline: 1em;
 
     border-radius: 1em;
+    border-color: var(--color-accent--darker, red);
 
     & > legend {
       font-weight: bold;
       padding-inline: 1ch;
     }
   }
+
+
 }

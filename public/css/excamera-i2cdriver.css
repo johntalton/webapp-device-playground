@@ -18,8 +18,8 @@ excamera-i2cdriver  {
     margin-block-start: 1em;
 
 
-    background-color: var(--color-accent-softer, red);
-    color: var(--color-accent-softer-text, red);
+    background-color: var(--color-accent--lighter, red);
+    color: var(--color-accent--lighter-text, red);
   }
 
   /* & div.tabsContent select {
@@ -38,6 +38,7 @@ excamera-i2cdriver  {
   & div.tabsContent {
     display: flex;
     align-items: flex-start;
+    align-content: flex-start;
     justify-content: flex-start;
     gap: 3em;
     flex-wrap: wrap;
@@ -85,7 +86,7 @@ excamera-i2cdriver  {
 
   & form[data-manual-add-form] {
     display: grid;
-    grid-template-columns: 5ch 1fr max-content;
+    grid-template-columns: 1fr 1fr;
     gap: 1em;
 
     background-color: var(--color-accent--lighter, red);
@@ -93,7 +94,7 @@ excamera-i2cdriver  {
 
     border-radius: 2em;
     padding-inline: 2em;
-    padding-block: 0.5em;
+    padding-block: 1em;
 
     align-items: center;
   }

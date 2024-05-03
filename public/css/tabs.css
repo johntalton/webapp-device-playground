@@ -72,7 +72,7 @@ main .tabsContent {
 	border: 0;
 	border-block-start: 0;
 
-	display: block;
+	/* display: block; */
 
 }
 

@@ -1,14 +1,14 @@
 aside ul {
   --item-radius: 2em;
 
-	--background: var(--color-accent-soft, red);
-	--color: var(--color-accent-soft-text, red);
+	--background: var(--color-accent--dark, red);
+	--color: var(--color-accent--dark-text, red);
 
 	--hover: var(--color-accent--light,red);
 	--hover-text: var(--color-accent--light-text, red);
 
-	--selected-background: var(--color-accent-softer, red);
-	--selected-color: var(--color-accent-softer-text, red);
+	--selected-background: var(--color-accent--lighter, red);
+	--selected-color: var(--color-accent--lighter-text, red);
 }
 
 aside ul {

@@ -136,20 +136,13 @@
 	--color-accent--darker-text: var(--color-white, red);
 
 	/*  */
-	--color-accent-soft: var(--color-accent--dark, red);
-	--color-accent-soft-text: var(--color-accent--dark-text, red);
-
-	--color-accent-softer: var(--color-accent--lighter, red);
-	--color-accent-softer-text: var(--color-accent--lighter-text, red);
-
-	/*  */
 	--color-disabled: grey;
 	--color-opaque-black: rgba(50 50 50 / 0.25);
 
 	/*  */
-	--base-accent-background-color: var(--color-accent-soft, red);
-	--base-accent-text-color: var(--color-accent-soft-text, red);
+	--base-accent-background-color: var(--color-accent--dark, red);
+	--base-accent-text-color: var(--color-accent--dark-text, red);
 
-	--base-page-background-color: var(--color-accent-softer, red);
+	--base-page-background-color: var(--color-accent--lighter, red);
 	--base-page-text-color: var(--color-black, red);
 }

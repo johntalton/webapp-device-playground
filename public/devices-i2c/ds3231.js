@@ -3,6 +3,8 @@ import { DS3231 } from '@johntalton/ds3231'
 
 export class DS3231Builder {
 	#abus
+
+	/** @type {DS3231} */
 	#device
 
 	static async builder(definition, ui) {
@@ -28,70 +30,29 @@ export class DS3231Builder {
 
 
 	async buildCustomView(selectionElem) {
-		const VIEW = `
-			<ds3231-config>
-				<form>
-					<button data-set-time>Set Now</button>
-					<button data-trigger-temperature>Trigger Temperature Conversion</button>
-					<button data-refresh>Refresh</button>
-					<button data-clear-all-flags>Clear Flags</button>
-				</form>
-				<form>
-					<label>Temperature</label>
-					<output data-temperature></output>
+		// fetch template
+		const response = await fetch('./custom-elements/ds3231.html')
+		if(!response.ok) { throw new Error('no html for view') }
+		const view = await response.text()
+		const doc = (new DOMParser()).parseFromString(view, 'text/html')
 
-					<label>Time</label>
-					<output data-time></output>
-
-					<label>Oscillator Stopped</label>
-					<output data-oscillator-stopped-flag></output>
-
-					<label>Busy</label>
-					<output data-busy-flag></output>
-
-					<label>Alarm1</label>
-					<output data-alarm1-flag></output>
-
-					<label>Alarm2</label>
-					<output data-alarm2-flag></output>
-				</form>
-				<form>
-					<label>Alarm1</label>
-					<input name="enableAlarm1" type="checkbox" />
-
-					<label>Alarm2</label>
-					<input name="enableAlarm2" type="checkbox" />
-
-					<label>Square Wave</label>
-					<input name="enableSquareWave" type="checkbox" />
-
-					<label>Square Wave Frequency</label>
-					<select name="squareWaveFrequency" disabled>
-						<option value="1">1</option>
-						<option value="1.024">1.024</option>
-						<option value="4.096">4.096</option>
-						<option value="8.192">8.192</option>
-					</select>
-
-					<fieldset>
-						<legend>Battery Backup</legend>
-
-						<label>Oscillator</label>
-						<input name="enableBatteryOscillator" type="checkbox" />
-
-						<label>Square Wave</label>
-						<input name="enableBatterySquareWave" type="checkbox" />
-					</fieldset>
-				</form>
-			</ds3231-config>
-		`
-		const node = (new DOMParser()).parseFromString(VIEW, 'text/html')
-
-		const root = node.body.firstChild
+		const root = doc?.querySelector('ds3231-config')
+		if(root === null) { throw new Error('no root for template')}
 
 		const century = 2000
 
-		function refreshView(root, temp, time, control, status) {
+		async function refreshView(root, device) {
+			const ctrl = await device.getControl()
+			const time = await device.getTime()
+			const status = await device.getStatus()
+			const temp = await device.getTemperature()
+			const alarm1 = await device.getAlarm1()
+			const alarm2 = await device.getAlarm1()
+
+			_refreshView(root, temp, time, ctrl, status, alarm1, alarm2)
+		}
+
+		function _refreshView(root, temp, time, control, status, alarm1, alarm2) {
 			// temperature
 			const temperatureOutput = root.querySelector('[data-temperature]')
 			temperatureOutput.value = `${temp.temperatureC} ℃`
@@ -151,11 +112,18 @@ export class DS3231Builder {
 
 			const oscillatorStoppedOutput = root.querySelector('[data-oscillator-stopped-flag]')
 			oscillatorStoppedOutput.value = oscillatorStoppedFlag ? '🛑 (true)' : '(false)'
+
+			// alarm 1
+			console.log(alarm1)
+
+			// alarm 2
+			console.log(alarm2)
+
 		}
 
 		const setTimeButton = root.querySelector('[data-set-time]')
-		setTimeButton.addEventListener('click', async event => {
-			setTimeButton.disabled = true
+		setTimeButton?.addEventListener('click', async event => {
+			event.preventDefault()
 
 			const now = new Date(Date.now())
 
@@ -167,40 +135,24 @@ export class DS3231Builder {
 			const month = now.getUTCMonth() + 1
 			const year = now.getUTCFullYear() - century
 
-			// await this.#device.setStatus({ clearOscillatorStoppedFlag: true })
+			//await this.#device.setStatus({ clearOscillatorStoppedFlag: true })
 			await this.#device.setTime({
 				seconds, minutes, hours, date, month, year
 			})
-			// await this.#device.setStatus({ oscillatorEnabled: true })
 
-			const ctrl = await this.#device.getControl()
-			const time = await this.#device.getTime()
-			const status = await this.#device.getStatus()
-			const temp = await this.#device.getTemperature()
-
-			refreshView(root, temp, time, ctrl, status)
-
-			setTimeButton.disabled = false
+			await refreshView(root, this.#device)
 		})
 
 		const refreshButton = root.querySelector('[data-refresh]')
-		refreshButton.addEventListener('click', async event => {
+		refreshButton?.addEventListener('click', async event => {
 			event.preventDefault()
-			refreshButton.disabled = true
 
-			const ctrl = await this.#device.getControl()
-			const time = await this.#device.getTime()
-			const status = await this.#device.getStatus()
-			const temp = await this.#device.getTemperature()
-
-			refreshView(root, temp, time, ctrl, status)
-			refreshButton.disabled = false
+			await refreshView(root, this.#device)
 		})
 
 		const clearButton = root.querySelector('[data-clear-all-flags]')
-		clearButton.addEventListener('click', async event => {
+		clearButton?.addEventListener('click', async event => {
 			event.preventDefault()
-			clearButton.disabled = true
 
 			await this.#device.setStatus({
 				clearOscillatorStoppedFlag: true,
@@ -208,21 +160,66 @@ export class DS3231Builder {
 				clearAlarm2: true
 			})
 
-			const ctrl = await this.#device.getControl()
-			const time = await this.#device.getTime()
-			const status = await this.#device.getStatus()
-			const temp = await this.#device.getTemperature()
-
-			refreshView(root, temp, time, ctrl, status)
-			clearButton.disabled = false
+			await refreshView(root, this.#device)
 		})
 
-		const ctrl = await this.#device.getControl()
-		const time = await this.#device.getTime()
-		const status = await this.#device.getStatus()
-		const temp = await this.#device.getTemperature()
+		const controlForm = root.querySelector('form[data-control]')
+		controlForm?.addEventListener('change', async event => {
+			event.preventDefault()
 
-		refreshView(root, temp, time, ctrl, status)
+			const alarm1Checkbox = root.querySelector('input[name="enableAlarm1"]')
+			const alarm2Checkbox = root.querySelector('input[name="enableAlarm2"]')
+
+			const batteryOscillatorCheckbox = root.querySelector('input[name="enableBatteryOscillator"]')
+
+			alarm1Checkbox.disabled = true
+			alarm2Checkbox.disabled = true
+			batteryOscillatorCheckbox.disabled = true
+
+			const enableAlarm1 = alarm1Checkbox.checked
+			const enableAlarm2 = alarm2Checkbox.checked
+			const enableOscillatorOnBatteryBackup = batteryOscillatorCheckbox.checked
+
+			await this.#device.setControl({
+				enableAlarm1,
+				enableAlarm2,
+				enableOscillatorOnBatteryBackup
+			})
+
+			await refreshView(root, this.#device)
+
+			alarm1Checkbox.disabled = false
+			alarm2Checkbox.disabled = false
+			batteryOscillatorCheckbox.disabled = false
+		})
+
+		const tabButtons = root.querySelectorAll('button[data-tab]')
+		for(const tabButton of tabButtons) {
+			tabButton.addEventListener('click', event => {
+				event.preventDefault()
+
+				const { target} = event
+				const parent = target?.parentNode.parentNode
+
+				const tabName = target.getAttribute('data-tab')
+
+				// remove content active
+				const activeOthers = parent.querySelectorAll('[data-active]')
+				activeOthers.forEach(ao => ao.toggleAttribute('data-active', false))
+
+				// remove tab button active
+				const activeOthersTabsButtons = parent.querySelectorAll('button[data-tab]')
+				activeOthersTabsButtons.forEach(ao => ao.toggleAttribute('data-active', false))
+
+				const tabContentElem = parent.querySelector(`[data-for-tab="${tabName}"]`)
+				tabContentElem.toggleAttribute('data-active', true)
+
+				tabButton.toggleAttribute('data-active', true)
+			})
+		}
+
+		await refreshView(root, this.#device)
+
 		return root
 	}
 }

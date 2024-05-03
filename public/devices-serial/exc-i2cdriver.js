@@ -251,19 +251,16 @@ export class ExcameraI2CDriverUIBuilder {
 
 					<form data-manual-add-form>
 						<label>Address</label>
-						<input type="number" />
+						<input name="ManualAddress" type="number" min="8" max="119" step="1" value="8" />
 
 						<label>Device</label>
-						<select name="">
+						<select name="ManualDeviceSelection">
 							${I2C_GUESSES.map(({ name }) => {
 								return `<option value="${name}">${name}</option>`
 							}).join('')}
 						</select>
 
-						<button>Create 🕹</button>
-
-						<button id="ManualAdd">Add +</button>
-
+						<button submit>Create 🕹</button>
 					</form>
 				</div>
 
@@ -598,15 +595,20 @@ export class ExcameraI2CDriverUIBuilder {
 
 		const addrDisp = stuff.querySelector('addr-display')
 		const devList = stuff.querySelector('[data-device-list]')
-		const addDevice = stuff.getElementById('ManualAdd')
+		const manualAddForm = stuff.querySelector('[data-manual-add-form]')
+		const manualCreateDevice = manualAddForm?.querySelector('button[submit]')
+		const manualDeviceSelection = manualAddForm?.querySelector('select[name="ManualDeviceSelection"]')
+		const manualAddressInput = manualAddForm?.querySelector('input[name="ManualAddress"]')
 
 		const startScanButton = stuff.getElementById('Scan')
 		startScanButton.addEventListener('click', event => handelScan(event, addrDisp, devList))
 
 
-		addDevice.addEventListener('click', event => {
+		manualCreateDevice.addEventListener('click', event => {
+			event.preventDefault()
 
-
+			const addr = manualAddressInput.value
+			const deviceGuess = manualDeviceSelection?.value
 
 			// todo change over to newer post message style
 			self.#ui.addI2CDevice({
