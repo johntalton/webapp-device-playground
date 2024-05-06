@@ -79,7 +79,8 @@ onmessage = event => {
 	const { data: message } = event
 	const { type } = message
 
-	console.log('usb worker: message', type)
+
 
 	if(type === 'scan') { scan().then(() => console.log('usb worker: scan complete')).catch(e => console.warn); return }
+	else { console.log('usb worker: message', type) }
 }

@@ -184,7 +184,7 @@ function hydrateCustomeElementTemplateImport(importElemId, name, konstructor) {
 	const element = document.getElementById(importElemId)
 
 	const callback = (mutations, observer) => {
-		console.log('installing html (observed)', name)
+		// console.log('installing html (observed)', name)
 		konstructor.template = element.firstChild
 		customElements.define(name, konstructor)
 		observer.disconnect()
@@ -196,13 +196,13 @@ function hydrateCustomeElementTemplateImport(importElemId, name, konstructor) {
 
 
 	element.addEventListener('loaded', event => {
-		console.log('installing html (loaded)', name)
+		// console.log('installing html (loaded)', name)
 		konstructor.template = element.firstChild
 		customElements.define(name, konstructor)
 		observer.disconnect()
 	})
 
-	console.log('hydrateCustomElement', importElemId, name, element)
+	// console.log('hydrateCustomElement', importElemId, name, element)
 }
 
 async function hydrateCustomElements() {
@@ -233,6 +233,25 @@ async function hydrateEffects() {
 
 		root.style.setProperty('--color-accent--h', next)
 	}, 1000 * 7)
+}
+
+async function hydrateTheme() {
+	const THEME_NAMES = [
+		'Crazy', 'Water', 'Slate', 'Paper', 'TodaysBlue',
+		'DeepOcean', 'Dream', 'Golden', 'Lavender', 'Bright', 'Plum',
+		'MoodyPlum', 'Washed'
+	]
+
+	const themRollerButton = document.querySelector('button[data-theme-roller]')
+	themRollerButton?.addEventListener('click', event => {
+		event.preventDefault()
+
+		const theme = THEME_NAMES[Math.floor(Math.random() * THEME_NAMES.length)]
+
+		const transition = document.startViewTransition(() => {
+			document.body.setAttribute('data-theme', theme)
+		})
+	})
 }
 
 //
@@ -314,11 +333,11 @@ async function onContentLoaded() {
 
 	const ui = {
 		addSerialPort: async (port, signal) => {
-			console.log('addSerialPort')
+			// console.log('addSerialPort')
 
 			const info =  port.getInfo()
 
-			console.log(info)
+			// console.log(info)
 
 			//
 			if(isExcameraLabs(info.usbVendorId, info.usbProductId)) {
@@ -396,6 +415,7 @@ async function onContentLoaded() {
 		hydrateUSB(requestUSBButton, ui),
 		hydrateHID(requestHIDButton, ui),
 
+		hydrateTheme(),
 		hydrateEffects(),
 
 		//ui.addI2CDevice({ type: 'mcp23', address: 0x00, bus: undefined })

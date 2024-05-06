@@ -118,6 +118,15 @@ export class ExcameraI2CDriverUIBuilder {
 		} = status
 
 
+		function uptimeToHuman(uptime) {
+			const trunc2 = t => Math.trunc(t * 100) / 100.0
+
+			if(uptime < 60) { return `${uptime} seconds` }
+			if(uptime < (60 * 60)) { return `${trunc2(uptime / 60.0)} minutes`}
+
+			return `${trunc2(uptime / 60.0 / 60.0)} hours`
+		}
+
 		function appendChildSlot(root, name, elem) {
 			elem.setAttribute('slot', name)
 			root.appendChild(elem)
@@ -303,7 +312,7 @@ export class ExcameraI2CDriverUIBuilder {
 						<output name="serial">${serial}</output>
 
 						<label>Uptime (S)</label>
-						<output name="uptime">${uptime}</output>
+						<output name="uptime">${uptime} (${uptimeToHuman(uptime)})</output>
 
 						<label>Voltage (V)</label>
 						<output name="voltage">${voltage}</output>
@@ -529,12 +538,13 @@ export class ExcameraI2CDriverUIBuilder {
 						crc
 					} = status
 
+					const humanUptime = uptimeToHuman(uptime)
 
 					const out = name => document.querySelector(`[data-info] output[name=${name}]`)
 
 					out('model').innerText = identifier
 					out('serial').innerText = serial
-					out('uptime').innerText = uptime
+					out('uptime').innerText = `${uptime} (${humanUptime})`
 					out('voltage').innerText = voltage
 					out('current').innerText = current
 					out('temperature').innerText = temperature
@@ -601,13 +611,13 @@ export class ExcameraI2CDriverUIBuilder {
 		const manualAddressInput = manualAddForm?.querySelector('input[name="ManualAddress"]')
 
 		const startScanButton = stuff.getElementById('Scan')
-		startScanButton.addEventListener('click', event => handelScan(event, addrDisp, devList))
+		startScanButton?.addEventListener('click', event => handelScan(event, addrDisp, devList))
 
 
-		manualCreateDevice.addEventListener('click', event => {
+		manualCreateDevice?.addEventListener('click', event => {
 			event.preventDefault()
 
-			const addr = manualAddressInput.value
+			const addr = manualAddressInput?.value
 			const deviceGuess = manualDeviceSelection?.value
 
 			// todo change over to newer post message style

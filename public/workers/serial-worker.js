@@ -1,4 +1,4 @@
-console.log('Serial Worker')
+// console.log('Serial Worker')
 
 function scan() {
 
