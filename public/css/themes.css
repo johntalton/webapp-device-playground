@@ -168,4 +168,29 @@
 	/* --color-accent--darker-text: black; */
 }
 
+[data-theme ~= "Washed"] {
+	--color-accent: oklab(0.62 -0.07 -0.21);
+	--color-accent-text: black;
+	--color-accent--light: oklab(0.62 -0.05 -0.2);
+	--color-accent--light-text: black;
+	--color-accent--lighter: oklab(0.98 0 0);
+	--color-accent--lighter-text: black;
+	--color-accent--lightest: oklab(0.94 -0.01 -0.03);
+	--color-accent--lightest-text: black;
+	--color-accent--dark: oklab(0.94 -0.01 -0.03);
+	--color-accent--dark-text: black;
+	--color-accent--darker: oklab(0.82 -0.04 -0.1);
+	--color-accent--darker-text: black;
+}
+
+[data-theme ~= "MoodyPlum"] {
+	--color-accent--h: 319;
+	--color-accent--s: 8%;
+	--color-accent--l: 53%;
+	--light-percentage: 2%;
+	--lighter-percentage: 8%;
+	--lightest-percentage: 22%;
+	--dark-percentage: 2%;
+	--darker-percentage: 9%;
+}
 

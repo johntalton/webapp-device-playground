@@ -8,8 +8,12 @@ ds3231-config {
   }
 
   & > form[data-output] {
-    font-size: smaller;
+    font-size: 1em;
     margin-block-end: 1em;
+  }
+
+  & > form button[submit] {
+    grid-column: 2 / -1;
   }
 
   & > form {

@@ -47,7 +47,7 @@ export class DS3231Builder {
 			const status = await device.getStatus()
 			const temp = await device.getTemperature()
 			const alarm1 = await device.getAlarm1()
-			const alarm2 = await device.getAlarm1()
+			const alarm2 = await device.getAlarm2()
 
 			_refreshView(root, temp, time, ctrl, status, alarm1, alarm2)
 		}
@@ -58,15 +58,17 @@ export class DS3231Builder {
 			temperatureOutput.value = `${temp.temperatureC} ℃`
 
 			// time
-			const { year, month, date, hours, minutes, seconds } = time
+			const { year, month, day, date, hours, minutes, seconds } = time
 			const storedDate = new Date(Date.UTC(
 				century + year,
 				month - 1,
 				date,
 				hours, minutes, seconds))
 
+			const dayMatch = (storedDate.getUTCDay() + 1) === day
+
 			const timeOutput = root.querySelector('[data-time]')
-			timeOutput.value = storedDate
+			timeOutput.value = `${storedDate} ${dayMatch ? '' : '(day mismatch)'}`
 
 			// control
 			const {
@@ -114,10 +116,42 @@ export class DS3231Builder {
 			oscillatorStoppedOutput.value = oscillatorStoppedFlag ? '🛑 (true)' : '(false)'
 
 			// alarm 1
-			console.log(alarm1)
+			{
+			const alarm1SecondsSelect = root.querySelector('select[data-alarm1-seconds]')
+			const alarm1MinutesSelect = root.querySelector('select[data-alarm1-minutes]')
+			const alarm1HoursSelect = root.querySelector('select[data-alarm1-hours]')
+			const alarm1PeriodSelect = root.querySelector('select[data-alarm1-period]')
+			const alarm1DateSelect = root.querySelector('select[data-alarm1-date]')
+			const alarm1DaySelect = root.querySelector('select[data-alarm1-day]')
+
+			const { seconds, minutes, hours, dayOfMonth, day, date } = alarm1
+
+			alarm1SecondsSelect.value = seconds === null ? 'any' : seconds
+			alarm1MinutesSelect.value = minutes === null ? 'any' : minutes
+			alarm1HoursSelect.value = hours === null ? 'any' : hours
+			alarm1PeriodSelect.value = dayOfMonth ? 'dom' : 'dow'
+			alarm1DateSelect.value = date === null ? 'any' : date
+			alarm1DaySelect.value = day === null ? 'any' : day
+
+			}
 
 			// alarm 2
-			console.log(alarm2)
+			{
+				const alarm2MinutesSelect = root.querySelector('select[data-alarm2-minutes]')
+				const alarm2HoursSelect = root.querySelector('select[data-alarm2-hours]')
+				const alarm2PeriodSelect = root.querySelector('select[data-alarm2-period]')
+				const alarm2DateSelect = root.querySelector('select[data-alarm2-date]')
+				const alarm2DaySelect = root.querySelector('select[data-alarm2-day]')
+
+				const { minutes, hours, dayOfMonth, day, date } = alarm2
+
+				alarm2MinutesSelect.value = minutes === null ? 'any' : minutes
+				alarm2HoursSelect.value = hours === null ? 'any' : hours
+				alarm2PeriodSelect.value = dayOfMonth ? 'dom' : 'dow'
+				alarm2DateSelect.value = date === null ? 'any' : date
+				alarm2DaySelect.value = day === null ? 'any' : day
+
+				}
 
 		}
 
@@ -130,14 +164,13 @@ export class DS3231Builder {
 			const seconds = now.getUTCSeconds()
 			const minutes = now.getUTCMinutes()
 			const hours = now.getUTCHours()
-
+			const day = now.getUTCDay() + 1
 			const date = now.getUTCDate()
 			const month = now.getUTCMonth() + 1
 			const year = now.getUTCFullYear() - century
 
-			//await this.#device.setStatus({ clearOscillatorStoppedFlag: true })
 			await this.#device.setTime({
-				seconds, minutes, hours, date, month, year
+				seconds, minutes, hours, day, date, month, year
 			})
 
 			await refreshView(root, this.#device)
@@ -156,8 +189,8 @@ export class DS3231Builder {
 
 			await this.#device.setStatus({
 				clearOscillatorStoppedFlag: true,
-				clearAlarm1: true,
-				clearAlarm2: true
+				clearAlarm1Flag: true,
+				clearAlarm2Flag: true
 			})
 
 			await refreshView(root, this.#device)
@@ -191,6 +224,54 @@ export class DS3231Builder {
 			alarm1Checkbox.disabled = false
 			alarm2Checkbox.disabled = false
 			batteryOscillatorCheckbox.disabled = false
+		})
+
+		const alarm1Submit = root.querySelector('form[data-alarm1] button[submit]')
+		alarm1Submit?.addEventListener('click', async event => {
+			event.preventDefault()
+
+			const alarm1SecondsSelect = root.querySelector('select[data-alarm1-seconds]')
+			const alarm1MinutesSelect = root.querySelector('select[data-alarm1-minutes]')
+			const alarm1HoursSelect = root.querySelector('select[data-alarm1-hours]')
+			const alarm1PeriodSelect = root.querySelector('select[data-alarm1-period]')
+			const alarm1DateSelect = root.querySelector('select[data-alarm1-date]')
+			const alarm1DaySelect = root.querySelector('select[data-alarm1-day]')
+
+			const seconds = alarm1SecondsSelect.value === 'any' ? null : alarm1SecondsSelect.value
+			const minutes = alarm1MinutesSelect.value === 'any' ? null : alarm1MinutesSelect.value
+			const hours = alarm1HoursSelect.value === 'any' ? null : alarm1HoursSelect.value
+			const dayOfWeek = alarm1PeriodSelect.value === 'dow'
+			const day = dayOfWeek ? alarm1DaySelect.value === 'any' ? null : alarm1DaySelect.value : undefined
+			const date = !dayOfWeek ? alarm1DateSelect.value === 'any' ? null : alarm1DateSelect.value : undefined
+
+			await this.#device.setAlarm1({
+				seconds, minutes, hours, day, date
+			}, false)
+
+			refreshView(root, this.#device)
+		})
+
+		const alarm2Submit = root.querySelector('form[data-alarm2] button[submit]')
+		alarm2Submit?.addEventListener('click', async event => {
+			event.preventDefault()
+
+			const alarm2MinutesSelect = root.querySelector('select[data-alarm2-minutes]')
+			const alarm2HoursSelect = root.querySelector('select[data-alarm2-hours]')
+			const alarm2PeriodSelect = root.querySelector('select[data-alarm2-period]')
+			const alarm2DateSelect = root.querySelector('select[data-alarm2-date]')
+			const alarm2DaySelect = root.querySelector('select[data-alarm2-day]')
+
+			const minutes = alarm2MinutesSelect.value === 'any' ? null : alarm2MinutesSelect.value
+			const hours = alarm2HoursSelect.value === 'any' ? null : alarm2HoursSelect.value
+			const dayOfWeek = alarm2PeriodSelect.value === 'dow'
+			const day = dayOfWeek ? alarm2DaySelect.value === 'any' ? null : alarm2DaySelect.value : undefined
+			const date = !dayOfWeek ? alarm2DateSelect.value === 'any' ? null : alarm2DateSelect.value : undefined
+
+			await this.#device.setAlarm2({
+				minutes, hours, day, date
+			}, false)
+
+			refreshView(root, this.#device)
 		})
 
 		const tabButtons = root.querySelectorAll('button[data-tab]')

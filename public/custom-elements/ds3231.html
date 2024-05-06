@@ -1,11 +1,11 @@
 
 <ds3231-config>
 
-
   <div class="tabs">
     <button data-tab="actions" data-active>Actions</button>
     <button data-tab="settings">Settings</button>
-    <button data-tab="alarms">Alarms</button>
+    <button data-tab="alarm1">Alarm 1</button>
+		<button data-tab="alarm2">Alarm 2</button>
   </div>
 
 	<form data-active data-for-tab="actions" data-actions class="tabsContent">
@@ -24,10 +24,10 @@
 	</form>
 
 	<form data-for-tab="settings" data-control class="tabsContent">
-		<label>Alarm1</label>
+		<label>Alarm 1 triggers interrupt</label>
 		<input name="enableAlarm1" type="checkbox" />
 
-		<label>Alarm2</label>
+		<label>Alarm 2 trigger interrupt</label>
 		<input name="enableAlarm2" type="checkbox" />
 
 		<label>Square Wave (disable interrupt)</label>
@@ -52,48 +52,209 @@
 		</fieldset>
 	</form>
 
-  <form data-for-tab="alarms" data-alarms class="tabsContent">
-    <fieldset>
-      <legend>Alarm 1</legend>
+  <form data-for-tab="alarm1" data-alarm1 class="tabsContent">
+		<label>Seconds</label>
+		<select data-alarm1-seconds>
+			<option value="any">(any)</option>
+			<option value="0">0</option>
+			<option value="15">15</option>
+			<option value="30">30</option>
+			<option value="45">45</option>
+			<option value="59">59</option>
+		</select>
 
-			<label>Seconds</label>
-			<select>
-				<option value="any">(any)</option>
-			</select>
+		<label>Minutes</label>
+		<select data-alarm1-minutes>
+			<option value="any">(any)</option>
+			<option value="0">0</option>
+			<option value="15">15</option>
+			<option value="30">30</option>
+			<option value="45">45</option>
+			<option value="59">59</option>
+		</select>
 
-			<label>Minutes</label>
-			<select>
-				<option value="any">(any)</option>
-			</select>
+		<label>Hours</label>
+		<select data-alarm1-hours>
+			<option value="any">(any)</option>
+			<option value="0">0</option>
+			<option value="1">1</option>
+			<option value="2">2</option>
+			<option value="3">3</option>
+			<option value="4">4</option>
+			<option value="5">5</option>
+			<option value="6">6</option>
+			<option value="7">7</option>
+			<option value="8">8</option>
+			<option value="9">9</option>
+			<option value="10">10</option>
+			<option value="11">11</option>
+			<option value="12">12</option>
+			<option value="13">13</option>
+			<option value="14">14</option>
+			<option value="15">15</option>
+			<option value="16">16</option>
+			<option value="17">17</option>
+			<option value="18">18</option>
+			<option value="19">19</option>
+			<option value="20">20</option>
+			<option value="21">21</option>
+			<option value="22">22</option>
+			<option value="23">23</option>
+		</select>
 
-			<label>Hours</label>
-			<select>
-				<option value="any">(any)</option>
-			</select>
+		<label>Period</label>
+		<select data-alarm1-period>
+			<option value="dow">Day of Week</option>
+			<option value="dom">Day of Month</option>
+		</select>
 
-			<label>Period</label>
-			<select>
-				<option value="dow">Day of Week</option>
-				<option value="dom">Day of Month</option>
-			</select>
+		<label>Date</label>
+		<select data-alarm1-date>
+			<option value="any">(any)</option>
+			<option value="1">1</option>
+			<option value="2">2</option>
+			<option value="3">3</option>
+			<option value="4">4</option>
+			<option value="5">5</option>
+			<option value="6">6</option>
+			<option value="7">7</option>
+			<option value="8">8</option>
+			<option value="9">9</option>
+			<option value="10">10</option>
+			<option value="11">11</option>
+			<option value="12">12</option>
+			<option value="13">13</option>
+			<option value="14">14</option>
+			<option value="15">15</option>
+			<option value="16">16</option>
+			<option value="17">17</option>
+			<option value="18">18</option>
+			<option value="19">19</option>
+			<option value="20">20</option>
+			<option value="21">21</option>
+			<option value="22">22</option>
+			<option value="23">23</option>
+			<option value="24">24</option>
+			<option value="25">25</option>
+			<option value="26">26</option>
+			<option value="27">27</option>
+			<option value="28">28</option>
+			<option value="29">29</option>
+			<option value="30">30</option>
+			<option value="31">31</option>
+		</select>
 
-			<label>Date</label>
-			<select>
-				<option value="any">(any)</option>
-			</select>
+		<label>Day</label>
+		<select data-alarm1-day>
+			<option value="any">(any)</option>
+			<option value="1">1</option>
+			<option value="2">2</option>
+			<option value="3">3</option>
+			<option value="4">4</option>
+			<option value="5">5</option>
+			<option value="6">6</option>
+			<option value="7">7</option>
+		</select>
 
-			<label>Day</label>
-			<select>
-				<option value="any">(any)</option>
-			</select>
+		<button data-alarm1-save submit>Save</button>
+  </form>
 
-    </fieldset>
+	<form data-for-tab="alarm2" data-alarm2 class="tabsContent">
+		<label>Minutes</label>
+		<select data-alarm2-minutes>
+			<option value="any">(any)</option>
+			<option value="0">0</option>
+			<option value="15">15</option>
+			<option value="30">30</option>
+			<option value="45">45</option>
+			<option value="59">59</option>
+		</select>
 
-    <fieldset>
-      <legend>Alarm 2</legend>
+		<label>Hours</label>
+		<select data-alarm2-hours>
+			<option value="any">(any)</option>
+			<option value="0">0</option>
+			<option value="1">1</option>
+			<option value="2">2</option>
+			<option value="3">3</option>
+			<option value="4">4</option>
+			<option value="5">5</option>
+			<option value="6">6</option>
+			<option value="7">7</option>
+			<option value="8">8</option>
+			<option value="9">9</option>
+			<option value="10">10</option>
+			<option value="11">11</option>
+			<option value="12">12</option>
+			<option value="13">13</option>
+			<option value="14">14</option>
+			<option value="15">15</option>
+			<option value="16">16</option>
+			<option value="17">17</option>
+			<option value="18">18</option>
+			<option value="19">19</option>
+			<option value="20">20</option>
+			<option value="21">21</option>
+			<option value="22">22</option>
+			<option value="23">23</option>
+		</select>
+
+		<label>Period</label>
+		<select data-alarm2-period>
+			<option value="dow">Day of Week</option>
+			<option value="dom">Day of Month</option>
+		</select>
+
+		<label>Date</label>
+		<select data-alarm2-date>
+			<option value="any">(any)</option>
+			<option value="1">1</option>
+			<option value="2">2</option>
+			<option value="3">3</option>
+			<option value="4">4</option>
+			<option value="5">5</option>
+			<option value="6">6</option>
+			<option value="7">7</option>
+			<option value="8">8</option>
+			<option value="9">9</option>
+			<option value="10">10</option>
+			<option value="11">11</option>
+			<option value="12">12</option>
+			<option value="13">13</option>
+			<option value="14">14</option>
+			<option value="15">15</option>
+			<option value="16">16</option>
+			<option value="17">17</option>
+			<option value="18">18</option>
+			<option value="19">19</option>
+			<option value="20">20</option>
+			<option value="21">21</option>
+			<option value="22">22</option>
+			<option value="23">23</option>
+			<option value="24">24</option>
+			<option value="25">25</option>
+			<option value="26">26</option>
+			<option value="27">27</option>
+			<option value="28">28</option>
+			<option value="29">29</option>
+			<option value="30">30</option>
+			<option value="31">31</option>
+		</select>
+
+		<label>Day</label>
+		<select data-alarm2-day>
+			<option value="any">(any)</option>
+			<option value="1">1</option>
+			<option value="2">2</option>
+			<option value="3">3</option>
+			<option value="4">4</option>
+			<option value="5">5</option>
+			<option value="6">6</option>
+			<option value="7">7</option>
+		</select>
 
 
-    </fieldset>
+		<button data-alarm2-save submit>Save</button>
   </form>
 
   <form data-output>
