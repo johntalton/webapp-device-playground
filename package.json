@@ -6,33 +6,29 @@
   },
   "dependencies": {
     "@johntalton/adt7410": "^1.0.2",
-    "@johntalton/adxl375": "../adxl375",
-    "@johntalton/ags02ma": "../ags02ma",
+
     "@johntalton/aht20": "^1.1.0",
     "@johntalton/am2320": "^1.0.0",
     "@johntalton/and-other-delights": "^7.0.0",
     "@johntalton/bitsmush": "^1.0.1",
-    "@johntalton/bno08x": "../bno08x",
+
     "@johntalton/boschieu": "^6.0.1",
-    "@johntalton/ds1841": "../ds1841",
+
     "@johntalton/ds3502": "^3.0.1",
     "@johntalton/excamera-i2cdriver": "^1.0.0",
-    "@johntalton/ft232h": "../ft232h",
+
     "@johntalton/ht16k33": "^1.0.3",
-    "@johntalton/i2c-bus-excamera-i2cdriver": "../i2c-bus-excamera-i2cdriver",
+    "@johntalton/i2c-bus-excamera-i2cdriver": "^1.0.0",
     "@johntalton/i2c-bus-mcp2221": "^2.0.1",
     "@johntalton/i2c-bus-tca9548a": "^1.0.1",
     "@johntalton/i2c-port": "^1.0.0",
-    "@johntalton/ina219": "^1.1.0",
+
     "@johntalton/mcp2221": "^3.0.3",
-    "@johntalton/mcp23": "../mcp23",
-    "@johntalton/pca9536": "../pca9536",
+
     "@johntalton/pcf8523": "^2.0.1",
     "@johntalton/pcf8574": "^1.0.7",
-    "@johntalton/ssd1306": "../ssd1306",
+
     "@johntalton/tca9548a": "^5.0.0",
-    "@johntalton/tcs34725": "../tcs34725",
-    "@johntalton/drv2605": "../drv2605",
     "@johntalton/ds3231": "^1.0.1"
   }
 }
