@@ -7,28 +7,25 @@
   "dependencies": {
     "@johntalton/adt7410": "^1.0.2",
 
-    "@johntalton/aht20": "^1.1.0",
+    "@johntalton/aht20": "^1.1.1",
     "@johntalton/am2320": "^1.0.0",
     "@johntalton/and-other-delights": "^7.0.0",
     "@johntalton/bitsmush": "^1.0.1",
-
     "@johntalton/boschieu": "^6.0.1",
-
-    "@johntalton/ds3502": "^3.0.1",
     "@johntalton/excamera-i2cdriver": "^1.0.0",
-
     "@johntalton/ht16k33": "^1.0.3",
     "@johntalton/i2c-bus-excamera-i2cdriver": "^1.0.0",
     "@johntalton/i2c-bus-mcp2221": "^2.0.1",
     "@johntalton/i2c-bus-tca9548a": "^1.0.1",
     "@johntalton/i2c-port": "^1.0.0",
-
     "@johntalton/mcp2221": "^3.0.3",
-
     "@johntalton/pcf8523": "^2.0.1",
     "@johntalton/pcf8574": "^1.0.7",
-
     "@johntalton/tca9548a": "^5.0.0",
-    "@johntalton/ds3231": "^1.0.1"
+    "@johntalton/ds3231": "^1.0.1",
+    "@johntalton/adxl375": "^1.0.0",
+    "@johntalton/pca9536": "^1.0.0",
+    "@johntalton/ds3502": "^3.0.1",
+    "@johntalton/ds1841": "^1.0.1"
   }
 }
