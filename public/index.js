@@ -17,7 +17,7 @@ import { PCF8523ConfigElement } from './custom-elements/pcf8523-config.js'
 //
 import { ExcameraI2CDriverUIBuilder } from './devices-serial/exc-i2cdriver.js'
 import { MCP2221UIBuilder } from './devices-hid/mcp2221.js'
-import { FT232H_PRODUCT_ID, FT232H_VENDOR_ID, FT232HUIBuilder } from './devices-usb/ft232h.js'
+// import { FT232H_PRODUCT_ID, FT232H_VENDOR_ID, FT232HUIBuilder } from './devices-usb/ft232h.js'
 import { MashUIBuilder } from './devices-serial/mash.js'
 
 //
@@ -38,10 +38,10 @@ const MCP2221_USB_FILTER = {
 	productId: 221
 }
 
-const FT232H_USB_FILTER = { vendorId: FT232H_VENDOR_ID, productId: FT232H_PRODUCT_ID }
+// const FT232H_USB_FILTER = { vendorId: FT232H_VENDOR_ID, productId: FT232H_PRODUCT_ID }
 
 const SUPPORTED_USB_FILTER = [
-	FT232H_USB_FILTER
+	// FT232H_USB_FILTER
 ]
 
 
@@ -319,11 +319,11 @@ async function onContentLoaded() {
 			}
 
 			//const liElem = makeListItem()
-			Promise.resolve()
-				.then(async () => {
-					const builder = await FT232HUIBuilder.builder(port, ui)
-					const demolisher = buildDeviceListItem(deviceListElem, builder)
-				})
+			// Promise.resolve()
+			// 	.then(async () => {
+			// 		const builder = await FT232HUIBuilder.builder(port, ui)
+			// 		const demolisher = buildDeviceListItem(deviceListElem, builder)
+			// 	})
 		}
 	}
 

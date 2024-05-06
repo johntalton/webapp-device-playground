@@ -1,9 +1,14 @@
-import { FT232H_PRODUCT_ID, FT232H_VENDOR_ID } from '../devices-usb/ft232h.js'
+// import { FT232H_PRODUCT_ID, FT232H_VENDOR_ID } from '../devices-usb/ft232h.js'
 
-export const FT232H_USB_FILTER = { vendorId: FT232H_VENDOR_ID, productId: FT232H_PRODUCT_ID }
+// export const FT232H_USB_FILTER = { vendorId: FT232H_VENDOR_ID, productId: FT232H_PRODUCT_ID }
+
+const CH9012F_VENDOR_ID = 6790
+const CH9102F_PRODUCT_ID = 21972
+export const CH9102F_USB_FILTER = { vendorId: CH9012F_VENDOR_ID, productId: CH9102F_PRODUCT_ID }
 
 export const SUPPORTED_USB_FILTER = [
-	FT232H_USB_FILTER
+	// FT232H_USB_FILTER,
+	CH9102F_USB_FILTER
 ]
 
 //
