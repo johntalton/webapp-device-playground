@@ -13,15 +13,15 @@ export const HT16K33_INFO = {
 }
 
 export const TCA9548_INFO = {
-	addresses: [ ...range(0x70, 0x77) ], name: 'tca9548a'
+	addresses: [ ...range(0x70, 0x77) ], name: 'tca9548a (Multiplexer)'
 }
 
 export const DS3502_INFO = {
-	addresses: [ ...range(0x28, 0x2b) ], name: 'ds3502'
+	addresses: [ ...range(0x28, 0x2b) ], name: 'ds3502 (Pot)'
 }
 
 export const DS1841_INFO = {
-	addresses: [ ...range(0x28, 0x2b) ], name: 'ds1841'
+	addresses: [ ...range(0x28, 0x2b) ], name: 'ds1841 (Pot)'
 }
 
 export const BOSCH_IEU_INFO = {
@@ -37,23 +37,27 @@ export const SSD1306_INFO = {
 }
 
 export const PCA_9536_INFO = {
-	addresses: [ 0x41 ], name: 'pca9536'
+	addresses: [ 0x41 ], name: 'pca9536 (4-pin gpio)'
 }
 
 export const PCF_8574_INFO = {
-	addresses: [ 0x20, 0x21 ], name: 'pcf8574'
+	addresses: [ 0x20, 0x21 ], name: 'pcf8574 (Gpio)'
 }
 
 export const PCF_8523_INFO = {
-	addresses: [ 0x68 ], name: 'pcf8523'
+	addresses: [ 0x68 ], name: 'pcf8523 (RTC)'
 }
 
 export const TCS_34725_INFO = {
-	addresses: [ 0x29 ], name: 'tcs34725'
+	addresses: [ 0x29 ], name: 'tcs34725 (RGB Light)'
+}
+
+export const TSL2591_INFO = {
+	addresses: [ 0x29 ], name: 'tsl2591 (Light)'
 }
 
 export const MCP23_INFO = {
-	addresses: [ ...range(0x20, 0x27) ], name: 'mcp23'
+	addresses: [ ...range(0x20, 0x27) ], name: 'mcp230xx (Gpio)'
 }
 
 export const EEPROM_INFO = {
@@ -72,6 +76,8 @@ export const AHT20_INFO = { addresses: [ 0x38 ], name: 'AHT20' }
 
 export const DRV2605_INFO = { addresses: [ 0x5a ], name: 'DRV2605' }
 
+export const AW9523_INFO = { addresses: [ 0x58 ], name: 'AW9523 (LED/GPIO)' }
+
 export const I2C_GUESSES = [
 	// 0x00
 	// 0x10
@@ -79,7 +85,6 @@ export const I2C_GUESSES = [
 	// 0x20
 	PCF_8574_INFO,
 	MCP23_INFO,
-	{ addresses: [ 0x29 ], name: 'tcs34725' },
 	DS1841_INFO,
 	DS3502_INFO,
 	{ addresses: [ 0x2d, 0x53, 0x57 ], name: 'st25dv16k' },
@@ -98,7 +103,7 @@ export const I2C_GUESSES = [
 	ADXL375_INFO,
 	{ addresses: [ 0x5c ], name: 'am2320' },
 	{ addresses: [ 0x5c ], name: 'am2315' },
-
+	AW9523_INFO,
 	EEPROM_INFO,
 	{ addresses: [ ...range(0x50, 0x57) ], name: 'Adafruit 24LC32' },
 	{ addresses: [ ...range(0x50, 0x57) ], name: 'mb85rc' },
@@ -108,6 +113,7 @@ export const I2C_GUESSES = [
 	PCF_8523_INFO,
 	// 0x70
 	TCA9548_INFO,
+	TSL2591_INFO,
 	BOSCH_IEU_INFO,
 	HT16K33_INFO,
 	ADT7410_INFO,

@@ -282,11 +282,19 @@ export class MCP2221UIBuilder {
 		scanButton.addEventListener('click', e => {
 			scanButton.disabled = true
 
-			console.log('mcp2221 testing ...')
+			const existingHexs = addressElem.querySelectorAll('hex-display')
+			existingHexs.forEach(eh => eh.remove())
+
+			const existingLis = root.querySelectorAll('li')
+			existingLis.forEach(el => el.remove())
+
+			console.log('mcp2221 scan...')
+
 
 			Promise.resolve()
 				.then(async () => {
 
+					await this.#device.common.status({ i2cClock: 400 })
 
 					const futureScans = [ ...range(0x08, 0x77) ].map(addr => {
 						return async () => {
@@ -332,6 +340,7 @@ export class MCP2221UIBuilder {
 						const listElem = document.createElement('li')
 						listElem.textContent = addr
 
+						listElem.setAttribute('slot', 'vdevice-guess-list')
 						listElem.toggleAttribute('data-acked', true)
 
 						const guesses = deviceGuessByAddress(addr)
@@ -342,12 +351,14 @@ export class MCP2221UIBuilder {
 							guessOptionElem.textContent = guess.name
 							guessSelectElem.appendChild(guessOptionElem)
 						})
+						listElem.appendChild(guessSelectElem)
 
 						const makeDeviceButton = document.createElement('button')
 						makeDeviceButton.textContent = 'Create Device 🕹'
+						makeDeviceButton.disabled = (guesses.length === 0)
 						listElem.appendChild(makeDeviceButton)
-						makeDeviceButton.addEventListener('click', e => {
 
+						makeDeviceButton.addEventListener('click', e => {
 							//
 							console.log('making Virtual Bus from MCP2221')
 							const deviceGuess = guessSelectElem.value
@@ -362,9 +373,6 @@ export class MCP2221UIBuilder {
 
 
 						}, { once: true })
-
-						listElem.setAttribute('slot', 'vdevice-guess-list')
-						listElem.appendChild(guessSelectElem)
 
 						root.appendChild(listElem)
 					})

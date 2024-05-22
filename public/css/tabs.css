@@ -1,11 +1,11 @@
 
-main .tabs {
+.tabs {
 	display: flex;
 	gap: 0;
 	font-size: 1.25em;
 }
 
-main .tabs button {
+.tabs button {
 	--disabled-accent: var(--color-disabled, red);
 
 	position: relative;
@@ -16,7 +16,7 @@ main .tabs button {
 	z-index: 2;
 
 	background-color: var(--color-accent--lighter, red);
-	color: var(--color-accent--lightest-text, red);
+	color: var(--color-accent--lighter-text, red);
 	border-block-start: 1px solid var(--color-accent--lightest, red);
 
 	border-block-end: 0;
@@ -25,11 +25,11 @@ main .tabs button {
 	padding-inline: 5ch;
 }
 
-main .tabs button:first-child {
+.tabs button:first-child {
 	border-inline-start: 1px solid var(--color-accent--lightest, red);
 }
 
-main .tabs button[data-active] {
+.tabs button[data-active] {
 	pointer-events: none;
 
 	background-color: var(--color-accent--lightest, red);
@@ -41,7 +41,7 @@ main .tabs button[data-active] {
 	font-weight: bold;
 }
 
-main .tabs button[disabled] {
+.tabs button[disabled] {
 	pointer-events: none;
 
 	background-color: transparent;
@@ -51,7 +51,7 @@ main .tabs button[disabled] {
 	border-block-end-width: 0;
 }
 
-main .tabs button:not([disabled]):hover {
+.tabs button:not([disabled]):hover {
 	text-decoration: underline;
 
 	background-color: var(--color-accent--lightest, red);
@@ -61,10 +61,11 @@ main .tabs button:not([disabled]):hover {
 
 
 
-main .tabsContent {
+.tabsContent {
 	margin-block-start: 0;
 	flex-grow: 1;
 	background-color: var(--color-accent--lightest, red);
+	color: var(--color-accent--lightest-text, red);
 	/* display: flex; */
 	border-radius: 0 2em 2em 2em;
 	/* border-inline-start: 1px solid purple; */
@@ -76,6 +77,6 @@ main .tabsContent {
 
 }
 
-main .tabsContent:not([data-active]) {
+.tabsContent:not([data-active]) {
 	display: none;
 }

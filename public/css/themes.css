@@ -26,13 +26,14 @@
 	--color-accent-text: darkblue;
 
 	--color-accent--light: blue;
-	--color-accent--light-text: darkblue;
+	--color-accent--light-text: white;
 
 	--color-accent--lighter: green;
 	--color-accent--lighter-text: lime;
 
 	--color-accent--lightest: darkorange;
-	--color-accent--lightest-text: gold;
+	/* --color-accent--lightest-text: gold; */
+	--color-accent--lightest-text: oklab(0.45 -0.01 0.1);
 
 	--color-accent--dark: magenta;
 	--color-accent--dark-text: plum;
@@ -194,3 +195,48 @@
 	--darker-percentage: 9%;
 }
 
+[data-theme ~= "NuLight"] {
+	--color-accent: oklab(0.95 -0.02 -0.01);
+	--color-accent-text: black;
+	--color-accent--light: oklab(0.78 -0.06 -0.06);
+	--color-accent--light-text: black;
+	--color-accent--lighter: oklab(1 0 0);
+	--color-accent--lighter-text: black;
+	--color-accent--lightest: oklab(0.93 -0.02 -0.01);
+	--color-accent--lightest-text: black;
+	--color-accent--dark: oklab(0.95 -0.02 -0.01);
+	--color-accent--dark-text: black;
+	--color-accent--darker: oklab(0.78 -0.06 -0.06);
+	--color-accent--darker-text: black;
+}
+
+
+[data-theme ~= "NuDark"] {
+	--color-accent: oklab(0.72 0 0.02);
+	--color-accent-text: black;
+	--color-accent--light: oklab(0.6 0.08 0.14);
+	--color-accent--light-text: white;
+	--color-accent--lighter: oklab(0.28 0.02 0.04);
+	--color-accent--lighter-text: white;
+	--color-accent--lightest: oklab(0.36 0.02 0.05);
+	--color-accent--lightest-text: white;
+	--color-accent--dark: oklab(0.72 0 0.02);
+	--color-accent--dark-text: black;
+	--color-accent--darker: oklab(0.62 0.1 0.13);
+	--color-accent--darker-text: white;
+}
+
+[data-theme ~= "Corp"] {
+	--color-accent: oklab(0.89 0 0);
+	--color-accent-text: black;
+	--color-accent--light: oklab(0.53 -0.07 -0.17);
+	--color-accent--light-text: white;
+	--color-accent--lighter: oklab(1 0 0);
+	--color-accent--lighter-text: black;
+	--color-accent--lightest: oklab(0.96 0 0);
+	--color-accent--lightest-text: black;
+	--color-accent--dark: oklab(0.89 0 0);
+	--color-accent--dark-text: black;
+	--color-accent--darker: oklab(0.68 -0.1 -0.17);
+	--color-accent--darker-text: white;
+}

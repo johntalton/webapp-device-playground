@@ -24,6 +24,10 @@
 @import url('./css/adxl375.css') layer(app);
 @import url('./css/aht20.css') layer(app);
 @import url('./css/ds3231.css') layer(app);
+@import url('./css/pca9536.css') layer(app);
+@import url('./css/pcf8574.css') layer(app);
+@import url('./css/aw9523.css') layer(app);
+@import url('./css/mcp23.css') layer(app);
 
 @import url('./css/gpio.css') layer(app);
 
@@ -61,5 +65,5 @@
 
 ::view-transition-old(root),
 ::view-transition-new(root) {
-  animation-duration: 600ms;
+  animation-duration: 200ms;
 }

@@ -1,0 +1,137 @@
+mcp23-config {
+
+	& [data-loader] {
+		display: flex;
+		flex-grow: 1;
+    align-self: center;
+    justify-content: center;
+
+		& p[data-load] {
+			font-size: 1em;
+			font-weight: bold;
+		}
+	}
+	&:not([data-loading]) [data-loader] {
+		display: none;
+	}
+	&[data-loading] form[data-gpio] {
+		display: none;
+	}
+
+
+
+
+	& div[data-port] {
+		display: flex;
+		flex-direction: row;
+
+		gap: 3em;
+
+		justify-content: flex-start;
+		align-items: baseline;
+
+		& ul {
+			display: flex;
+			flex-direction: column;
+			list-style: none;
+
+			border-radius: 1em;
+
+			/* box-shadow: inset 4px 4px 5px #0000003d; */
+
+			background-color: var(--color-accent--lighter, red);
+			color: var(--color-accent--lighter-text, red);
+
+			padding: 1em;
+			padding-inline: 2em;
+
+			& > li button {
+				padding: 1em;
+				padding-inline: 5ch;
+
+				background-color: inherit;
+				color: inherit;
+
+				cursor: pointer;
+
+				&:hover {
+					background-color: var(--color-accent--darker, red);
+					color: var(--color-accent--darker-text, red);
+					text-decoration: underline;
+				}
+
+				&[data-active]:not(:hover) {
+					background-color: var(--color-accent--lightest, red);
+					color: var(--color-accent--lightest-text, red);
+				}
+			}
+		}
+	}
+
+
+
+	& form {
+		flex-grow: 1;
+
+		display: grid;
+		grid-template-columns: 1fr 1fr;
+		gap: 1em;
+
+		align-items: center;
+
+		/* border: 1px solid var(--color-accent--light, red);
+    border-radius: 1em;
+    padding: 1em;
+    margin: 0; */
+    align-self: stretch;
+
+		& fieldset {
+			grid-column: 1 / -1;
+
+			display: grid;
+			grid-template-columns: 1fr 1fr;
+			gap: 1em;
+
+			padding: 2em;
+			border-radius: 1em;
+			border-color: var(--color-accent--darker, red);
+
+			& legend {
+				font-weight: bold;
+				padding-inline: 1ch;
+			}
+		}
+
+		& select {
+			background-color: var(--color-accent--lighter, red);
+			color: var(--color-accent--lighter-text, red);
+		}
+
+		& input[type="checkbox"] {
+			accent-color: var(--color-accent--darker, red);
+			width: 1.25em;
+			height: 1.25em;
+			margin: 0.5em;
+		}
+	}
+
+
+	& form[data-status] {
+		display: flex;
+		flex-direction: row;
+		align-items: flex-start;
+
+		& fieldset {
+			flex-grow: 1;
+
+			display: grid;
+			grid-template-columns: 1fr 1fr 1fr;
+			gap: 1em;
+
+
+			& output[data-flag="false"] {
+				visibility: hidden;
+			}
+		}
+	}
+}

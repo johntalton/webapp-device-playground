@@ -1,7 +1,7 @@
 
 input[type="number"] {
 
-  font-size: 1.25em;
+  font-size: 1.5em;
 
   /* margin-inline: 0; */
   padding-inline-start: 1ch;
@@ -27,5 +27,6 @@ input[type="number"]:where(:focus-visible, :focus) {
 }
 
 input[type="range"] {
+  accent-color: var(--color-accent--darker, red);
 
 }

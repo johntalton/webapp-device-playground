@@ -1,7 +1,16 @@
 tca9548-config::part(fieldset) {
-  border: 0;
+  border: 1px solid var(--color-accent--light, red);
+  border-radius: 1em;
+  padding-inline-start: 2em;
   padding-block: 1em;
-  margin: 0;
+
+  margin-inline-end: 3em;
+
+  display: grid;
+  grid-template-columns: min-content 1fr;
+  gap: 1em;
+  justify-items: start;
+  align-items: center;
 
   color: var(--color-accent--lighter-text);
 }
@@ -16,7 +25,7 @@ tca9548-config::part(title) {
 
 tca9548-config::part(inputs) {
   accent-color: var(--color-accent--light, red);
-  /* color: var(--color-accent--light-text, red); */
+  color: var(--color-accent--light-text, red);
 
   display: inline-block;
   aspect-ratio: 1;

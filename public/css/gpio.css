@@ -1,9 +1,4 @@
-pca9536-config {
-  display: flex;
-  flex-direction: column;
-  margin-inline-start: 1em;
-  margin-inline-end: 2em;
-}
+
 
 gpio-config {
   display: block;

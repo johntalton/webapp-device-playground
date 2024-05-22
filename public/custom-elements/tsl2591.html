@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<!-- <link rel="stylesheet"  href="http://localhost:5500/public/index.css"></link> -->
+</head>
+<body>
+	<tsl2591-config lang="en">
+		<style>
+			/* body {
+				display: flex;
+				background-color: inherit;
+			}
+
+			tsl2591-config {
+				width: 100%;
+			} */
+
+
+			tsl2591-config form[data-active] {
+				display: grid;
+				grid-template-columns: 1fr 1fr;
+				gap: 1em;
+				align-items: stretch;
+				justify-items: stretch;
+
+				margin-inline-end: 2em;
+
+				& select {
+					background-color: var(--color-accent--lighter, red);
+				}
+
+				& input[type="number"]:not(:where(:focus-visible, :focus)) {
+					background-color: var(--color-accent--lighter, red);
+				}
+
+				& input[type="checkbox"] {
+					accent-color: var(--color-accent--darker, red);
+					width: 1.25em;
+					height: 1.25em;
+				}
+
+				& > fieldset {
+					display: grid;
+					grid-template-columns: 1fr 1fr;
+					gap: 1em;
+					align-items: center;
+					align-content: baseline;
+
+					padding-block: 1em;
+					padding-inline: 1em;
+
+					border-radius: 1em;
+					border-color: var(--color-accent--darker, red);
+
+					& > legend {
+						font-weight: bold;
+						padding-inline: 1ch;
+					}
+
+					&[data-actions] {
+						grid-column: 1 / -1;
+						justify-self: normal;
+					}
+				}
+			}
+
+			tsl2591-config [data-active][data-for-tab="data"] {
+				display: flex;
+				justify-content: center;
+				margin-inline-end: 2em;
+			}
+
+			tsl2591-config canvas {
+				border: 1px solid var(--color-accent, red);
+				border-radius: 1em;
+				margin-inline: 1em;
+			}
+		</style>
+		<div class="tabs">
+			<button data-tab="profile" data-active>Profile</button>
+			<button data-tab="thresholds">Thresholds</button>
+			<button data-tab="status">Status</button>
+			<button data-tab="data">Data</button>
+		</div>
+
+		<form data-config data-for-tab="profile" data-active class="tabsContent">
+			<label>Enable No Persist Interrupt</label>
+			<input name="enableNoPersistInterrupt" type="checkbox">
+
+			<label>Enable Interrupt</label>
+			<input name="enableInterrupt" type="checkbox">
+
+			<label>Enable Sleep After Interrupt</label>
+			<input name="enableSleepAfterInterrupt" type="checkbox">
+
+			<label>Enabled</label>
+			<input name="enabled" type="checkbox">
+
+			<label>Power On</label>
+			<input name="powerOn" type="checkbox">
+
+			<label>Gain</label>
+			<select name="gain">
+				<option value="0">Low</option>
+				<option value="1">Medium</option>
+				<option value="2">High</option>
+				<option value="3">Max</option>
+			</select>
+
+			<label>Time</label>
+			<select name="time">
+				<option value="0">100ms</option>
+				<option value="1">200ms</option>
+				<option value="2">300ms</option>
+				<option value="3">400ms</option>
+				<option value="4">500ms</option>
+				<option value="5">600ms</option>
+			</select>
+		</form>
+
+		<form data-thresholds data-for-tab="thresholds" class="tabsContent">
+			<fieldset>
+				<legend>Interrupt</legend>
+
+				<label>Low</label>
+				<input name="interruptThresholdLow" type="number" min="0" max="65535">
+
+				<label>High</label>
+				<input name="interruptThresholdHigh" type="number" min="0" max="65535">
+
+				<label>Persist</label>
+				<select name="persist">
+					<option value="0">Every</option>
+					<option value="1">Any</option>
+					<option value="2">2</option>
+					<option value="3">3</option>
+					<option value="4">5</option>
+					<option value="5">10</option>
+					<option value="6">15</option>
+					<option value="7">20</option>
+					<option value="8">25</option>
+					<option value="9">30</option>
+					<option value="10">35</option>
+					<option value="11">40</option>
+					<option value="12">45</option>
+					<option value="13">50</option>
+					<option value="14">55</option>
+					<option value="15">60</option>
+				</select>
+			</fieldset>
+
+			<fieldset>
+				<legend>No Persist Interrupt</legend>
+
+				<label>Low</label>
+				<input name="nePersistInterruptThresholdLow" type="number" min="0" max="65535">
+
+				<label>High</label>
+				<input name="noPersistInterruptThresholdHigh" type="number" min="0" max="65535">
+			</fieldset>
+
+			<button data-set-threshold>Set</button>
+		</form>
+
+		<form data-for-tab="status" class="tabsContent">
+			<label>Device Id</label>
+			<output name="deviceID"></output>
+
+			<label>No Persist Interrupt</label>
+			<output name="noPersistInterruptFlag"></output>
+
+			<label>Interrupt</label>
+			<output name="interruptFlag"></output>
+
+			<label>Valid</label>
+			<output name="valid"></output>
+
+			<fieldset data-actions>
+				<button data-refresh-status>Refresh</button>
+				<button data-clear-interrupt>Clear</button>
+				<button data-trigger-interrupt>Trigger</button>
+				<button data-reset>Reset</button>
+			</fieldset>
+		</form>
+
+		<section data-for-tab="data" class="tabsContent">
+			<canvas data-hours width="300" height="300"></canvas>
+			<canvas data-minutes width="300" height="300"></canvas>
+			<canvas data-seconds width="300" height="300"></canvas>
+		</section>
+	</tsl2591-config>
+</body>
+</html>

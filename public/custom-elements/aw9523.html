@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<template data-gpio>
+			<details name="" data-gpio="">
+				<summary>
+					<span data-summary-key></span>
+					<ol data-summary-description>
+						<li data-summary-interrupt></li>
+						<li data-summary-mode></li>
+						<li data-summary-direction></li>
+					</ol>
+				</summary>
+
+				<fieldset>
+					<label>Mode</label>
+					<select name="mode">
+						<option value="1">Gpio</option>
+						<option value="0">LED</option>
+					</select>
+
+					<label>Direction</label>
+					<select name="direction">
+						<option value="0">Output</option>
+						<option value="1">Input</option>
+					</select>
+
+					<label>Output</label>
+					<select name="output">
+						<option value="true">High</option>
+						<option value="false">Low</option>
+					</select>
+
+					<label>Interrupt</label>
+					<select name="interrupt">
+						<option value="true">Enabled</option>
+						<option value="false">Disabled</option>
+					</select>
+
+					<label>Dimming</label>
+					<input name="dimming" type="range" min="0" max="255" />
+				</fieldset>
+			</details>
+		</template>
+	</head>
+  <body>
+    <aw9523-config>
+
+			<div class="tabs">
+				<button data-tab="profile" data-active>Profile</button>
+				<button data-tab="port0">Port 0</button>
+				<button data-tab="port1">Port 1</button>
+				<button data-tab="status">Status</button>
+			</div>
+
+			<form data-status data-for-tab="status" class="tabsContent">
+				<fieldset>
+					<legend>Port 0</legend>
+
+					<label>pin 0</label>
+					<output name="gpioValue0">-</output>
+
+					<label>pin 1</label>
+					<output name="gpioValue1">-</output>
+
+					<label>pin 2</label>
+					<output name="gpioValue2">-</output>
+
+					<label>pin 3</label>
+					<output name="gpioValue3">-</output>
+
+					<label>pin 4</label>
+					<output name="gpioValue4">-</output>
+
+					<label>pin 5</label>
+					<output name="gpioValue5">-</output>
+
+					<label>pin 6</label>
+					<output name="gpioValue6">-</output>
+
+					<label>pin 7</label>
+					<output name="gpioValue7">-</output>
+				</fieldset>
+
+				<fieldset>
+					<legend>Port 1</legend>
+
+					<label>pin 0</label>
+					<output name="gpioValue8">-</output>
+
+					<label>pin 1</label>
+					<output name="gpioValue9">-</output>
+
+					<label>pin 2</label>
+					<output name="gpioValue10">-</output>
+
+					<label>pin 3</label>
+					<output name="gpioValue11">-</output>
+
+					<label>pin 4</label>
+					<output name="gpioValue12">-</output>
+
+					<label>pin 5</label>
+					<output name="gpioValue13">-</output>
+
+					<label>pin 6</label>
+					<output name="gpioValue14">-</output>
+
+					<label>pin 7</label>
+					<output name="gpioValue15">-</output>
+				</fieldset>
+
+				<button data-refresh>Refresh</button>
+			</form>
+
+			<form data-profile data-for-tab="profile" data-active class="tabsContent">
+				<label>Port 0 Drive</label>
+				<select name="port0PushPull">
+					<option value="false">Open Drain (default)</option>
+					<option value="true">Push Pull</option>
+				</select>
+
+				<label>IMax Range</label>
+				<select name="iMaxRange">
+					<option value="0">Full</option>
+					<option value="1">1 / 4</option>
+					<option value="2">2 / 4</option>
+					<option value="3">3 / 4</option>
+				</select>
+
+				<button data-reset>Reset</button>
+			</form>
+
+			<form data-port0 data-for-tab="port0" class="tabsContent">
+				<!-- details template -->
+			</form>
+
+			<form data-port1 data-for-tab="port1" class="tabsContent">
+				<!-- details template -->
+			</form>
+
+		</aw9523-config>
+	</body>
+</html>

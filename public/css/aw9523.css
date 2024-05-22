@@ -1,0 +1,142 @@
+aw9523-config {
+	& form[data-active] {
+
+	}
+
+	& form[data-profile] {
+		display: grid;
+		grid-template-columns: 1fr 1fr;
+
+		& select {
+			background-color: var(--color-accent--lighter, red);
+			color: var(--color-accent--lighter-text, red);
+		}
+	}
+
+	& form[data-status] {
+		display: flex;
+		flex-direction: row;
+		flex-wrap: wrap;
+
+		& fieldset {
+			flex-grow: 1;
+
+			display: grid;
+			grid-template-columns: 1fr 1fr;
+			gap: 2em;
+
+			justify-items: center;
+
+			padding: 2em;
+			border-radius: 1em;
+			border-color: var(--color-accent--darker, red);
+
+			& legend {
+				font-weight: bold;
+				padding-inline: 1ch;
+			}
+		}
+
+		& button {
+			align-self: flex-start;
+		}
+	}
+
+	& form {
+		/* grid-template-columns: 1fr 1fr; */
+		gap: 1em;
+		align-items: stretch;
+		justify-items: stretch;
+
+		margin-inline-end: 2em;
+
+		& input[type="number"]:not(:where(:focus-visible, :focus)) {
+			background-color: var(--color-accent--lighter, red);
+		}
+
+		& input[type="range"] {
+			min-height: 3em;
+		}
+
+		& input[type="checkbox"] {
+			accent-color: var(--color-accent--darker, red);
+			width: 1.25em;
+			height: 1.25em;
+			margin: 0.5em;
+		}
+	}
+
+	& details {
+		/* display: grid; */
+		/* border: 1px solid red; */
+		border-radius: 1em;
+
+
+		& > summary {
+			display: flex;
+			padding-inline: 1em;
+			padding-block: 1em;
+			padding-inline-start: 2em;
+
+			justify-content: space-between;
+
+			cursor: pointer;
+
+			& ol[data-summary-description] {
+				display: flex;
+				flex-direction: row;
+				gap: 1em;
+				margin-inline-start: 1em;
+
+				list-style: none;
+
+				& li {
+
+				}
+
+				& li[data-default] {
+					display: none;
+				}
+			}
+		}
+
+		&:not([open]) > summary {
+
+			&:hover {
+				text-decoration: underline;
+				background-color: var(--color-accent--lighter, red);
+				color: var(--color-accent--lighter-text);
+				border-radius: 1em;
+			}
+		}
+
+		&[open] {
+			/* background-color: pink; */
+			background-color: var(--color-accent--darker, red);
+			color: var(--color-accent--darker-text);
+		}
+
+		&[open] > summary {
+			/* border: 1px solid red; */
+			font-weight: bold;
+
+			border-radius: 1em;
+		}
+
+		& > fieldset {
+			display: grid;
+			grid-template-columns: 1fr 1fr;
+			align-items: center;
+			gap: 1em;
+			padding: 1em;
+			padding-block: 2em;
+			padding-inline-start: 2em;
+
+			background-color: var(--color-accent--lighter, red);
+			color: var(--color-accent--lighter-text, red);
+
+			border: 0;
+			border-radius: 1em;
+		}
+	}
+}

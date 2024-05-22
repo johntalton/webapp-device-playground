@@ -1,0 +1,23 @@
+pcf8574-config {
+	display: flex;
+	gap: 1em;
+	align-items: start;
+
+	& > form {
+		display: grid;
+		grid-template-columns: 1fr 1fr 1fr;
+
+		gap: 1em;
+		align-items: baseline;
+    justify-items: stretch;
+
+    margin-inline-start: 1em;
+		padding: 1em;
+		padding-inline: 3em;
+		background-color: var(--color-accent--lightest, red);
+		border-radius: 1em;
+
+	}
+
+
+}

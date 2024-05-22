@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html>
+  <body>
+    <pca9536-config>
+      <form data-config>
+
+        <fieldset data-gpio="0">
+          <legend>Gpio 0</legend>
+
+          <label>Direction</label>
+          <select data-update="direction" name="gpio0Direction">
+            <option value="0">Output</option>
+            <option value="1">Input</option>
+          </select>
+
+          <label>Inverse Polarity</label>
+          <input data-update="polarity" name="gpio0InversePolarity" type="checkbox">
+
+          <label>Output Value</label>
+          <select  data-update="output" name="gpio0Output">
+            <option value="1">High</option>
+            <option value="0">Low</option>
+          </select>
+        </fieldset>
+
+        <fieldset data-gpio="1">
+          <legend>Gpio 1</legend>
+
+          <label>Direction</label>
+          <select data-update="direction" name="gpio1Direction">
+            <option value="0">Output</option>
+            <option value="1">Input</option>
+          </select>
+
+          <label>Inverse Polarity</label>
+          <input data-update="polarity" name="gpio1InversePolarity" type="checkbox">
+
+          <label>Output Value</label>
+          <select data-update="output" name="gpio1Output">
+            <option value="1">High</option>
+            <option value="0">Low</option>
+          </select>
+        </fieldset>
+
+        <fieldset data-gpio="2">
+          <legend>Gpio 2</legend>
+
+          <label>Direction</label>
+          <select data-update="direction" name="gpio2Direction">
+            <option value="0">Output</option>
+            <option value="1">Input</option>
+          </select>
+
+          <label>Inverse Polarity</label>
+          <input data-update="polarity" name="gpio2InversePolarity" type="checkbox">
+
+          <label>Output Value</label>
+          <select data-update="output" name="gpio2Output">
+            <option value="1">High</option>
+            <option value="0">Low</option>
+          </select>
+        </fieldset>
+
+        <fieldset data-gpio="3">
+          <legend>Gpio 3</legend>
+
+          <label>Direction</label>
+          <select data-update="direction" name="gpio3Direction">
+            <option value="0">Output</option>
+            <option value="1">Input</option>
+          </select>
+
+          <label>Inverse Polarity</label>
+          <input data-update="polarity" name="gpio3InversePolarity" type="checkbox">
+
+          <label>Output Value</label>
+          <select data-update="output" name="gpio3Output">
+            <option value="1">High</option>
+            <option value="0">Low</option>
+          </select>
+        </fieldset>
+
+        <fieldset data-output>
+          <label>Gpio 0</label>
+          <output name="gpio0Value"></output>
+
+          <label>Gpio 1</label>
+          <output name="gpio1Value"></output>
+
+          <label>Gpio 2</label>
+          <output name="gpio2Value"></output>
+
+          <label>Gpio 3</label>
+          <output name="gpio3Value"></output>
+        </fieldset>
+
+        <fieldset data-actions>
+          <button data-refresh>Refresh</button>
+        </fieldset>
+      </form>
+    </pca9536-config>
+  </body>
+</html>

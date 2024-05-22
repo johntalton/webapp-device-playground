@@ -32,6 +32,7 @@ ds3231-config {
 
   & > form > fieldset {
     grid-column: 1 / span 2;
+    justify-self: normal;
 
     display: grid;
     grid-template-columns: 1fr 1fr;

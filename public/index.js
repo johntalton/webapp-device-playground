@@ -149,7 +149,7 @@ function buildDeviceListItem(deviceListElem, builder) {
 	//
 	liElem.addEventListener('click', e => {
 		const transition = document.startViewTransition(() => {
-			deviceListElem.querySelectorAll('li').forEach(li => {
+			deviceListElem.querySelectorAll(':scope > li').forEach(li => {
 				li.removeAttribute('data-active')
 				const bElem = li.querySelector('button')
 				bElem.disabled = false
@@ -158,7 +158,7 @@ function buildDeviceListItem(deviceListElem, builder) {
 			liElem.toggleAttribute('data-active', true)
 			buttonElem.disabled = true
 
-			mainElem.querySelectorAll('section').forEach(s => s.removeAttribute('data-active'))
+			mainElem.querySelectorAll(':scope > section').forEach(s => s.removeAttribute('data-active'))
 
 			sectionElem.toggleAttribute('data-active', true)
 		})
@@ -239,7 +239,7 @@ async function hydrateTheme() {
 	const THEME_NAMES = [
 		'Crazy', 'Water', 'Slate', 'Paper', 'TodaysBlue',
 		'DeepOcean', 'Dream', 'Golden', 'Lavender', 'Bright', 'Plum',
-		'MoodyPlum', 'Washed'
+		'MoodyPlum', 'Washed', "NuLight", "NuDark", "Corp"
 	]
 
 	const themRollerButton = document.querySelector('button[data-theme-roller]')
@@ -247,6 +247,8 @@ async function hydrateTheme() {
 		event.preventDefault()
 
 		const theme = THEME_NAMES[Math.floor(Math.random() * THEME_NAMES.length)]
+
+		themRollerButton.setAttribute('title', theme)
 
 		const transition = document.startViewTransition(() => {
 			document.body.setAttribute('data-theme', theme)
