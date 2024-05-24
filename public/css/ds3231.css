@@ -5,6 +5,10 @@ ds3231-config {
 
   & > form input[type="checkbox"] {
     justify-self: start;
+    accent-color: var(--color-accent--darker, red);
+    width: 1.25em;
+    height: 1.25em;
+    margin: 0.5em;
   }
 
   & > form[data-output] {

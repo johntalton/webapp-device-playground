@@ -84,15 +84,16 @@ export class DS3231Builder {
 			const alarm1Input = root.querySelector('input[name="enableAlarm1"]')
 			const alarm2Input = root.querySelector('input[name="enableAlarm2"]')
 			const enableSquareWaveInput = root.querySelector('input[name="enableSquareWave"]')
-
 			const enableBatteryOscillatorInput = root.querySelector('input[name="enableBatteryOscillator"]')
 			const enableBatterySquareWaveInput = root.querySelector('input[name="enableBatterySquareWave"]')
+			const squareWaveFrequencySelect = root.querySelector('select[name="squareWaveFrequency"]')
 
 			alarm1Input.checked = alarm1Enabled
 			alarm2Input.checked = alarm2Enabled
 			enableSquareWaveInput.checked = squareWaveEnabled
 			enableBatteryOscillatorInput.checked = batteryBackupOscillatorEnabled
 			enableBatterySquareWaveInput.checked = batteryBackupSquareWaveEnabled
+			squareWaveFrequencySelect.value = squareWaveFrequencyKHz
 
 			// status
 			const {
@@ -202,21 +203,34 @@ export class DS3231Builder {
 
 			const alarm1Checkbox = root.querySelector('input[name="enableAlarm1"]')
 			const alarm2Checkbox = root.querySelector('input[name="enableAlarm2"]')
-
+			const enableSquareWaveCheckbox = root.querySelector('input[name="enableSquareWave"]')
 			const batteryOscillatorCheckbox = root.querySelector('input[name="enableBatteryOscillator"]')
+			const batterySquareWaveCheckbox = root.querySelector('input[name="enableBatterySquareWave"]')
+			const squareWaveFrequencySelect = root.querySelector('select[name="squareWaveFrequency"]')
 
 			alarm1Checkbox.disabled = true
 			alarm2Checkbox.disabled = true
 			batteryOscillatorCheckbox.disabled = true
+			enableSquareWaveCheckbox.disabled = true
+			batterySquareWaveCheckbox.disabled = true
+			squareWaveFrequencySelect.disabled = true
 
 			const enableAlarm1 = alarm1Checkbox.checked
 			const enableAlarm2 = alarm2Checkbox.checked
 			const enableOscillatorOnBatteryBackup = batteryOscillatorCheckbox.checked
+			const enableSquareWave = enableSquareWaveCheckbox.checked
+			const enableSquareWaveOnBatteryBackup = batterySquareWaveCheckbox.checked
+			const squareWaveFrequencyKHz = parseFloat(squareWaveFrequencySelect.value)
 
 			await this.#device.setControl({
 				enableAlarm1,
 				enableAlarm2,
-				enableOscillatorOnBatteryBackup
+
+				enableSquareWave,
+				squareWaveFrequencyKHz,
+
+				enableOscillatorOnBatteryBackup,
+				enableSquareWaveOnBatteryBackup
 			})
 
 			await refreshView(root, this.#device)
@@ -224,6 +238,9 @@ export class DS3231Builder {
 			alarm1Checkbox.disabled = false
 			alarm2Checkbox.disabled = false
 			batteryOscillatorCheckbox.disabled = false
+			enableSquareWaveCheckbox.disabled = false
+			batterySquareWaveCheckbox.disabled = false
+			squareWaveFrequencySelect.disabled = false
 		})
 
 		const alarm1Submit = root.querySelector('form[data-alarm1] button[submit]')

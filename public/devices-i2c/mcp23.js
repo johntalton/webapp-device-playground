@@ -2,6 +2,7 @@
 import {
 	BANK_0,
 	BANK_1,
+	DEFAULT,
 	DIRECTION,
 	HIGH,
 	INTERRUPT_CONTROL,
@@ -19,10 +20,31 @@ const delayMs = ms => new Promise(resolve => setTimeout(resolve, ms))
 
 class InvalidModeError extends Error {}
 
+function percentDifferentFromDefault(portCache, pin) {
+	// return Math.random() * 100
+
+	const tests = [
+		portCache.direction[pin] !== DEFAULT.DIRECTION,
+		portCache.polarity[pin] !== DEFAULT.POLARITY,
+		portCache.interrupt[pin] !== DEFAULT.INTERRUPT,
+		portCache.defaultValue[pin] !== DEFAULT.DEFAULT_VALUE,
+		portCache.interruptControl[pin] !== DEFAULT.INPUT_CONTROL,
+		portCache.pullUp[pin] !== DEFAULT.PULL_UP,
+		portCache.outputLatchValue[pin] !== DEFAULT.OUTPUT_LATCH_VALUE
+	]
+
+	return tests.reduce((acc, value) => acc + (value ? 1 : 0), 0) / tests.length * 100
+}
+
+function modeMatch(mode, bank, sequential) {
+	if(bank && mode.bank !== bank) { return false }
+	if(sequential && mode.sequential !== sequential) { return false }
+	return true
+}
+
 function assertMode(mode, bank, sequential) {
-	if(mode.bank !== bank) { throw new InvalidModeError() }
-	if(sequential === undefined) { return }
-	if(mode.sequential !== sequential) { throw new InvalidModeError() }
+	if(!modeMatch(mode, bank, sequential)) { throw new InvalidModeError() }
+	return mode
 }
 
 const assertModeBank0 = mode => assertMode(mode, BANK_0)
@@ -98,6 +120,48 @@ class MCP23GuardedMode {
 
 }
 
+export class MCP23GuardedModeTransactional extends MCP23GuardedMode {
+	constructor(host, mode = MODE.INTERLACED_BLOCK) {
+		super(host, mode)
+	}
+
+	async _getPort(port) {
+		console.log('getPort fallback transaction')
+		const [
+			direction,
+			polarity,
+			interrupt,
+			defaultValue,
+			interruptControl,
+			pullUp,
+			outputLatchValue
+		] = await Promise.all([
+			this.getDirection(port),
+			this.getPolarity(port),
+			this.getInterrupt(port),
+			this.getDefaultValue(port),
+			this.getInterruptControl(port),
+			this.getPullUp(port),
+			this.getOutputLatchValue(port)
+		])
+
+		return {
+			direction,
+			polarity,
+			interrupt,
+			defaultValue,
+			interruptControl,
+			pullUp,
+			outputLatchValue
+		}
+	}
+
+	async getPort(port) {
+		if(modeMatch(this.mode, BANK_1, true)) { return super.getPort(port) }
+		return this._getPort(port)
+	}
+}
+
 
 export class MCP23Builder {
 	#abus
@@ -117,7 +181,7 @@ export class MCP23Builder {
 
 
 	async open() {
-		this.#device = new MCP23GuardedMode(new MCP23(this.#abus), MODE.INTERLACED_BLOCK)
+		this.#device = new MCP23GuardedModeTransactional(new MCP23(this.#abus), MODE.INTERLACED_BLOCK)
 	}
 
 	async close() {}
@@ -181,7 +245,7 @@ export class MCP23Builder {
 
 			console.log('refresh cache from device', port)
 
-			const [
+			const {
 				direction,
 				polarity,
 				interrupt,
@@ -189,15 +253,7 @@ export class MCP23Builder {
 				interruptControl,
 				pullUp,
 				outputLatchValue
-			] = await Promise.all([
-				this.#device.getDirection(port),
-				this.#device.getPolarity(port),
-				this.#device.getInterrupt(port),
-				this.#device.getDefaultValue(port),
-				this.#device.getInterruptControl(port),
-				this.#device.getPullUp(port),
-				this.#device.getOutputLatchValue(port)
-			])
+		 } = await this.#device.getPort(port)
 
 			const update = {
 				...currentCache,
@@ -222,6 +278,13 @@ export class MCP23Builder {
 
 			const cache = JSON.parse(root.dataset.cache)
 			const portCache = cache[port]
+
+			for(const pin of range(0, 7)) {
+				const percent = percentDifferentFromDefault(portCache, pin)
+				const badgeDiv = root.querySelector(`:has(> button[data-gpio="${pin}"]) > [data-badge]`)
+				badgeDiv.style.setProperty('--percent-accent', percent)
+			}
+
 
 			const direction = portCache.direction[pin]
 			const polarity = portCache.polarity[pin]
@@ -443,37 +506,86 @@ export class MCP23Builder {
 
 
 		const refreshPollButton = root.querySelector('button[data-refresh]')
-		refreshPollButton?.addEventListener('click', event => {
+		const refreshPollRateSelect = root.querySelector('select[name="refreshRate"]')
+		const refreshPollCounter = root.querySelector('output[name="counter"]')
+		const refreshPollProgress = root.querySelector('progress[name="progress"]')
+		refreshPollButton?.addEventListener('click', async event => {
 			event.preventDefault()
 
-			refreshPollButton.disabled = true
+			const cacheMap = {  }
 
-			const timeoutStr = refreshPollButton.getAttribute('data-refresh')
-			const timeout = parseInt(timeoutStr)
+			const pollSingle = async () => {
 
-			const poller = setInterval(async () =>  {
-				console.log('poll')
 				for (const port of [PORT.A, PORT.B]) {
 					const flags = await this.#device.getInterruptFlag(port)
 					const caps = await this.#device.getInterruptCaptureValue(port)
 					const outs = await this.#device.getOutputValue(port)
 
 					for(const pin of range(0, 7)) {
-						const output = root.querySelector(`output[name="port${port}pin${pin}"]`)
-						const outputCapture = root.querySelector(`output[name="port${port}pin${pin}Capture"]`)
+
+						if(cacheMap[`out${port}${pin}`] === undefined) {
+							cacheMap[`out${port}${pin}`] = root.querySelector(`output[name="port${port}pin${pin}"]`)
+						}
+						const output = cacheMap[`out${port}${pin}`]
+
+						if(cacheMap[`outCap${port}${pin}`] === undefined) {
+							cacheMap[`outCap${port}${pin}`] = root.querySelector(`output[name="port${port}pin${pin}Capture"]`)
+						}
+						const outputCapture = cacheMap[`outCap${port}${pin}`]
 
 						outputCapture?.setAttribute('data-flag', flags[pin])
 						outputCapture.innerText = caps[pin] === HIGH ? '🔔 (High)' : '🔔 (Low)'
 
 						output?.toggleAttribute('data-high', outs[pin])
 						output.innerText = outs[pin] === HIGH ? 'High' : 'Low'
-
 					}
 				}
-			}, 1000 * 1)
+			}
+
+			const timeoutStr = refreshPollRateSelect.value
+
+			if(timeoutStr === 'once') {
+				refreshPollButton.disabled = true
+				refreshPollProgress.max = 100
+				refreshPollProgress.value = 0
+
+				await pollSingle()
+
+				refreshPollButton.disabled = false
+				refreshPollProgress.value = 100
+
+				return
+			}
+
+			const timeout = parseInt(timeoutStr)
+			var counter = 0
+			const POLL_RATE_S = 0.5
+
+			refreshPollButton.disabled = true
+			refreshPollRateSelect.disabled = true
+			refreshPollCounter.innerText = ''
+
+			refreshPollProgress.disabled = false
+			refreshPollProgress.value = counter
+			refreshPollProgress.max = timeout
+
+			//
+			const poller = setInterval(async () =>  {
+				counter += POLL_RATE_S
+				refreshPollProgress.value = counter
+
+				await pollSingle()
+
+			}, 1000 * POLL_RATE_S)
 			setTimeout(() => {
 				clearInterval(poller)
+
+				refreshPollRateSelect.disabled = false
 				refreshPollButton.disabled = false
+
+				refreshPollProgress.disabled = true
+				refreshPollProgress.value = 100
+				refreshPollProgress.max = 100
 			}, 1000 * timeout)
 		})
 

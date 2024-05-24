@@ -260,12 +260,12 @@ export class ExcameraI2CDriverUIBuilder {
 
 					<form data-manual-add-form>
 						<label>Address</label>
-						<input name="ManualAddress" type="number" min="8" max="119" step="1" value="8" />
+						<input name="ManualAddress" type="number" min="8" max="119" step="1" value="${32}" />
 
 						<label>Device</label>
 						<select name="ManualDeviceSelection">
 							${I2C_GUESSES.map(({ name }) => {
-								return `<option value="${name}">${name}</option>`
+								return `<option value="${name}" ${name === 'mcp230xx (Gpio)' ? 'selected' : ''}>${name}</option>`
 							}).join('')}
 						</select>
 
@@ -540,7 +540,8 @@ export class ExcameraI2CDriverUIBuilder {
 
 					const humanUptime = uptimeToHuman(uptime)
 
-					const out = name => document.querySelector(`[data-info] output[name=${name}]`)
+					const exRoot = event.target.closest('excamera-i2cdriver')
+					const out = name => exRoot.querySelector(`[data-info] output[name=${name}]`)
 
 					out('model').innerText = identifier
 					out('serial').innerText = serial

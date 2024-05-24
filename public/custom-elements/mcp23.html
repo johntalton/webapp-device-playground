@@ -65,14 +65,14 @@
 
 			<div data-port data-for-tab="portAB" class="tabsContent">
 				<ul>
-					<li><button data-gpio="0" data-active>Gpio 0</button></li>
-					<li><button data-gpio="1">Gpio 1</button></li>
-					<li><button data-gpio="2">Gpio 2</button></li>
-					<li><button data-gpio="3">Gpio 3</button></li>
-					<li><button data-gpio="4">Gpio 4</button></li>
-					<li><button data-gpio="5">Gpio 5</button></li>
-					<li><button data-gpio="6">Gpio 6</button></li>
-					<li><button data-gpio="7">Gpio 7</button></li>
+					<li><button data-gpio="0">Gpio 0</button><div data-badge></div></li>
+					<li><button data-gpio="1">Gpio 1</button><div data-badge></div></li>
+					<li><button data-gpio="2">Gpio 2</button><div data-badge></div></li>
+					<li><button data-gpio="3">Gpio 3</button><div data-badge></div></li>
+					<li><button data-gpio="4">Gpio 4</button><div data-badge></div></li>
+					<li><button data-gpio="5">Gpio 5</button><div data-badge></div></li>
+					<li><button data-gpio="6">Gpio 6</button><div data-badge></div></li>
+					<li><button data-gpio="7">Gpio 7</button><div data-badge></div></li>
 				</ul>
 
 				<div data-loader>
@@ -124,80 +124,93 @@
 				</form>
 			</div>
 
-			<form data-status data-for-tab="status" class="tabsContent">
-				<button data-refresh="30">Refresh</button>
+			<div data-for-tab="status" class="tabsContent">
+				<form data-refresh>
+					<button data-refresh>Refresh</button>
+					<select name="refreshRate">
+						<option value="once">Once</option>
+						<option value="10">10 sec</option>
+						<option value="30">30 sec</option>
+						<option value="60">1 min</option>
+						<option value="900">15 min</option>
+					</select>
+					<output name="counter"></output>
+					<progress name="progress" max="100" value="0" disabled></progress>
+				</form>
 
-				<fieldset data-port="A">
-					<legend>Port A</legend>
+				<form data-status>
+					<fieldset data-port="A">
+						<legend>Port A</legend>
 
-					<label>Gpio 0</label>
-					<output name="portApin0"></output>
-					<output name="portApin0Capture"></output>
+						<label>Gpio 0</label>
+						<output port="A" pin="0" name="portApin0"></output>
+						<output port="A" pin="0" name="portApin0Capture"></output>
 
-					<label>Gpio 1</label>
-					<output name="portApin1"></output>
-					<output name="portApin1Capture"></output>
+						<label>Gpio 1</label>
+						<output port="A" pin="1" name="portApin1"></output>
+						<output port="A" pin="1" name="portApin1Capture"></output>
 
-					<label>Gpio 2</label>
-					<output name="portApin2"></output>
-					<output name="portApin2Capture"></output>
+						<label>Gpio 2</label>
+						<output port="A" pin="2" name="portApin2"></output>
+						<output port="A" pin="2" name="portApin2Capture"></output>
 
-					<label>Gpio 3</label>
-					<output name="portApin3"></output>
-					<output name="portApin3Capture"></output>
+						<label>Gpio 3</label>
+						<output port="A" pin="3" name="portApin3"></output>
+						<output port="A" pin="3" name="portApin3Capture"></output>
 
-					<label>Gpio 4</label>
-					<output name="portApin4"></output>
-					<output name="portApin4Capture"></output>
+						<label>Gpio 4</label>
+						<output port="A" pin="4" name="portApin4"></output>
+						<output port="A" pin="4" name="portApin4Capture"></output>
 
-					<label>Gpio 5</label>
-					<output name="portApin5"></output>
-					<output name="portApin5Capture"></output>
+						<label>Gpio 5</label>
+						<output port="A" pin="5" name="portApin5"></output>
+						<output port="A" pin="5" name="portApin5Capture"></output>
 
-					<label>Gpio 6</label>
-					<output name="portApin6"></output>
-					<output name="portApin6Capture"></output>
+						<label>Gpio 6</label>
+						<output port="A" pin="6" name="portApin6"></output>
+						<output port="A" pin="6" name="portApin6Capture"></output>
 
-					<label>Gpio 7</label>
-					<output name="portApin7"></output>
-					<output name="portApin7Capture"></output>
-				</fieldset>
-				<fieldset data-port="B">
-					<legend>Port B</legend>
+						<label>Gpio 7</label>
+						<output port="A" pin="7" name="portApin7"></output>
+						<output port="A" pin="7" name="portApin7Capture"></output>
+					</fieldset>
+					<fieldset data-port="B">
+						<legend>Port B</legend>
 
-					<label>Gpio 0</label>
-					<output name="portBpin0"></output>
-					<output name="portBpin0Capture"></output>
+						<label>Gpio 0</label>
+						<output port="B" pin="0" name="portBpin0"></output>
+						<output port="B" pin="0" name="portBpin0Capture"></output>
 
-					<label>Gpio 1</label>
-					<output name="portBpin1"></output>
-					<output name="portBpin1Capture"></output>
+						<label>Gpio 1</label>
+						<output port="B" pin="1" name="portBpin1"></output>
+						<output port="B" pin="1" name="portBpin1Capture"></output>
 
-					<label>Gpio 2</label>
-					<output name="portBpin2"></output>
-					<output name="portBpin2Capture"></output>
+						<label>Gpio 2</label>
+						<output port="B" pin="2" name="portBpin2"></output>
+						<output port="B" pin="2" name="portBpin2Capture"></output>
 
-					<label>Gpio 3</label>
-					<output name="portBpin3"></output>
-					<output name="portBpin3Capture"></output>
+						<label>Gpio 3</label>
+						<output port="B" pin="3" name="portBpin3"></output>
+						<output port="B" pin="3" name="portBpin3Capture"></output>
 
-					<label>Gpio 4</label>
-					<output name="portBpin4"></output>
-					<output name="portBpin4Capture"></output>
+						<label>Gpio 4</label>
+						<output port="B" pin="4" name="portBpin4"></output>
+						<output port="B" pin="4" name="portBpin4Capture"></output>
 
-					<label>Gpio 5</label>
-					<output name="portBpin5"></output>
-					<output name="portBpin5Capture"></output>
+						<label>Gpio 5</label>
+						<output port="B" pin="5" name="portBpin5"></output>
+						<output port="B" pin="5" name="portBpin5Capture"></output>
 
-					<label>Gpio 6</label>
-					<output name="portBpin6"></output>
-					<output name="portBpin6Capture"></output>
+						<label>Gpio 6</label>
+						<output port="B" pin="6" name="portBpin6"></output>
+						<output port="B" pin="6" name="portBpin6Capture"></output>
 
-					<label>Gpio 7</label>
-					<output name="portBpin7"></output>
-					<output name="portBpin7Capture"></output>
-				</fieldset>
-			</form>
+						<label>Gpio 7</label>
+						<output port="B" pin="7" name="portBpin7"></output>
+						<output port="B" pin="7" name="portBpin7Capture"></output>
+					</fieldset>
+				</form>
+			</div>
 
 		</mcp23-config>
 	</body>

@@ -13,7 +13,7 @@
     "@johntalton/bitsmush": "^1.0.1",
     "@johntalton/boschieu": "^6.0.1",
     "@johntalton/ds1841": "^1.0.1",
-    "@johntalton/ds3231": "^1.0.1",
+    "@johntalton/ds3231": "^1.1.0",
     "@johntalton/ds3502": "^4.0.0",
     "@johntalton/excamera-i2cdriver": "^1.0.0",
     "@johntalton/ht16k33": "^1.0.3",

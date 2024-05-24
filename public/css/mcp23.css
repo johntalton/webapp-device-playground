@@ -20,6 +20,37 @@ mcp23-config {
 
 
 
+	& :has([data-badge]) {
+		position: relative;
+		display: grid;
+
+		& > * {
+			grid-column: 1 / -1;
+			grid-row: 1 / -1;
+		}
+	}
+
+	& [data-badge] {
+		align-self: center;
+		justify-self: end;
+		margin-inline-end: 1em;
+
+		width: 1em;
+		height: 1em;
+		border-radius: 0.5em;
+
+		--percent-accent: 0;
+		--max-accent: 0.5em;
+		--lerp-value: clamp(
+			0px,
+			calc(var(--percent-accent) / 100.0 * var(--max-accent)),
+			var(--max-accent));
+		border: var(--lerp-value) solid var(--color-accent--light, red);
+
+		transition: border-width 500ms;
+	}
+
+
 
 	& div[data-port] {
 		display: flex;
@@ -58,6 +89,10 @@ mcp23-config {
 					background-color: var(--color-accent--darker, red);
 					color: var(--color-accent--darker-text, red);
 					text-decoration: underline;
+
+					&  ~ [data-badge] {
+						border-color: var(--color-accent--lighter, red);
+					}
 				}
 
 				&[data-active]:not(:hover) {
@@ -116,6 +151,17 @@ mcp23-config {
 	}
 
 
+	& form[data-refresh] {
+		display: flex;
+		flex-direction: row;
+		margin-block-end: 2em;
+    gap: 2em;
+
+		& progress {
+			accent-color: var(--color-accent--darker, red);
+		}
+	}
+
 	& form[data-status] {
 		display: flex;
 		flex-direction: row;
@@ -131,6 +177,14 @@ mcp23-config {
 
 			& output[data-flag="false"] {
 				visibility: hidden;
+			}
+
+			& output:where([name ^= "portApin"], [name ^= "portBpin"]) {
+				justify-self: end;
+			}
+
+			& output:where([name ^= "portApin"], [name ^= "portBpin"])[data-high] {
+				justify-self: start;
 			}
 		}
 	}

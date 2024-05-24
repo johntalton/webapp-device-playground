@@ -10,7 +10,7 @@
 
 	<form data-active data-for-tab="actions" data-actions class="tabsContent">
 		<button data-set-time>Set Now</button>
-		<button data-trigger-temperature>Trigger Temperature Conversion</button>
+		<button disabled data-trigger-temperature>Trigger Temperature Conversion</button>
 		<button data-refresh>Refresh</button>
 		<button data-clear-all-flags>Clear Flags</button>
 	</form>
@@ -34,7 +34,7 @@
 		<input name="enableSquareWave" type="checkbox" />
 
 		<label>Square Wave Frequency</label>
-		<select name="squareWaveFrequency" disabled>
+		<select name="squareWaveFrequency">
 			<option value="1">1</option>
 			<option value="1.024">1.024</option>
 			<option value="4.096">4.096</option>
