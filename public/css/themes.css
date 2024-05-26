@@ -239,4 +239,20 @@
 	--color-accent--dark-text: black;
 	--color-accent--darker: oklab(0.68 -0.1 -0.17);
 	--color-accent--darker-text: white;
+
+	@media (prefers-color-scheme: dark) {
+		--color-accent: oklab(0.27 0 0);
+    --color-accent-text: white;
+    --color-accent--light: oklab(0.53 -0.07 -0.17);
+    --color-accent--light-text: white;
+    --color-accent--lighter: oklab(0.31 0 0);
+    --color-accent--lighter-text: white;
+    --color-accent--lightest: oklab(0.43 0 0);
+    --color-accent--lightest-text: white;
+    --color-accent--dark: oklab(0.27 0 0);
+    --color-accent--dark-text: white;
+    --color-accent--darker: oklab(0.68 -0.1 -0.17);
+    --color-accent--darker-text: white;
+	}
 }
+

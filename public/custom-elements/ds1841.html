@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html>
+	<head></head>
+	<body>
+		<ds1841-config data-enable>
+			<div class="tabs">
+				<button data-tab="Config" data-active>Config</button>
+				<button data-tab="Values">Values</button>
+				<button data-tab="LUT">Lookup Table</button>
+			</div>
+
+			<form data-config data-for-tab="Config" class="tabsContent" data-active>
+				<fieldset data-what="control0">
+					<legend></legend>
+
+					<label>Shadow Registers</label>
+					<select name="enableShadowRegisters">
+						<option value="true">Enable</option>
+						<option value="false">Disable</option>
+					</select>
+				</fieldset>
+
+				<fieldset data-what="control1">
+					<legend></legend>
+
+					<label>Enable ADC (Lookup Table Mode)</label>
+					<input name="enableADC" type="checkbox" />
+
+					<label>Enable Output Summation</label>
+					<input name="enableLUTSummation" type="checkbox" />
+
+					<p data-shadow-warning>ADC and Summation Shadowed</p>
+				</fieldset>
+
+				<fieldset data-what="control2">
+					<legend>Lookup Table Mode</legend>
+
+					<label>Temperature updates Index</label>
+					<input name="enableTemperatureUpdates" type="checkbox" />
+
+					<label>Index updates Value</label>
+					<input name="enableIndexUpdates" type="checkbox" />
+				</fieldset>
+			</form>
+
+			<form data-values data-for-tab="Values" class="tabsContent">
+				<fieldset>
+					<legend></legend>
+
+					<fieldset>
+						<label>Initial Value</label>
+						<div data-number-range>
+							<input name="ivrValue" type="number" min="0" max="127" />
+							<input name="ivrValueAlt" type="range" min="0" max="127" />
+						</div>
+						<p data-shadow-warning>Initial Value Shadowed</p>
+					</fieldset>
+
+					<label>Lookup Table Value</label>
+					<div data-number-range>
+						<input name="lutValue" type="number" min="0" max="127" disabled />
+						<input name="lutValueAlt" type="range" min="0" max="127" disabled />
+					</div>
+
+
+					<label>Lookup Table Index</label>
+					<input name="lutIndex" type="number" min="0" max="72" disabled />
+
+					<fieldset>
+						<label>Temperature:</label>
+						<output name="temperature"></output>
+
+						<label>Voltage:</label>
+						<output name="voltage"></output>
+					</fieldset>
+
+					<button data-refresh>Refresh</button>
+				</fieldset>
+			</form>
+
+			<form data-lut data-for-tab="LUT" class="tabsContent">
+				<fieldset>
+					<ol data-lut-list>
+						<template>
+							<li data-index="">
+								<label>-0 - 0</label>
+								<input type="number" min="-127" max="127">
+							</li>
+						</template>
+
+						<!-- generated -->
+					</ol>
+				</fieldset>
+			</form>
+		</ds1841-config>
+	</body>
+</html>
+

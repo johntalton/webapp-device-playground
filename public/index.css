@@ -28,6 +28,7 @@
 @import url('./css/pcf8574.css') layer(app);
 @import url('./css/aw9523.css') layer(app);
 @import url('./css/mcp23.css') layer(app);
+@import url('./css/ds1841.css') layer(app);
 
 @import url('./css/gpio.css') layer(app);
 

@@ -1,39 +1,115 @@
 import { I2CAddressedBus } from '@johntalton/and-other-delights'
-import { DS1841, MODE, ADC, ADDITION_MODE, ACCESS_CONTROL, LUT_MODE } from '@johntalton/ds1841'
+import { DS1841, LUT_BYTE_PER_ENTRY, LUT_BYTE_SIZE, LUT_TABLE_SIZE } from '@johntalton/ds1841'
+import { range } from '../util/range.js'
+
+const SINGLE_SPACE = ' '
+const EMPTY_SPACE = ''
+
+export class NotDOMTokenList {
+	#set
+	#attr
+	constructor(attr) {
+		this.#set = new Set(attr.value.split(SINGLE_SPACE).filter(v => v !== EMPTY_SPACE))
+		this.#attr = attr
+	}
+
+	_update() {
+		this.#attr.value = this.value
+	}
+
+	toString() {
+		return [ ...this.#set.values() ].join(SINGLE_SPACE)
+	}
+
+	get value() { return this.toString() }
+
+	contains(token) {
+		return this.#set.has(token)
+	}
+
+	add(...tokens) {
+		for(const token of tokens) {
+			if(token === EMPTY_SPACE) { throw new SyntaxError('token empty') }
+			if(token.includes(SINGLE_SPACE)) { throw new InvalidCharacterError('token whitespace') }
+		}
+
+		for(const token of tokens) {
+			this.#set.add(token)
+		}
+
+		this._update()
+	}
 
 
-async function fetchOutputs(device) {
-	const lutIndex = await device.getLUTIndex()
-	const lutValue = await device.getLUTByIndex(lutIndex)
-	const ivr = await device.getIVR()
-	const temp = await device.getTemperature()
-	const volt = await device.getVoltage()
+	remove(...tokens) {
+		for(const token of tokens) {
+			if(token === EMPTY_SPACE) { throw new SyntaxError('token empty') }
+			if(token.includes(SINGLE_SPACE)) { throw new InvalidCharacterError('token whitespace') }
+		}
 
-	const { wiperAccessControl, lutIndexMode } = await device.getCR2()
+		for(const token of tokens) {
+			this.#set.delete(token)
+		}
 
-	const controlFunctionality = (wiperAccessControl === ACCESS_CONTROL.MANUAL) ? 'WIPER'
-			: (lutIndexMode === LUT_MODE.FROM_DIRECT_VALUE) ? 'LUTAR' : 'TEMP'
+		this._update()
+	}
 
-	return { temp, volt, ivr, lutIndex, lutValue, controlFunctionality }
+	toggle(token, force) {
+		if(token === EMPTY_SPACE) { throw new SyntaxError('token empty') }
+		if(token.includes(SINGLE_SPACE)) { throw new InvalidCharacterError('token whitespace') }
+
+		if(this.#set.has(token)) {
+			if(force === undefined || force === false) {
+				this.#set.delete(token)
+				this._update()
+				return false
+			}
+
+			return true
+		}
+
+		if(force === undefined || force === true) {
+			this.#set.add(token)
+			this._update()
+			return true
+		}
+
+		return false
+	}
 }
 
-async function updateOutputs({
-	temp, volt, ivr, lutIndex, lutValue, controlFunctionality
-}) {
-	const outputTemp = document.getElementById('outputTemp')
-	const outputVoltage = document.getElementById('outputVoltage')
-	const outputIVR = document.getElementById('outputIVR')
-	const outputLUTIndex = document.getElementById('outputLUTIndex')
-	const outputLUTValue = document.getElementById('outputLUTValue')
-	const outputFunctionality = document.getElementById('outputFunctionality')
+// async function fetchOutputs(device) {
+// 	const lutIndex = await device.getLUTIndex()
+// 	const lutValue = await device.getLUTByIndex(lutIndex)
+// 	const ivr = await device.getIVR()
+// 	const temp = await device.getTemperature()
+// 	const volt = await device.getVoltage()
 
-	outputTemp.innerText = temp
-	outputVoltage.innerText = volt
-	outputIVR.innerText = ivr
-	outputLUTIndex.innerText = lutIndex
-	outputLUTValue.innerText = lutValue
-	outputFunctionality.innerText = controlFunctionality
-}
+// 	const { wiperAccessControl, lutIndexMode } = await device.getCR2()
+
+// 	const controlFunctionality = (wiperAccessControl === ACCESS_CONTROL.MANUAL) ? 'WIPER'
+// 			: (lutIndexMode === LUT_MODE.FROM_DIRECT_VALUE) ? 'LUTAR' : 'TEMP'
+
+// 	return { temp, volt, ivr, lutIndex, lutValue, controlFunctionality }
+// }
+
+// async function updateOutputs({
+// 	temp, volt, ivr, lutIndex, lutValue, controlFunctionality
+// }) {
+// 	const outputTemp = document.getElementById('outputTemp')
+// 	const outputVoltage = document.getElementById('outputVoltage')
+// 	const outputIVR = document.getElementById('outputIVR')
+// 	const outputLUTIndex = document.getElementById('outputLUTIndex')
+// 	const outputLUTValue = document.getElementById('outputLUTValue')
+// 	const outputFunctionality = document.getElementById('outputFunctionality')
+
+// 	outputTemp.innerText = temp
+// 	outputVoltage.innerText = volt
+// 	outputIVR.innerText = ivr
+// 	outputLUTIndex.innerText = lutIndex
+// 	outputLUTValue.innerText = lutValue
+// 	outputFunctionality.innerText = controlFunctionality
+// }
 
 export class DS1841Builder {
 	#abus
@@ -63,223 +139,365 @@ export class DS1841Builder {
 	signature() { }
 
 	async buildCustomView(selectionElem) {
-		const root = document.createElement('ds1841-config')
+		const response = await fetch('./custom-elements/ds1841.html')
+		if (!response.ok) { throw new Error('no html for view') }
+		const view = await response.text()
+		const doc = (new DOMParser()).parseFromString(view, 'text/html')
 
-		root.addEventListener('change', e => {
-
-			if(e.target.id === 'wiperSlider') {
-				e.target.disabled = true
-
-
-				return
-			}
-
-			const updateModeNVRAM = e.target.id === 'updateNVRAMMode'
-
-			if(updateModeNVRAM || e.target.id === 'updateOnlyMode') {
-
-				const group = document.getElementById('updateModeGroup')
-				group.disabled = true
-
-				const mode = updateModeNVRAM ? MODE.SET_AND_UPDATE : MODE.UPDATE_ONLY
-
-				console.log('set mode', mode)
-
-				this.#device.setCR0({ mode })
-					.then(() => {
-						group.disabled = false
-					})
-					.catch(e => console.log(e))
-
-				return
-			}
-
-			if(e.target.id === 'enableADC') {
-				const sumElem = document.getElementById('enableSummation')
-				const controlsGroup = document.getElementById('functionalityControl')
+		const root = doc?.querySelector('ds1841-config')
+		if (root === null) { throw new Error('no root for template') }
 
 
-				console.log(e, e.target.checked)
-				const enableControlsOnSuccess = e.target.checked
-				controlsGroup.disabled = true
 
-				e.target.disabled = true
+		const configForm = root.querySelector('form[data-config]')
+		const valuesForm = root.querySelector('form[data-values]')
+		const lutForm = root.querySelector('form[data-lut]')
 
-				const additionMode = sumElem.checked ? ADDITION_MODE.SUMMED : ADDITION_MODE.DIRECT
-				const updateMode = e.target.checked ? ADC.ON : ADC.OFF
+		const enableShadowSelect = configForm?.querySelector('select[name="enableShadowRegisters"]')
+		const enableADCCheckbox = configForm?.querySelector('input[name="enableADC"]')
+		const enableSumCheckbox = configForm?.querySelector('input[name="enableLUTSummation"]')
+		const enableLUTAddrCheckbox = configForm?.querySelector('input[name="enableTemperatureUpdates"]')
+		const enableLUTValueCheckbox = configForm?.querySelector('input[name="enableIndexUpdates"]')
 
-				this.#device.setCR1({
-					updateMode,
-					additionMode
+		const ivrNumber = valuesForm?.querySelector('input[name="ivrValue"]')
+		const ivrRange = valuesForm?.querySelector('input[name="ivrValueAlt"]')
+		const lutValueNumber = valuesForm?.querySelector('input[name="lutValue"]')
+		const lutValueRange = valuesForm?.querySelector('input[name="lutValueAlt"]')
+		const lutIndexNumber = valuesForm?.querySelector('input[name="lutIndex"]')
+		const temperatureOutput = valuesForm?.querySelector('output[name="temperature"]')
+		const voltageOutput = valuesForm?.querySelector('output[name="voltage"]')
+
+		const lutList = lutForm?.querySelector('ol[data-lut-list]')
+		const lustListTemplate = lutList?.querySelector(':scope > template')
+
+		const refreshButton = root.querySelector('button[data-refresh]')
+
+		const tokens = new NotDOMTokenList(root.getAttributeNode('data-enable'))
+
+
+		const revalidateValues = async => {
+			const adc = tokens.contains('adc')
+			const addr = adc && !tokens.contains('address')
+			const value = adc && !tokens.contains('value')
+
+			lutValueNumber.disabled = !value
+			lutValueRange.disabled = !value
+
+			lutIndexNumber.disabled = !addr
+
+			temperatureOutput.disabled = !adc
+			voltageOutput.disabled = !adc
+		}
+
+		const delayMs = ms => new Promise(resolve => setTimeout(resolve, ms))
+		const SHADOW_DELAY_MS = 20
+		const  delayEEPROM = () => delayMs(SHADOW_DELAY_MS)
+
+		const refreshLUTValue = async () => {
+			// await delayMs(1000)
+			const lutValue = await this.#device.getLUTValue()
+			lutValueNumber.value = lutValue
+			lutValueRange.value = lutValue
+		}
+
+		const refreshValues = async () => {
+			const ivr = await this.#device.getIVR()
+			const lutIndex = await this.#device.getLUTIndex()
+			const lutValue = await this.#device.getLUTValue()
+			const temperature = await this.#device.getTemperature()
+			const voltage = await this.#device.getVoltage()
+
+
+			const t = `${Math.trunc(temperature * 100.0) / 100.0} ℃`
+			const v = `${Math.trunc(voltage / 1000.0 * 100.0) / 100.0} mV`
+
+			ivrNumber.value = ivr
+			ivrRange.value = ivr
+
+			lutValueNumber.value = lutValue
+			lutValueRange.value = lutValue
+
+			lutIndexNumber.value = lutIndex
+
+			temperatureOutput.value = t
+			voltageOutput.value = v
+
+		}
+
+		const refreshControl0 = async () => {
+			const {
+				enableShadowEE
+			} = await this.#device.getCR0()
+
+			enableShadowSelect.value = enableShadowEE
+
+			// implications
+			tokens.toggle('shadow', enableShadowEE)
+		}
+
+		const refreshControl1 = async () => {
+			const {
+				enableSummation,
+				enableADC
+			} = await this.#device.getCR1()
+
+			enableADCCheckbox.checked = enableADC
+			enableSumCheckbox.checked = enableSummation
+
+			// implications
+			tokens.toggle('adc', enableADC)
+			tokens.toggle('sum', enableSummation)
+		}
+
+		const refreshControl2 = async () => {
+			const {
+				enableLUTValueUpdate,
+				enableLUTAddressUpdate
+			} = await this.#device.getCR2()
+
+			enableLUTAddrCheckbox.checked = enableLUTAddressUpdate
+			enableLUTValueCheckbox.checked = enableLUTValueUpdate
+
+			// implications
+			tokens.toggle('address', enableLUTAddressUpdate)
+			tokens.toggle('value', enableLUTValueUpdate)
+		}
+
+		const refreshControls = async () => {
+			await refreshControl0()
+			await refreshControl1()
+			await refreshControl2()
+		}
+
+
+		function temperatureRangeForLUTIndex(index) {
+			if(index === 0) { return [ -Infinity, -40 ] }
+			if(index >= 71) { return [ 101, Infinity]}
+
+			const temp = (index * 2) + -40
+			return [ temp - 1, temp ]
+		}
+
+
+		const refreshLUTBulk = async () => {
+			// as most i2c does not allow infinite reads, an upper bound
+			// must be set, the LUT is 72 bytes, however, our current
+			// but driver can only support upto 64 bytes.
+			// Choosing a 'random' value here to make things work
+			const SAFE_READ_SIZE = 24
+			const maxCount = Math.floor(SAFE_READ_SIZE / LUT_BYTE_PER_ENTRY)
+
+			for(const begin of range(0, LUT_TABLE_SIZE, maxCount)) {
+				const size = Math.min(begin + maxCount, LUT_TABLE_SIZE) - begin
+				if(size === 0) { break }
+
+				const lut = await this.#device.getLUT(begin, size)
+
+				lut.forEach((value, current) => {
+					const index = begin + current
+
+					const li = lutForm?.querySelector(`li[data-index="${index}"]`)
+					const lutEntryNumber = li?.querySelector('input')
+					const lutEntryLabel = li?.querySelector('label')
+
+					const [low, high] = temperatureRangeForLUTIndex(index)
+
+					lutEntryNumber.value = value
+					lutEntryLabel.innerText = `${low} - ${high} ℃`
 				})
-					.then(() => {
-						console.log('cr1 updated', enableControlsOnSuccess)
-						controlsGroup.disabled = !enableControlsOnSuccess
-						e.target.disabled = false
-					})
-					.catch(e => console.log(e))
-
-				return
 			}
+		}
+
+		const refreshLUT = async (index) => {
+
+		}
 
 
-			if(e.target.name === 'controlFunctionalityGroup') {
-				const group = document.getElementById('functionalityControl')
 
-				const selected = document.querySelector('input[name="controlFunctionalityGroup"]:checked')
+		configForm?.addEventListener('change', async event => {
+			const whatChanged = event.target.closest('[data-what]').getAttribute('data-what')
 
-				group.disabled = true
-
-				const wiperAccessControl = (selected.value === 'WIPER') ? ACCESS_CONTROL.MANUAL : ACCESS_CONTROL.ADC_CONTROL
-				const lutIndexMode = (selected.value === 'LUTAR') ? LUT_MODE.FROM_DIRECT_VALUE : LUT_MODE.FROM_ADC_TEMPERATURE
-
-				this.#device.setCR2({
-					wiperAccessControl,
-					lutIndexMode
+			if(whatChanged.includes('control0')) {
+				await this.#device.setCR0({
+					enableShadowEE: enableShadowSelect.value === 'true'
 				})
-					.then(() => {
-						group.disabled = false
-					})
-					.then(() => fetchOutputs(this.#device))
-					.then(updateOutputs)
-					.catch(e => console.log(e))
 
+				await delayEEPROM()
 
-				return
+				await refreshControl0()
+				await refreshControl1()
 			}
 
-			if(e.target.id.startsWith('lutValueIndex')) {
-				const value = parseInt(e.target.value, 10)
-				const lutIndex = parseInt(e.target.getAttribute('data-index'), 10)
+			if(whatChanged.includes('control1')) {
+				await this.#device.setCR1({
+					enableADC: enableADCCheckbox.checked,
+					enableSummation: enableSumCheckbox.checked
+				})
 
-				console.log('set lut index', lutIndex, value)
-				this.#device.setLUTByIndex(lutIndex, value)
-					.then(() => {
-						console.log('lut index set')
-					})
-					.catch(e => console.log(e))
+				if(!tokens.contains('shadow')) {
+					await delayEEPROM()
+				}
 
-				return
+				await refreshControl1()
 			}
 
+			if(whatChanged.includes('control2')) {
+				await this.#device.setCR2({
+					enableLUTAddressUpdate: enableLUTAddrCheckbox.checked,
+					enableLUTValueUpdate: enableLUTValueCheckbox.checked
+				})
 
-			console.warn('change unhandled', e)
+				await refreshControl2()
+			}
 
-		}, {})
-
-
-		// await this.#device.setIVR(3)
-		const wiper = await this.#device.getWIPER()
-
-		const { mode } = await this.#device.getCR0()
-		const { updateMode, additionMode } = await this.#device.getCR1()
-
-		const {
-			temp, volt, ivr, lutIndex, lutValue, controlFunctionality
-		} = await fetchOutputs(this.#device)
-
-		const lut = await this.#device.getLUT()
+			await revalidateValues()
+		})
 
 
+		ivrNumber?.addEventListener('change', async event => {
+			event.preventDefault()
+
+			ivrNumber.disabled = true
+			ivrRange.disabled = true
+
+			ivrRange.value = ivrNumber.value
+
+			await this.#device.setIVR(parseInt(ivrNumber.value))
+
+			if(!tokens.contains('shadow')) {
+				await delayEEPROM()
+			}
+			await refreshLUTValue()
+
+			ivrNumber.disabled = false
+			ivrRange.disabled = false
+		})
+
+		ivrRange?.addEventListener('change', async event => {
+			event.preventDefault()
+
+			ivrNumber.disabled = true
+			ivrRange.disabled = true
+
+			ivrNumber.value = ivrRange.value
+
+			await this.#device.setIVR(parseInt(ivrRange.value))
+
+			if(!tokens.contains('shadow')) {
+				await delayEEPROM()
+			}
+			await refreshLUTValue()
+
+			ivrNumber.disabled = false
+			ivrRange.disabled = false
+		})
+
+		lutValueNumber?.addEventListener('change', async event => {
+			event.preventDefault()
+
+			lutValueNumber.disabled = true
+			lutValueRange.disabled = true
+
+			lutValueRange.value = lutValueNumber.value
+
+			await this.#device.setLUTValue(parseInt(lutValueNumber.value))
+
+			lutValueNumber.disabled = false
+			lutValueRange.disabled = false
+		})
+
+		lutValueRange?.addEventListener('change', async event => {
+			event.preventDefault()
+
+			lutValueNumber.disabled = true
+			lutValueRange.disabled = true
+
+			lutValueNumber.value = lutValueRange.value
+
+			await this.#device.setLUTValue(parseInt(lutValueRange.value))
+
+			lutValueNumber.disabled = false
+			lutValueRange.disabled = false
+		})
+
+		lutIndexNumber?.addEventListener('change', async event => {
+			event.preventDefault()
+
+			lutIndexNumber.disabled = true
+
+			await this.#device.setLUTIndex(parseInt(lutIndexNumber.value))
+			await refreshLUTValue()
+
+			lutIndexNumber.disabled = false
+		})
 
 
-		const template = `
+		for(const lutIndex of range(0, LUT_TABLE_SIZE - 1)) {
+			const liDoc = lustListTemplate.content.cloneNode(true)
+			const li = liDoc.querySelector('li')
 
-			<fieldset>
-				<label for="outputTemp">Temperature C:</label>
-				<output id="outputTemp">${temp}</output>
+			li.setAttribute('data-index', lutIndex)
 
-				<label for="outputVoltage">Voltage mV:</label>
-				<output id="outputVoltage">${volt}</output>
+			lutList.append(li)
 
-				<label for="outputIVR">IVR:</label>
-				<output id="outputIVR">${ivr}</output>
+			const lutEntryNumber = li.querySelector('input')
+			lutEntryNumber.addEventListener('change', async event => {
+				event.preventDefault()
 
-				<label for="outputLUTIndex">LUT Index:</label>
-				<output id="outputLUTIndex">${lutIndex}</output>
+				const value = pasrseInt(lutEntryNumber.value)
+				await this.#device.setLUT(lutIndex, value)
 
-				<label for="outputLUTValue">LUT Value:</label>
-				<output id="outputLUTValue">${lutValue}</output>
+			})
+		}
 
-				<label for="outputWiper">Wiper:</label>
-				<output id="outputWiper">${wiper}</output>
+		refreshButton?.addEventListener('click', async event => {
+			event.preventDefault()
 
-				<label for="outputFunctionality">Functionality:</label>
-				<output id="outputFunctionality">${controlFunctionality}</output>
-			</fieldset>
+			refreshButton.disabled = true
 
-			<fieldset id="updateModeGroup">
-				<legend>Mode</legend>
+			// await refreshControls()
+			// await revalidateValues()
 
-				<label for="updateNVRAMMode">Update NVRAM and update Wiper (default)</label>
-				<input id="updateNVRAMMode" type="radio" name="updateModeGroup" ${((mode === MODE.SET_AND_UPDATE) ? 'checked' : '')} />
+			await refreshValues()
 
-				<label for="updateOnlyMode">Update Wiper only</label>
-				<input id="updateOnlyMode" type="radio" name="updateModeGroup" ${((mode === MODE.UPDATE_ONLY) ? 'checked' : '')} />
-			</fieldset>
-
-			<fieldset>
-				<legend></legend>
-
-				<label for="enableADC">Enable ADC</label>
-				<input id="enableADC" type="checkbox" ${updateMode === ADC.ON ? 'checked' : ''} />
-			</fieldset>
-
-			<fieldset id="functionalityControl" ${updateMode === ADC.ON ? '' : 'disabled'}>
-				<legend></legend>
-
-				<label for="enableSummation">Enable Output Summation</label>
-				<input id="enableSummation" type="checkbox" ${additionMode === ADDITION_MODE.SUMMED ? 'checked' : ''} />
+			refreshButton.disabled = false
+		})
 
 
-				<label for="functionalityTemperatureControl">Temperature Controlled</label>
-				<input id="functionalityTemperatureControl" type="radio" name="controlFunctionalityGroup" value="TEMP" ${controlFunctionality === 'TEMP' ? 'checked' : ''} />
+		const tabButtons = root.querySelectorAll('button[data-tab]')
+		for (const tabButton of tabButtons) {
+			tabButton.addEventListener('click', event => {
+				event.preventDefault()
 
-				<label for="functionalityWiperControl">Direct Wiper Controlled</label>
-				<input id="functionalityWiperControl" type="radio" name="controlFunctionalityGroup" value="WIPER" ${controlFunctionality === 'WIPER' ? 'checked' : ''} />
+				const { target } = event
+				const parent = target?.parentNode
+				const grandParent = parent.parentNode
 
-				<label for="functionalityLUTARControl">Direct LUTAR Controlled</label>
-				<input id="functionalityLUTARControl" type="radio" name="controlFunctionalityGroup" value="LUTAR" ${controlFunctionality === 'LUTAR' ? 'checked' : ''} />
+				const tabName = target.getAttribute('data-tab')
 
-			</fieldset>
+				// remove content active
+				const activeOthers = grandParent.querySelectorAll(':scope > [data-active]')
+				activeOthers.forEach(ao => ao.toggleAttribute('data-active', false))
 
-			<fieldset>
-				<legend></legend>
+				// remove tab button active
+				const activeOthersTabsButtons = parent.querySelectorAll(':scope > button[data-tab]')
+				activeOthersTabsButtons.forEach(ao => ao.toggleAttribute('data-active', false))
 
-				<label for="directLUTARValue">Direct LUTAR</label>
-				<input id="directLUTARValue" ${controlFunctionality !== 'LUTAR' ? 'disabled' : ''} type="number" />
+				const tabContentElem = grandParent.querySelector(`:scope > [data-for-tab="${tabName}"]`)
+				if(tabContentElem === null) { console.warn('tab content not found', tabName) }
+				else {
+					tabContentElem.toggleAttribute('data-active', true)
+				}
 
-				<label for="directWiperValue">Direct WIPER</label>
-				<input id="directWiperValue" ${controlFunctionality !== 'WIPER' ? 'disabled' : ''} type="number" />
-			</fieldset>
+				tabButton.toggleAttribute('data-active', true)
+			})
+		}
 
 
-			<fieldset>
-				<legend></legend>
-
-				<label for="wiperSlider">Manual Wiper</label>
-				<input id="wiperSlider" type="range" />
-			</fieldset>
-
-			<ol>
-				${Object.entries(lut).map(([key, value]) => {
-					const index = parseInt(key, 10)
-					const selected = lutIndex === index
-
-					const from = (index * 2 - 1) - 40
-					const to = from + 1
-
-					return `
-						<li>
-							<label for="lutValueIndex-${index}">(${from} - ${to}) ${selected ? ' * ' : ''}</label>
-							<input id="lutValueIndex-${index}" data-index="${index}" type="number" value="${value}" />
-						</li>
-						`
-				}).join('')}
-			</ol>
-			`
-
-		root.innerHTML = template
+		await refreshControls()
+		await refreshValues()
+		await revalidateValues()
+		await refreshLUTBulk()
 
 		return root
 	}
