@@ -13,10 +13,12 @@ import {
 } from '@johntalton/mcp23'
 import { I2CAddressedTransactionBus } from '@johntalton/and-other-delights'
 import { range } from '../util/range.js'
+import { delayMs} from '../util/delay.js'
+import { asyncEvent } from '../util/async-event.js'
 
 // import { data } from '../custom-elements/mcp23.html' with { type: 'html' }
 
-const delayMs = ms => new Promise(resolve => setTimeout(resolve, ms))
+
 
 class InvalidModeError extends Error {}
 
@@ -323,7 +325,7 @@ export class MCP23Builder {
 
 
 		const configForm = root.querySelector('form[data-config]')
-		configForm?.addEventListener('change', async event => {
+		configForm?.addEventListener('change', asyncEvent(async event => {
 
 			const configForm = root.querySelector('form[data-config]')
 			const bankSelect = configForm.querySelector('select[name="bank"]')
@@ -350,10 +352,10 @@ export class MCP23Builder {
 
 
 			await refreshControl()
-		})
+		}))
 
 		const useButton = root.querySelector('button[data-use]')
-		useButton?.addEventListener('click', async event => {
+		useButton?.addEventListener('click', asyncEvent(async event => {
 			event.preventDefault()
 
 			useButton.disabled = true
@@ -376,11 +378,11 @@ export class MCP23Builder {
 			b?.dispatchEvent(new Event('click'))
 
 			useButton.disabled = false
-		})
+		}))
 
 		const gpioButtons = root.querySelectorAll('button[data-gpio]')
 		for(const gpioButton of gpioButtons) {
-			gpioButton.addEventListener('click', async event => {
+			gpioButton.addEventListener('click', asyncEvent(async event => {
 
 				const { target } = event
 				const parent = target.closest('ul')
@@ -395,7 +397,7 @@ export class MCP23Builder {
 				currentPortTab?.setAttribute('data-preferred-pin', pin)
 
 				root.setAttribute('pin', pin)
-			})
+			}))
 		}
 
 		const abTabObserver = new MutationObserver(mutations => {
@@ -446,7 +448,7 @@ export class MCP23Builder {
 
 
 		const gpioForm = root.querySelector('form[data-gpio]')
-		gpioForm?.addEventListener('change', async event => {
+		gpioForm?.addEventListener('change', asyncEvent(async event => {
 			event.preventDefault()
 
 			const port = root.getAttribute('port')
@@ -459,7 +461,9 @@ export class MCP23Builder {
 
 
 			console.log('old port value', portCache)
-			await delayMs(1000)
+			// await delayMs(1000)
+
+
 			const whatChanged = event.target.getAttribute('name')
 			if(whatChanged === 'direction') {
 				const dir = event.target.value === 'in' ? DIRECTION.IN : DIRECTION.OUT
@@ -502,14 +506,14 @@ export class MCP23Builder {
 			refreshDeviceCacheIfNeeded(port, false)
 				.then(refreshForm)
 				.catch(e => console.warn('refreshing port error', e))
-		})
+		}))
 
 
 		const refreshPollButton = root.querySelector('button[data-refresh]')
 		const refreshPollRateSelect = root.querySelector('select[name="refreshRate"]')
 		const refreshPollCounter = root.querySelector('output[name="counter"]')
 		const refreshPollProgress = root.querySelector('progress[name="progress"]')
-		refreshPollButton?.addEventListener('click', async event => {
+		refreshPollButton?.addEventListener('click', asyncEvent(async event => {
 			event.preventDefault()
 
 			const cacheMap = {  }
@@ -587,7 +591,7 @@ export class MCP23Builder {
 				refreshPollProgress.value = 100
 				refreshPollProgress.max = 100
 			}, 1000 * timeout)
-		})
+		}))
 
 		const tabButtons = root.querySelectorAll('button[data-tab]')
 		for (const tabButton of tabButtons) {

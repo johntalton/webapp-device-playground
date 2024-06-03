@@ -12,41 +12,35 @@ main {
   /* overflow-y: scroll; */
 }
 
+
 main > section {
-  display: grid;
+  display: flex;
+  flex-direction: column;
+  /* flex-wrap: wrap; */
+  align-content: flex-start;
+
+  /* display: grid;
 
   grid-template-areas: "controls custom";
-  grid-template-columns: max-content 1fr;
+  grid-template-columns: max-content 1fr; */
 
   align-items: start;
   gap: 1em;
   height: 100%;
   width: 100%;
+
+  & > :not(button) {
+    align-self: stretch;
+  }
+
+  &[data-loading] {
+    display: none;
+  }
 }
 
 main > section:not([data-active]) {
   display: none;
 }
-
-main > section[data-connect] {
-
-}
-
-
-main > section[data-connected] > button {
-  align-content: space-between;
-	grid-area: controls;
-
-  font-size: 1.25em;
-
-	padding-inline: 2ch;
-	padding-block: 0.5em;
-	margin-inline-end: 0.75em;
-}
-
-
-
-
 
 main button {
   display: block;

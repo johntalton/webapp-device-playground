@@ -3,8 +3,7 @@ import { I2CBusMCP2221 } from '@johntalton/i2c-bus-mcp2221'
 import { dumpHIDDevice } from '../util/hid-info.js'
 import { range } from '../util/range.js'
 import { deviceGuessByAddress } from '../devices-i2c/guesses.js'
-
-const delayMs = ms => new Promise(resolve => setTimeout(resolve, ms))
+import { delayMs} from '../util/delay.js'
 
 class WaitableQueue {
 	#latchResolve = () => {}

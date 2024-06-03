@@ -1,4 +1,6 @@
 
+import { delayMs} from '../util/delay.js'
+
 export class Lemming {
 	static limit(opaqueID, options) {
 		const { store, durationMs, total } = options
@@ -48,8 +50,6 @@ const script = [
 	{ ms: 50, id: 42 },
 	{ ms: 50, id: 42 },
 ]
-
-const delayMs = ms => new Promise(resolve => setTimeout(resolve, ms))
 
 for await (const entry of script) {
 	const { ms, id } = entry

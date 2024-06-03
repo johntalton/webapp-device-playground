@@ -7,12 +7,12 @@ import { hydrateHID } from './hydrate/hid.js'
 //
 import { HTMLImportElement } from './custom-elements/html-import.js'
 import { I2CAddressDisplayElement } from './custom-elements/address-display.js'
-import { ExcameraI2CDriverElement } from './custom-elements/excamera-i2cdriver.js'
 import { MCP2221ConfigElement } from './custom-elements/mcp2221-config.js'
 import { CaptureEventElement } from './custom-elements/capture-event.js'
 import { TCA9548ConfigElement } from './custom-elements/tca9548-config.js'
-import { DS3502ConfigElement } from './custom-elements/ds3502-config.js'
 import { PCF8523ConfigElement } from './custom-elements/pcf8523-config.js'
+
+import { DOMTokenListLike } from './util/dom-token-list.js'
 
 //
 import { ExcameraI2CDriverUIBuilder } from './devices-serial/exc-i2cdriver.js'
@@ -74,60 +74,28 @@ const isFT232H = (vendorId, productId) => {
 function buildDeviceSection(builder) {
 	//
 	const sectionElem = document.createElement('section')
-	// sectionElem.setAttribute('data-active', true)
-	sectionElem.setAttribute('data-connect', true)
+	sectionElem.toggleAttribute('data-loading', true)
 
-	const connectButtonEleme = document.createElement('button')
-	connectButtonEleme.textContent = 'Connect to Device'
-	sectionElem.appendChild(connectButtonEleme)
+	Promise.resolve()
+		.then(async () => builder.open())
+		.then(async () => {
 
-	connectButtonEleme.addEventListener('click', e => {
-		connectButtonEleme.disabled = true
-		connectButtonEleme.remove()
+			const controller = new AbortController()
+			const signal = controller.signal
 
-		Promise.resolve()
-			.then(() => {})
-			.then(async () => builder.open())
-			.then(async () => {
-
-				const closeButton = document.createElement('button')
-				closeButton.textContent = 'Close Device'
-				sectionElem.appendChild(closeButton)
-
-				const signal = {}
-
-				try {
-					const customElem = await builder.buildCustomView({ signal })
-					if(customElem instanceof String || typeof customElem === 'string') {
-						const stuff = (new DOMParser()).parseFromString(customElem, 'text/html')
-						sectionElem.appendChild(stuff.body.firstChild)
-					}
-					else {
-						sectionElem.appendChild(customElem)
-					}
-
-				}
-				catch(e) {
-					console.error('error building view', e)
-				}
-
-				closeButton.addEventListener('click', e => {
-
-					sectionElem.remove()
-
-					builder.close()
-						.then(() => {
-							console.log('closed')
-						})
-						.catch(console.warn)
-
-				}, { once: true })
-			})
-			.catch(e => console.warn(e))
-
-
-	}, { once: true })
-
+			try {
+				const customElem = await builder.buildCustomView({ signal })
+				sectionElem.appendChild(customElem)
+				sectionElem.toggleAttribute('data-loading', false)
+			}
+			catch(e) {
+				sectionElem.toggleAttribute('data-error', true)
+				console.error('error building view', e)
+			}
+		})
+		.catch(e => {
+			sectionElem.toggleAttribute('data-error', true)
+		})
 
 	return sectionElem
 }
@@ -212,9 +180,7 @@ async function hydrateCustomElements() {
 	hydrateCustomeElementTemplateImport('capture-event', 'capture-event', CaptureEventElement)
 	hydrateCustomeElementTemplateImport('addr-display', 'addr-display', I2CAddressDisplayElement)
 	hydrateCustomeElementTemplateImport('mcp2221-config', 'mcp2221-config', MCP2221ConfigElement)
-	hydrateCustomeElementTemplateImport('excamera-i2cdriver', 'excamera-i2cdriver', ExcameraI2CDriverElement)
 	hydrateCustomeElementTemplateImport('tca9548-config', 'tca9548-config', TCA9548ConfigElement)
-	hydrateCustomeElementTemplateImport('ds3502-config', 'ds3502-config', DS3502ConfigElement)
 	hydrateCustomeElementTemplateImport('pcf8523-config', 'pcf8523-config', PCF8523ConfigElement)
 }
 
@@ -266,6 +232,14 @@ async function onContentLoaded() {
 	}
 
 
+	const toggleAsideButton = document.querySelector('button[data-aside-toggle]')
+	toggleAsideButton?.addEventListener('click', event => {
+		const viewDTL = new DOMTokenListLike(document.body.getAttributeNode('data-view'))
+
+		viewDTL.toggle('aside')
+	})
+
+
 	const requestSerialButton = document.getElementById('requestSerial')
 	const requestUSBButton = document.getElementById('requestUSB')
 	const requestHIDButton = document.getElementById('requestHID')
@@ -289,16 +263,16 @@ async function onContentLoaded() {
 
 
 
-	function makeListItem() {
-		const liElem = document.createElement('li')
-		//
-		const buttonElem = document.createElement('button')
-		buttonElem.textContent = builder.title
-		liElem.appendChild(buttonElem)
-		deviceListElem.appendChild(liElem)
+	// function makeListItem() {
+	// 	const liElem = document.createElement('li')
+	// 	//
+	// 	const buttonElem = document.createElement('button')
+	// 	buttonElem.textContent = builder.title
+	// 	liElem.appendChild(buttonElem)
+	// 	deviceListElem.appendChild(liElem)
 
-		return liElem
-	}
+	// 	return liElem
+	// }
 
 
 	const serialWorker = new Worker('./workers/serial-worker.js', { type: 'module' })

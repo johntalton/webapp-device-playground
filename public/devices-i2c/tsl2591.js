@@ -1,5 +1,6 @@
 import { I2CAddressedBus } from '@johntalton/and-other-delights'
 import { TSL2591, DEVICE_ID, GAIN_MODE_HIGH } from '@johntalton/tsl2591'
+import { asyncEvent } from '../util/async-event.js'
 
 export class TSL2591Builder {
 	#abus
@@ -124,7 +125,7 @@ export class TSL2591Builder {
 		const refresh = (all) => _refresh(this.#device)
 
 		const statusButton = root.querySelector('form button[data-refresh-status]')
-		statusButton?.addEventListener('click', async event => {
+		statusButton?.addEventListener('click', asyncEvent(async event => {
 			event.preventDefault()
 
 			statusButton.disabled = true
@@ -132,10 +133,10 @@ export class TSL2591Builder {
 			await refresh()
 
 			statusButton.disabled = false
-		})
+		}))
 
 		const clearButton = root.querySelector('form button[data-clear-interrupt]')
-		clearButton?.addEventListener('click', async event => {
+		clearButton?.addEventListener('click', asyncEvent(async event => {
 			event.preventDefault()
 
 			// console.log(event.shiftKey)
@@ -143,28 +144,28 @@ export class TSL2591Builder {
 			await this.#device.clearInterrupt(true, true)
 
 			await refresh()
-		})
+		}))
 
 		const triggerButton = root.querySelector('form button[data-trigger-interrupt]')
-		triggerButton?.addEventListener('click', async event => {
+		triggerButton?.addEventListener('click', asyncEvent(async event => {
 			event.preventDefault()
 
 			await this.#device.triggerInterrupt()
 
 			await refresh()
-		})
+		}))
 
 		const resetButton = root.querySelector('form button[data-reset]')
-		resetButton?.addEventListener('click', async event => {
+		resetButton?.addEventListener('click', asyncEvent(async event => {
 			event.preventDefault()
 
 			await this.#device.reset()
 
 			await refresh()
-		})
+		}))
 
 		const setThresholdButton = root.querySelector('form button[data-set-threshold]')
-		setThresholdButton?.addEventListener('click', async event => {
+		setThresholdButton?.addEventListener('click', asyncEvent(async event => {
 			event.preventDefault()
 
 			await this.#device.setThreshold({
@@ -178,12 +179,12 @@ export class TSL2591Builder {
 			})
 
 			await refresh()
-		})
+		}))
 
 
 
 		const profileForm = root.querySelector('form[data-config]')
-		profileForm?.addEventListener('change', async event => {
+		profileForm?.addEventListener('change', asyncEvent(async event => {
 			const enableNoPersistInterruptCheckbox = root.querySelector('input[name="enableNoPersistInterrupt"]')
 			const enableInterruptCheckbox = root.querySelector('input[name="enableInterrupt"]')
 			const enableSleepAfterInterruptCheckbox = root.querySelector('input[name="enableSleepAfterInterrupt"]')
@@ -203,7 +204,7 @@ export class TSL2591Builder {
 			})
 
 			await refresh()
-		})
+		}))
 
 		const tabButtons = root.querySelectorAll('button[data-tab]')
 		for(const tabButton of tabButtons) {

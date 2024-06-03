@@ -1,5 +1,6 @@
 import { I2CAddressedBus } from '@johntalton/and-other-delights'
 import { PCF8574 } from '@johntalton/pcf8574'
+import { asyncEvent } from '../util/async-event.js'
 
 export class PCF8574Builder {
 	#abus
@@ -82,7 +83,7 @@ export class PCF8574Builder {
 		}
 
 		const refreshButton = root.querySelector('button[data-refresh]')
-		refreshButton.addEventListener('click', async event => {
+		refreshButton.addEventListener('click', asyncEvent(async event => {
 			event.preventDefault()
 
 			refreshButton.disabled = true
@@ -90,30 +91,25 @@ export class PCF8574Builder {
 			await refresh()
 
 			refreshButton.disabled = false
-		})
+		}))
 
 		const configForm = root.querySelector('form')
-		configForm.addEventListener('change', event => {
+		configForm.addEventListener('change', asyncEvent(async event => {
 			console.log('event change has occurred')
 
-			Promise.resolve()
-				.then(async () => {
+			await this.#device.writePort({
+				p0: root.querySelector('input[name="gpio0"]').checked,
+				p1: root.querySelector('input[name="gpio1"]').checked,
+				p2: root.querySelector('input[name="gpio2"]').checked,
+				p3: root.querySelector('input[name="gpio3"]').checked,
+				p4: root.querySelector('input[name="gpio4"]').checked,
+				p5: root.querySelector('input[name="gpio5"]').checked,
+				p6: root.querySelector('input[name="gpio6"]').checked,
+				p7: root.querySelector('input[name="gpio7"]').checked
+			})
 
-					await this.#device.writePort({
-						p0: root.querySelector('input[name="gpio0"]').checked,
-						p1: root.querySelector('input[name="gpio1"]').checked,
-						p2: root.querySelector('input[name="gpio2"]').checked,
-						p3: root.querySelector('input[name="gpio3"]').checked,
-						p4: root.querySelector('input[name="gpio4"]').checked,
-						p5: root.querySelector('input[name="gpio5"]').checked,
-						p6: root.querySelector('input[name="gpio6"]').checked,
-						p7: root.querySelector('input[name="gpio7"]').checked
-					})
-
-					await refresh()
-				})
-				.catch(e => console.warn(e))
-		})
+			await refresh()
+		}))
 
 		return root
 	}

@@ -1,7 +1,6 @@
 import { I2CAddressedBus } from '@johntalton/and-other-delights'
 import { ADXL375 } from '@johntalton/adxl375'
-
-const delayMs = ms => new Promise(resolve => setTimeout(resolve, ms))
+import { delayMs} from '../util/delay.js'
 
 let going = false
 

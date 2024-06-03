@@ -1,6 +1,7 @@
 import { I2CAddressedBus } from '@johntalton/and-other-delights'
 import { AW9523, DEFAULT, DEVICE_ID, INTERRUPT_ENABLE, INTERRUPT_DISABLE, MODE_LED, DIRECTION_OUTPUT } from '@johntalton/aw9523'
 import { range } from '../util/range.js'
+import { asyncEvent } from '../util/async-event.js'
 
 export class AW9523Builder {
 	#abus
@@ -110,7 +111,7 @@ export class AW9523Builder {
 		}
 
 		const profileForm = root.querySelector('form[data-profile]')
-		profileForm?.addEventListener('change', async event => {
+		profileForm?.addEventListener('change', asyncEvent(async event => {
 			event.preventDefault()
 
 			const port0Select = profileForm.querySelector('select[name="port0PushPull"]')
@@ -120,7 +121,7 @@ export class AW9523Builder {
 				port0PushPull: port0Select.value === 'true',
 				iMaxRange: parseInt(iMaxRangeSelect.value)
 			})
-		})
+		}))
 
 		const form0 = root.querySelector('form[data-port0]')
 		const form1 = root.querySelector('form[data-port1]')
@@ -140,7 +141,7 @@ export class AW9523Builder {
 		}
 
 		for (const { port, form } of [ { port: 0, form: form0 }, { port: 1, form: form1 } ]) {
-			form?.addEventListener('change', async event => {
+			form?.addEventListener('change', asyncEvent(async event => {
 				event.preventDefault()
 
 
@@ -172,20 +173,20 @@ export class AW9523Builder {
 
 
 				await refresh()
-			})
+			}))
 		}
 
 		const resetButton = root.querySelector('button[data-reset]')
-		resetButton?.addEventListener('click', async event => {
+		resetButton?.addEventListener('click', asyncEvent(async event => {
 			event.preventDefault()
 
 			await this.#device.reset()
 
 			await refresh()
-		})
+		}))
 
 		const refreshButton = root.querySelector('button[data-refresh]')
-		refreshButton?.addEventListener('click', async event => {
+		refreshButton?.addEventListener('click', asyncEvent(async event => {
 			event.preventDefault()
 
 			const input0 = await this.#device.getInput(0)
@@ -193,7 +194,7 @@ export class AW9523Builder {
 
 			const input01 = [ ...input0.input, ...input1.input ]
 			refreshInputs(input01)
-		})
+		}))
 
 		const tabButtons = root.querySelectorAll('button[data-tab]')
 		for (const tabButton of tabButtons) {

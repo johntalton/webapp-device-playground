@@ -40,12 +40,16 @@ ds1841-config {
 			grid-template-columns: 1fr 1fr;
 			align-items: center;
 
-			/* margin-block: 0.25em; */
+			border: 0.25em solid transparent;
 
 			padding: .5em;
 			padding-inline-start: 1em;
 			background-color: var(--color-accent--lighter, red);
 			border-radius: 1em;
+		}
+
+		& li[data-active] {
+			border-color: var(--color-accent--darker, red);
 		}
 	}
 
@@ -81,7 +85,7 @@ ds1841-config {
 			justify-items: start;
       align-items: center;
 
-			& legend {
+			& legend:not(:empty) {
 				font-weight: bold;
 				padding-inline: 1ch;
 			}

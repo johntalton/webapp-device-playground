@@ -7,18 +7,18 @@ aside {
 
   display: flex;
   flex-direction: column;
-
-  flex-direction: column;
   flex-wrap: nowrap;
   justify-content: space-between;
   align-items: stretch;
+
+  margin-block-start: 2em;
 
   overflow: hidden;
   /* overflow-y: scroll; */
 }
 
-aside h2 {
+/* aside h2 {
   font-size: 1.125em;
   margin-inline: auto;
   padding-block-start: 1em;
-}
+} */

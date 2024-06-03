@@ -84,7 +84,7 @@ async function hydrateSerialEvents(add) {
 
 const build_requestSerialPortHandler = add => event => requestSerialPortHandler(add, event)
 
-async function hydrateSerialReqeustButton(requestSerialButton, add) {
+async function hydrateSerialRequestButton(requestSerialButton, add) {
 	requestSerialButton.addEventListener('click', build_requestSerialPortHandler(add), { once: false })
 	requestSerialButton.disabled = false
 }
@@ -96,6 +96,6 @@ export async function hydrateSerial(requestSerialButton, ui) {
 	return Promise.all([
 		hydrateSerialBackgroundPorts(add),
 		hydrateSerialEvents(add),
-		hydrateSerialReqeustButton(requestSerialButton, add)
+		hydrateSerialRequestButton(requestSerialButton, add)
 	])
 }

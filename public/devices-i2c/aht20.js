@@ -32,7 +32,7 @@ export class AHT20Builder {
 			<form data-form-buttons method="dialog">
 				<button type="button" data-reset>Reset</button>
 				<button data-state>State</button>
-				<button data-init disabled>Init</button>
+				<!-- button data-init >Init</button -->
 				<button data-trigger>Trigger</button>
 				<button data-measurement>Measurement</button>
 			</form>
@@ -81,7 +81,7 @@ export class AHT20Builder {
 			outCali.innerText = state.calibrated ? '👍' : '👎'
 		})
 
-		buttonInit.addEventListener('click', async e => { // async into the void
+		buttonInit?.addEventListener('click', async e => { // async into the void
 			await this.#device.initialize()
 		})
 

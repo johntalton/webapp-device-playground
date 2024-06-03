@@ -68,6 +68,7 @@ aside > ul > li > button {
 
 	height: 4em;
 	padding: 0.25em;
+	padding-inline: 10ch;
 
 	background-color: var(--background, red);
 	color: var(--color, red);

@@ -15,6 +15,7 @@ nav {
   display: flex;
   flex-direction: row;
   justify-content: flex-end;
+  flex-wrap: wrap;
   width: 100%;
 
   padding-inline-start: 2ch;

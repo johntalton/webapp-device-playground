@@ -1,7 +1,5 @@
 import { I2CAddressedBus } from '@johntalton/and-other-delights'
 
-const delayMs = ms => new Promise(resolve => setTimeout(resolve, ms))
-
 function toAddress16BE(address) {}
 function readI2cBlock16(bus, address, length, into) {}
 function writeI2cBlock16(bus, address, buffer) {}

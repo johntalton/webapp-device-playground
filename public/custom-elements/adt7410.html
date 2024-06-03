@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html>
+	<head></head>
+	<body>
+		<adt7410-config data-resolution="13">
+			<div class="tabs">
+				<button data-tab="config" data-active>Config</button>
+				<button data-tab="setpoints">Set Points</button>
+				<button data-tab="output">Output</button>
+			</div>
+
+
+			<form name="configuration" data-active data-for-tab="config" class="tabsContent">
+				<label>Mode</label>
+				<select name="mode">
+					<option value="0">Continuous</option>
+					<option value="1">One Shot</option>
+					<option value="2">1 SPS</option>
+					<option value="3">Shutdown</option>
+				</select>
+
+				<label>INT/CT Mode</label>
+				<select name="comparisonMode">
+					<option value="false">Interrupt</option>
+					<option value="true">Comparator</option>
+				</select>
+
+				<label>Fault Queue Length</label>
+				<select name="faultQueueLength">
+					<option value="1">1</option>
+					<option value="2">2</option>
+					<option value="3">3</option>
+					<option value="4">4</option>
+				</select>
+
+				<label>Resolution</label>
+				<select name="resolution">
+					<option value="13">13-bit</option>
+					<option value="16">16-bit</option>
+				</select>
+
+				<label>INT Polarity</label>
+				<select name="intPolarity">
+					<option value="false">Active Low</option>
+					<option value="true">Active High</option>
+				</select>
+
+				<label>CT Polarity</label>
+				<select name="ctPolarity">
+					<option value="false">Active Low</option>
+					<option value="true">Active High</option>
+				</select>
+
+				<button name="reset">Reset</button>
+			</form>
+
+			<form name="setPoints" data-for-tab="setpoints" class="tabsContent">
+				<fieldset>
+					<legend>Set Points</legend>
+
+					<label>Critical ℃</label>
+					<input name="critical" type="number" min="-55" max="150" step="0.0625">
+
+					<label>High ℃</label>
+					<input name="high" type="number" min="-55" max="150" step="0.0625">
+
+					<label>Low ℃</label>
+					<input name="low" type="number" min="-55" max="150" step="0.0625">
+
+					<label>Hysteria ℃</label>
+					<input name="hysteria" type="number" min="0" max="15">
+				</fieldset>
+
+				<button name="setSetPoints">Set</button>
+			</form>
+
+			<form name="output" data-for-tab="output" class="tabsContent">
+				<label>Id</label>
+				<output name="id"></output>
+
+				<label>Temperature</label>
+				<output name="temperature"></output>
+				<button name="pollTemperature">Poll</button>
+
+				<fieldset>
+					<legend>Status</legend>
+
+					<label>High</label>
+					<output name="high"></output>
+
+					<label>Low</label>
+					<output name="low"></output>
+
+					<label>Critical</label>
+					<output name="critical"></output>
+
+					<label>Ready</label>
+					<output name="ready"></output>
+
+					<button name="refreshStatus">Refresh / Clear</button>
+				</fieldset>
+			</form>
+
+		</adt7410-config>
+	</body>
+</html>

@@ -2,8 +2,13 @@
 <html>
 	<head>
 		<meta charset="utf-8" />
-		<meta name="viewport" content="width=device-width, initial-scale=1" />
+		<!-- <meta name="viewport" content="width=device-width, initial-scale=1" /> -->
+		<!-- <meta name="viewport" content="initial-scale=1, viewport-fit=cover"> -->
+		<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no, viewport-fit=cover">
+
 		<meta name="view-transition" content="same-origin" />
+
+		<meta content="light dark" name="color-scheme">
 
 		<title>Web I²C Playground</title>
 
@@ -49,10 +54,8 @@
 		<script src="./index.js" type="module" async defer></script>
 		<link rel="stylesheet" type="text/css" href="./index.css"></link>
 	</head>
-	<body data-theme="NuDark" data-view="aside">
-		<html-import id="excamera-i2cdriver" src="./custom-elements/excamera-i2cdriver.html"></html-import>
+	<body data-theme="Corp" data-view="aside">
 		<html-import id="mcp2221-config" src="./custom-elements/mcp2221-config.html"></html-import>
-		<html-import id="ds3502-config" src="./custom-elements/ds3502-config.html"></html-import>
 		<html-import id="tca9548-config" src="./custom-elements/tca9548-config.html"></html-import>
 		<html-import id="addr-display" src="./custom-elements/address-display.html"></html-import>
 		<html-import id="capture-event" src="./custom-elements/capture-event.html"></html-import>
@@ -61,6 +64,7 @@
 		<h1>⚙️ Web I²C Playground</h1>
 
 		<nav>
+			<button data-aside-toggle>🔖 Menu</button>
 			<button data-theme-roller>♲</button>
 			<button disabled id="requestSerial">🔌 Serial</button>
 			<button disabled id="requestUSB">🔌 USB</button>
@@ -68,7 +72,6 @@
 		</nav>
 
 		<aside>
-			<h2>Devices:</h2>
 			<ul id="deviceList">
 				<!--  -->
 			</ul>

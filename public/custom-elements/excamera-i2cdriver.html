@@ -1,4 +1,160 @@
-<template>
-	<slot name="prefix" part="prefix"></slot>
-	<slot part="content"></slot>
-</template>
+<!DOCTYPE html>
+<body>
+	<head>
+	</head>
+	<body>
+		<excamera-i2cdriver>
+			<div class="tabs" slot="prefix">
+				<button data-tab="settings" data-active>Settings</button>
+				<button data-tab="scan">Host</button>
+				<button data-tab="capture">Capture</button>
+				<button disabled data-tab="bitbang">Bitbang</button>
+			</div>
+
+
+			<div data-for-tab="scan" class="tabsContent">
+				<div data-scan-group>
+					<button data-scan>Scan 🔎</button>
+
+					<addr-display>
+					</addr-display>
+
+					<ul data-device-list>
+						<!-- dynamic content -->
+						<template>
+							<li>
+
+							</li>
+						</template>
+					</ul>
+				</div>
+
+				<form data-manual-add-form>
+					<fieldset>
+						<legend>Manually Add Device</legend>
+
+						<label>Address</label>
+						<input name="ManualAddress" type="number" min="8" max="119" step="1"/>
+
+						<label>Device</label>
+						<select name="ManualDeviceSelection">
+							<!-- Dynamic Guesses -->
+							<template>
+								<option value=""></option>
+							</template>
+						</select>
+
+						<button submit>Create 🕹</button>
+					</fieldset>
+				</form>
+			</div>
+
+			<div data-for-tab="capture" class="tabsContent">
+				<form data-capture-controls>
+					<button data-capture="Start">
+						<span data-capture="Start">Start ▶️</span>
+						<span data-capture="Stop">Stop ⏹</span>
+					</button>
+					<button data-clear>Clear</button>
+				</form>
+
+				<ul data-capture-list>
+					<!-- dynamic content -->
+					<template>
+						<li data-state="" data-address="" data-mode="">
+						</li>
+					</template>
+					<template>
+						<li data-data>
+							<hex-display></hex-display>
+						</li>
+					</template>
+				</ul>
+			</div>
+
+			<div data-for-tab="settings" class="tabsContent" data-active>
+				<form data-config>
+					<label>Mode</label>
+					<select name="mode" disabled readonly>
+						<option value="I">I²C Host</option>
+						<option value="B">Bitbang</option>
+						<option value="M">Monitor</option>
+						<option value="C">Cpapture</option>
+					</select>
+
+					<label>Speed</label>
+					<select name="speed">
+						<option value="100">100kHz</option>
+						<option value="400">400kHz</option>
+					</select>
+
+					<label>Pullups SDA</label>
+					<select name="pullupSDA">
+						<option value="0">0 K (no pull-up)</option>
+						<option value="1">2.2 K</option>
+						<option value="2">4.3 K</option>
+						<option value="3">1.5 K</option>
+						<option value="4">4.7 K</option>
+						<option value="5">1.5 K</option>
+						<option value="6">2.2 K</option>
+						<option value="7">1.1 K</option>
+					</select>
+
+					<label>Pullups SCL</label>
+					<select name="pullupSCL">
+						<option value="0">0 K (no pull-up)</option>
+						<option value="1">2.2 K</option>
+						<option value="2">4.3 K</option>
+						<option value="3">1.5 K</option>
+						<option value="4">4.7 K</option>
+						<option value="5">1.5 K</option>
+						<option value="6">2.2 K</option>
+						<option value="7">1.1 K</option>
+					</select>
+				</form>
+
+				<form data-info method="dialog">
+					<label>Model</label>
+					<output name="model"></output>
+
+					<label>Serial</label>
+					<output name="serial"></output>
+
+					<label>Uptime (S)</label>
+					<output name="uptime"></output>
+
+					<label>Voltage (V)</label>
+					<output name="voltage"></output>
+
+					<label>Current (mA)</label>
+					<output name="current"></output>
+
+					<label>Temperature (°C)</label>
+					<output name="temperature"></output>
+
+					<label>SDA</label>
+					<output name="sda"></output>
+
+					<label>SCL</label>
+					<output name="scl"></output>
+
+					<label>CRC</label>
+					<output name="crc"></output>
+
+					<button data-update>Update</button>
+				</form>
+
+				<fieldset data-action>
+					<button data-reboot>Reboot</button>
+					<button data-reset>Reset Bus</button>
+				</fieldset>
+
+			</div>
+
+			<div data-for-tab="bitbang" class="tabsContent">
+				<form data-bitbang>
+
+				</form>
+		</excamera-i2cdriver>
+	</body>
+</body>

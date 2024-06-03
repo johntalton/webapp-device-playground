@@ -1,5 +1,6 @@
 import { I2CAddressedBus } from '@johntalton/and-other-delights'
 import { DS3231 } from '@johntalton/ds3231'
+import { asyncEvent } from '../util/async-event.js'
 
 export class DS3231Builder {
 	#abus
@@ -157,7 +158,7 @@ export class DS3231Builder {
 		}
 
 		const setTimeButton = root.querySelector('[data-set-time]')
-		setTimeButton?.addEventListener('click', async event => {
+		setTimeButton?.addEventListener('click', asyncEvent(async event => {
 			event.preventDefault()
 
 			const now = new Date(Date.now())
@@ -175,17 +176,17 @@ export class DS3231Builder {
 			})
 
 			await refreshView(root, this.#device)
-		})
+		}))
 
 		const refreshButton = root.querySelector('[data-refresh]')
-		refreshButton?.addEventListener('click', async event => {
+		refreshButton?.addEventListener('click', asyncEvent(async event => {
 			event.preventDefault()
 
 			await refreshView(root, this.#device)
-		})
+		}))
 
 		const clearButton = root.querySelector('[data-clear-all-flags]')
-		clearButton?.addEventListener('click', async event => {
+		clearButton?.addEventListener('click', asyncEvent(async event => {
 			event.preventDefault()
 
 			await this.#device.setStatus({
@@ -195,10 +196,10 @@ export class DS3231Builder {
 			})
 
 			await refreshView(root, this.#device)
-		})
+		}))
 
 		const controlForm = root.querySelector('form[data-control]')
-		controlForm?.addEventListener('change', async event => {
+		controlForm?.addEventListener('change', asyncEvent(async event => {
 			event.preventDefault()
 
 			const alarm1Checkbox = root.querySelector('input[name="enableAlarm1"]')
@@ -241,10 +242,10 @@ export class DS3231Builder {
 			enableSquareWaveCheckbox.disabled = false
 			batterySquareWaveCheckbox.disabled = false
 			squareWaveFrequencySelect.disabled = false
-		})
+		}))
 
 		const alarm1Submit = root.querySelector('form[data-alarm1] button[submit]')
-		alarm1Submit?.addEventListener('click', async event => {
+		alarm1Submit?.addEventListener('click', asyncEvent(async event => {
 			event.preventDefault()
 
 			const alarm1SecondsSelect = root.querySelector('select[data-alarm1-seconds]')
@@ -266,10 +267,10 @@ export class DS3231Builder {
 			}, false)
 
 			refreshView(root, this.#device)
-		})
+		}))
 
 		const alarm2Submit = root.querySelector('form[data-alarm2] button[submit]')
-		alarm2Submit?.addEventListener('click', async event => {
+		alarm2Submit?.addEventListener('click', asyncEvent(async event => {
 			event.preventDefault()
 
 			const alarm2MinutesSelect = root.querySelector('select[data-alarm2-minutes]')
@@ -289,7 +290,7 @@ export class DS3231Builder {
 			}, false)
 
 			refreshView(root, this.#device)
-		})
+		}))
 
 		const tabButtons = root.querySelectorAll('button[data-tab]')
 		for(const tabButton of tabButtons) {

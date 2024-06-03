@@ -18,3 +18,16 @@ h1 {
   background-color: var(--logo-color, red);
   color: var(--logo-color-text, red);
 }
+
+/* [data-view ^= "aside"] {
+  & h1 {
+    grid-column: 1 / -1;
+
+    margin-inline-start: 1em;
+
+    justify-self: flex-start;
+    flex-direction: row;
+    align-items: center;
+    justify-content: flex-start;
+  }
+} */

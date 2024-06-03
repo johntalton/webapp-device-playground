@@ -17,12 +17,25 @@ body {
 		"aside main";
 
 	grid-template-rows: 5em 1fr;
-	grid-template-columns: 0 1fr;
+	grid-template-columns: max-content 1fr;
 
 	background-color: var(--base-accent-background-color, red);
 	color: var(--base-accent-text-color, red);
 }
 
-body[data-view ^= "aside"] {
-	grid-template-columns: 20% 1fr;
+body:not([data-view ^= "aside"]) {
+	/* grid-template-areas:
+		"nav"
+		"main";
+
+	grid-template-rows: 5em 1fr;
+	grid-template-columns: 1fr; */
+
+	& aside {
+		display: none;
+	}
+
+	& h1 {
+		display: none;
+	}
 }

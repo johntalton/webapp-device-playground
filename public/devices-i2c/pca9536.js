@@ -1,8 +1,8 @@
 
 import { PCA9536, SET, CLEAR } from '@johntalton/pca9536'
 import { I2CAddressedBus } from '@johntalton/and-other-delights'
+import { asyncEvent } from '../util/async-event.js'
 
-const delayMs = ms => new Promise(resolve => setTimeout(resolve, ms))
 
 export class PCA9536Builder {
 	#abus
@@ -121,14 +121,14 @@ export class PCA9536Builder {
 		}
 
 		const refreshButton = root.querySelector('[data-refresh]')
-		refreshButton?.addEventListener('click', async event => {
+		refreshButton?.addEventListener('click', asyncEvent(async event => {
 			event.preventDefault()
 
 			await refresh()
-		})
+		}))
 
 		const configForm = root.querySelector('form[data-config]')
-		configForm?.addEventListener('change', async event => {
+		configForm?.addEventListener('change', asyncEvent(async event => {
 			event.preventDefault()
 			const update = event.target.getAttribute('data-update')
 
@@ -160,7 +160,7 @@ export class PCA9536Builder {
 			}
 
 			await refresh()
-		})
+		}))
 
 		await refresh()
 

@@ -1,82 +1,9 @@
 import { I2CAddressedBus } from '@johntalton/and-other-delights'
 import { DS1841, LUT_BYTE_PER_ENTRY, LUT_BYTE_SIZE, LUT_TABLE_SIZE } from '@johntalton/ds1841'
 import { range } from '../util/range.js'
-
-const SINGLE_SPACE = ' '
-const EMPTY_SPACE = ''
-
-export class NotDOMTokenList {
-	#set
-	#attr
-	constructor(attr) {
-		this.#set = new Set(attr.value.split(SINGLE_SPACE).filter(v => v !== EMPTY_SPACE))
-		this.#attr = attr
-	}
-
-	_update() {
-		this.#attr.value = this.value
-	}
-
-	toString() {
-		return [ ...this.#set.values() ].join(SINGLE_SPACE)
-	}
-
-	get value() { return this.toString() }
-
-	contains(token) {
-		return this.#set.has(token)
-	}
-
-	add(...tokens) {
-		for(const token of tokens) {
-			if(token === EMPTY_SPACE) { throw new SyntaxError('token empty') }
-			if(token.includes(SINGLE_SPACE)) { throw new InvalidCharacterError('token whitespace') }
-		}
-
-		for(const token of tokens) {
-			this.#set.add(token)
-		}
-
-		this._update()
-	}
-
-
-	remove(...tokens) {
-		for(const token of tokens) {
-			if(token === EMPTY_SPACE) { throw new SyntaxError('token empty') }
-			if(token.includes(SINGLE_SPACE)) { throw new InvalidCharacterError('token whitespace') }
-		}
-
-		for(const token of tokens) {
-			this.#set.delete(token)
-		}
-
-		this._update()
-	}
-
-	toggle(token, force) {
-		if(token === EMPTY_SPACE) { throw new SyntaxError('token empty') }
-		if(token.includes(SINGLE_SPACE)) { throw new InvalidCharacterError('token whitespace') }
-
-		if(this.#set.has(token)) {
-			if(force === undefined || force === false) {
-				this.#set.delete(token)
-				this._update()
-				return false
-			}
-
-			return true
-		}
-
-		if(force === undefined || force === true) {
-			this.#set.add(token)
-			this._update()
-			return true
-		}
-
-		return false
-	}
-}
+import { delayMs} from '../util/delay.js'
+import { asyncEvent } from '../util/async-event.js'
+import { DOMTokenListLike } from '../util/dom-token-list.js'
 
 // async function fetchOutputs(device) {
 // 	const lutIndex = await device.getLUTIndex()
@@ -122,7 +49,7 @@ export class DS1841Builder {
 	constructor(definition, ui) {
 		const { bus, address } = definition
 
-		this.#abus = new I2CAddressedBus(bus, address)
+		this.#abus = new I2CAddressedBus(bus, address, {})
 	}
 
 
@@ -172,7 +99,7 @@ export class DS1841Builder {
 
 		const refreshButton = root.querySelector('button[data-refresh]')
 
-		const tokens = new NotDOMTokenList(root.getAttributeNode('data-enable'))
+		const tokens = new DOMTokenListLike(root.getAttributeNode('data-enable'))
 
 
 		const revalidateValues = async => {
@@ -189,7 +116,7 @@ export class DS1841Builder {
 			voltageOutput.disabled = !adc
 		}
 
-		const delayMs = ms => new Promise(resolve => setTimeout(resolve, ms))
+
 		const SHADOW_DELAY_MS = 20
 		const  delayEEPROM = () => delayMs(SHADOW_DELAY_MS)
 
@@ -222,6 +149,8 @@ export class DS1841Builder {
 			temperatureOutput.value = t
 			voltageOutput.value = v
 
+			lutList?.querySelectorAll('li[data-active]').forEach(li => li.toggleAttribute('data-active', false))
+			lutList?.querySelector(`li[data-index="${lutIndex}"]`)?.toggleAttribute('data-active', true)
 		}
 
 		const refreshControl0 = async () => {
@@ -314,7 +243,7 @@ export class DS1841Builder {
 
 
 
-		configForm?.addEventListener('change', async event => {
+		configForm?.addEventListener('change', asyncEvent(async event => {
 			const whatChanged = event.target.closest('[data-what]').getAttribute('data-what')
 
 			if(whatChanged.includes('control0')) {
@@ -351,10 +280,10 @@ export class DS1841Builder {
 			}
 
 			await revalidateValues()
-		})
+		}))
 
 
-		ivrNumber?.addEventListener('change', async event => {
+		ivrNumber?.addEventListener('change', asyncEvent(async event => {
 			event.preventDefault()
 
 			ivrNumber.disabled = true
@@ -371,9 +300,9 @@ export class DS1841Builder {
 
 			ivrNumber.disabled = false
 			ivrRange.disabled = false
-		})
+		}))
 
-		ivrRange?.addEventListener('change', async event => {
+		ivrRange?.addEventListener('change', asyncEvent(async event => {
 			event.preventDefault()
 
 			ivrNumber.disabled = true
@@ -390,9 +319,9 @@ export class DS1841Builder {
 
 			ivrNumber.disabled = false
 			ivrRange.disabled = false
-		})
+		}))
 
-		lutValueNumber?.addEventListener('change', async event => {
+		lutValueNumber?.addEventListener('change', asyncEvent(async event => {
 			event.preventDefault()
 
 			lutValueNumber.disabled = true
@@ -404,9 +333,9 @@ export class DS1841Builder {
 
 			lutValueNumber.disabled = false
 			lutValueRange.disabled = false
-		})
+		}))
 
-		lutValueRange?.addEventListener('change', async event => {
+		lutValueRange?.addEventListener('change', asyncEvent(async event => {
 			event.preventDefault()
 
 			lutValueNumber.disabled = true
@@ -418,9 +347,9 @@ export class DS1841Builder {
 
 			lutValueNumber.disabled = false
 			lutValueRange.disabled = false
-		})
+		}))
 
-		lutIndexNumber?.addEventListener('change', async event => {
+		lutIndexNumber?.addEventListener('change', asyncEvent(async event => {
 			event.preventDefault()
 
 			lutIndexNumber.disabled = true
@@ -429,7 +358,7 @@ export class DS1841Builder {
 			await refreshLUTValue()
 
 			lutIndexNumber.disabled = false
-		})
+		}))
 
 
 		for(const lutIndex of range(0, LUT_TABLE_SIZE - 1)) {
@@ -441,16 +370,16 @@ export class DS1841Builder {
 			lutList.append(li)
 
 			const lutEntryNumber = li.querySelector('input')
-			lutEntryNumber.addEventListener('change', async event => {
+			lutEntryNumber.addEventListener('change', asyncEvent(async event => {
 				event.preventDefault()
 
-				const value = pasrseInt(lutEntryNumber.value)
+				const value = parseInt(lutEntryNumber.value)
 				await this.#device.setLUT(lutIndex, value)
 
-			})
+			}))
 		}
 
-		refreshButton?.addEventListener('click', async event => {
+		refreshButton?.addEventListener('click', asyncEvent(async event => {
 			event.preventDefault()
 
 			refreshButton.disabled = true
@@ -461,7 +390,7 @@ export class DS1841Builder {
 			await refreshValues()
 
 			refreshButton.disabled = false
-		})
+		}))
 
 
 		const tabButtons = root.querySelectorAll('button[data-tab]')

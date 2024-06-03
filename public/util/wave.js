@@ -1,3 +1,4 @@
+
 const defaultOptions = {
 	low: 90,
 	high: 127,
@@ -40,7 +41,6 @@ export class Waves {
 }
 
 
-// const delayMs = ms => new Promise(resolve => setTimeout(resolve, ms))
 
 // const controller = new AbortController()
 // const { signal } = controller

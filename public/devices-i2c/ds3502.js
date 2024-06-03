@@ -2,15 +2,13 @@ import { I2CAddressedBus } from '@johntalton/and-other-delights'
 import { DS3502 } from '@johntalton/ds3502'
 
 import { Waves } from '../util/wave.js'
-
-const delayMs = ms => new Promise(resolve => setTimeout(resolve, ms))
-
+import { delayMs} from '../util/delay.js'
 
 async function potScript(device, options) {
-	const sinWave = Waves.sin(options)
-	for await (const value of sinWave) {
+	await device.setControl({ persist: false})
+	for await (const value of Waves.sin(options)) {
 		await delayMs(100)
-		await device.setProfile({ WR: value })
+		await device.setWiper(value)
 	}
 }
 
@@ -32,7 +30,7 @@ export class DS3502Builder {
 
 
 	async open() {
-		this.#device = await DS3502.from(this.#abus, {})
+		this.#device = await DS3502.from(this.#abus)
 	}
 
 	async close() { }
@@ -40,15 +38,66 @@ export class DS3502Builder {
 	signature() { }
 
 	async buildCustomView(selectionElem) {
-		const root = document.createElement('ds3502-config')
+		const response = await fetch('./custom-elements/ds3502.html')
+		if (!response.ok) { throw new Error('no html for view') }
+		const view = await response.text()
+		const doc = (new DOMParser()).parseFromString(view, 'text/html')
 
-		const toggleSinButton = document.createElement('button')
+		const root = doc?.querySelector('ds3502-config')
+		if (root === null) { throw new Error('no root for template') }
+
+		//
+		const valueForm = root.querySelector('form[data-value]')
+		const wiperRange = valueForm?.querySelector('input[name="wiperValueRange"]')
+		const wiperNumber = valueForm?.querySelector('input[name="wiperValueNumber"]')
+		const persistCheckbox = valueForm?.querySelector('input[name="persist"]')
+
+		const toggleSinButton = root.querySelector('button[data-script="wave"]')
+
+		const refresh = async () => {
+			await delayMs(100)
+
+			const { persist } = await this.#device.getControl()
+			const value = await this.#device.getWiper()
+
+			console.log({ persist, value })
+
+			wiperNumber.value = value
+			wiperRange.value = value
+
+			persistCheckbox.checked = persist
+		}
+
+		//
+		valueForm?.addEventListener('change', asyncEvent(async event => {
+			event.preventDefault()
+
+			const whatChanged = event.target.getAttribute('name')
+
+			if(whatChanged === 'wiperValueNumber') {
+				wiperRange.value = wiperNumber.value
+				await this.#device.setWiper(parseInt(wiperNumber.value))
+			}
+			else if(whatChanged === 'wiperValueRange') {
+				wiperNumber.value = wiperRange.value
+				await this.#device.setWiper(parseInt(wiperRange.value))
+			}
+			else if(whatChanged === 'persist') {
+				persistCheckbox.disabled = true
+				await this.#device.setControl({ persist: persistCheckbox.checked })
+			}
+
+			await refresh()
+
+			persistCheckbox.disabled = false
+		}))
+
+
+		let controller = undefined
 		toggleSinButton.textContent = 'Wave 🌊'
-		root.appendChild(toggleSinButton)
-
-
-		let controller
 		toggleSinButton.addEventListener('click', e => {
+			e.preventDefault()
+
 			if(controller === undefined) {
 				controller = new AbortController()
 				const { signal } = controller
@@ -73,20 +122,40 @@ export class DS3502Builder {
 
 
 
-		// root.addEventListener('change', e => {
-		// 	const { channels } = e
-		// 	console.log('channel change request', channels)
 
-		// 	Promise.resolve()
-		// 		.then(async () => {
 
-		// 		await this.#device.setChannels(channels)
-		// 		const resultChannels = await this.#device.getChannels()
-		// 		console.log({ resultChannels })
 
-		// 	})
-		// })
 
+		const tabButtons = root.querySelectorAll('button[data-tab]')
+		for (const tabButton of tabButtons) {
+			tabButton.addEventListener('click', event => {
+				event.preventDefault()
+
+				const { target } = event
+				const parent = target?.parentNode
+				const grandParent = parent.parentNode
+
+				const tabName = target.getAttribute('data-tab')
+
+				// remove content active
+				const activeOthers = grandParent.querySelectorAll(':scope > [data-active]')
+				activeOthers.forEach(ao => ao.toggleAttribute('data-active', false))
+
+				// remove tab button active
+				const activeOthersTabsButtons = parent.querySelectorAll(':scope > button[data-tab]')
+				activeOthersTabsButtons.forEach(ao => ao.toggleAttribute('data-active', false))
+
+				const tabContentElem = grandParent.querySelector(`:scope > [data-for-tab="${tabName}"]`)
+				if(tabContentElem === null) { console.warn('tab content not found', tabName) }
+				else {
+					tabContentElem.toggleAttribute('data-active', true)
+				}
+
+				tabButton.toggleAttribute('data-active', true)
+			})
+		}
+
+		await refresh()
 
 		return root
 	}

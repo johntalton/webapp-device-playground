@@ -2,14 +2,14 @@ import { I2CTransactionBus } from '@johntalton/and-other-delights'
 import {
 	ExcameraLabsI2CDriver,
 	EXCAMERA_LABS_VENDOR_ID,
-	EXCAMERA_LABS_MINI_PRODUCT_ID
+	ExcameraLabsI2CDriverI2C
 } from '@johntalton/excamera-i2cdriver'
-
+import { I2CBusExcameraI2CDriver } from '@johntalton/i2c-bus-excamera-i2cdriver'
 import { 	eventStreamFromReader } from '@johntalton/excamera-i2cdriver/capture'
 
 import { deviceGuessByAddress, I2C_GUESSES } from '../devices-i2c/guesses.js'
-
-import { I2CBusExcameraI2CDriver } from '@johntalton/i2c-bus-excamera-i2cdriver'
+import { delayMs} from '../util/delay.js'
+import { asyncEvent } from '../util/async-event.js'
 
 export const EXCAMERA_LABS_USB_FILTER = { usbVendorId: EXCAMERA_LABS_VENDOR_ID }
 
@@ -20,12 +20,14 @@ async function initScript(port) {
 	await ExcameraLabsI2CDriver.endBitbangCommand(port)
 	await ExcameraLabsI2CDriver.exitMonitorMode(port)
 
-	await ExcameraLabsI2CDriver.resetBus(port)
+	// await ExcameraLabsI2CDriver.resetBus(port)
 	// await ExcameraLabsI2CDriver.reboot(port)
-	await ExcameraLabsI2CDriver.setSpeed(port, 400)
+	// await ExcameraLabsI2CDriver.setSpeed(port, 400)
 
 	// end more (64) bytes of @ to flush the connection
 	// ?
+
+	await delayMs(500)
 
 	// echo some bytes to validate the connection
 	console.log('basic echo test for validity')
@@ -33,17 +35,66 @@ async function initScript(port) {
 	for (let echoByte of echoSig) {
 		// console.log('echoByte', echoByte)
 		const result = await ExcameraLabsI2CDriver.echoByte(port, echoByte)
-		// console.log({ echoByte, result })
+		console.log({ echoByte, result })
 		if(echoByte !== result) { console.warn('EchoByte miss-match')}
 	}
 
 	// await ExcameraLabsI2CDriver.setSpeed(port, 100)
 }
 
+async function startCapture(port) {
+	const controller = new AbortController()
+	const { signal } = controller
+
+	await ExcameraLabsI2CDriver.enterCaptureMode(port)
+	const reader = port.readable.getReader()
+
+	// const buffer = Uint8Array.from([
+		// 0x1c, 0xac, 0xbe, 0xc1, 0xca, 0xe8, 0x88, 0xd8, 0xd2
+
+	// 	0x00, 0x00, 0x00,
+	// 	0b0001_1000, 0b1110_1000,
+	// 	0b1001_1010, 0b1100_0010,
+
+	// 	// 0x00,
+	// 	0b0001_1000, 0b1110_1010,
+	// 	0b1010_1011, 0b1010_1000,
+	// 	0b1010_1001, 0b0010_0000,
+
+	// 	0x00, 0x00, 0x00,
+	// 	0b0001_1000, 0b1110_1000,
+	// 	0b1001_1010, 0b1100_0010,
+
+	// 	// 0x00,
+	// 	0b0001_1000, 0b1110_1010,
+	// 	0b1010_1011, 0b1010_1000,
+	// 	0b1010_1001, 0b0010_0000
+	// ])
+	// const blob = new Blob([ buffer ])
+	// const stream = blob.stream()
+	// const reader = stream.getReader()
+
+
+	const pipeline = eventStreamFromReader(reader, { signal })
+
+	return {
+		pipeline,
+		abort: async () => {
+			controller.abort('user requested stop')
+			reader.cancel('user request stop')
+			reader.releaseLock()
+		}
+	}
+}
+
+
+
+
 export class ExcameraI2CDriverUIBuilder {
 	#port
 	#ui
 	#vbus
+	#capture
 
 	static async builder(port, ui) {
 		return new ExcameraI2CDriverUIBuilder(port, ui)
@@ -59,12 +110,6 @@ export class ExcameraI2CDriverUIBuilder {
 	}
 
 	async open() {
-		console.log('opening excamera labs port')
-
-		// this.#port.addEventListener('disconnect', event => {
-		// 	console.log('Excamera device disconnect - post open', this)
-		// })
-
 		// at 1M baud, 8 bits, no parity, 1 stop bit (1000000 8N1).
 		await this.#port.open({
 			baudRate: 1000000,
@@ -76,61 +121,206 @@ export class ExcameraI2CDriverUIBuilder {
 		// device author provided init script
 		await initScript(this.#port)
 
-		// console.log('check status info')
-		// const info = await ExcameraLabsI2CDriver.transmitStatusInfo(this.#port)
-		// console.log(info)
-
 		console.warn('allocing untracked vbus ... please cleanup hooks')
-		// const vbus = VBusFactory.from({ port: self.#port })
-		const I2CAPI = ExcameraLabsI2CDriver.from({ port: this.#port })
-		const exbus = I2CBusExcameraI2CDriver.from(I2CAPI)
+		const I2C = ExcameraLabsI2CDriverI2C.from({ port: this.#port })
+		const exbus = I2CBusExcameraI2CDriver.from(I2C)
 		this.#vbus = I2CTransactionBus.from(exbus)
-
 	}
 
-	async close() {
-		return this.#port.close()
-	}
+	async close() { return this.#port.close() }
 
 	signature() {
 		const info =  this.#port.getInfo()
-
 		return `PORT(USB(${info.usbVendorId},${info.usbProductId}))`
 	}
 
 	async buildCustomView(sectionElem) {
+		const response = await fetch('./custom-elements/excamera-i2cdriver.html')
+		if (!response.ok) { throw new Error('no html for view') }
+		const view = await response.text()
+		const doc = (new DOMParser()).parseFromString(view, 'text/html')
 
-		const status = await ExcameraLabsI2CDriver.transmitStatusInfo(this.#port)
+		const root = doc?.querySelector('excamera-i2cdriver')
+		if (root === null) { throw new Error('no root for template') }
 
-		const {
-			identifier,
-			serial,
-			uptime,
-			voltage,
-			current,
-			temperature,
-			mode,
-			sda,
-			scl,
-			speed,
-			pullups,
-			crc
-		} = status
 
+		const modeSelect = root.querySelector('[data-config] select[name="mode"]')
+		const speedSelect = root.querySelector('[data-config] select[name="speed"]')
+		const pullUpSelectSDA = root.querySelector('[data-config] select[name="pullupSDA"]')
+		const pullUpSelectSCL = root.querySelector('[data-config] select[name="pullupSCL"]')
+
+		const manualAddForm = root.querySelector('[data-manual-add-form]')
+		const manualCreateDevice = manualAddForm?.querySelector('button[submit]')
+		const manualDeviceSelection = manualAddForm?.querySelector('select[name="ManualDeviceSelection"]')
+		const manualAddressInput = manualAddForm?.querySelector('input[name="ManualAddress"]')
+
+		const dataCaptureList = root.querySelector('[data-capture-list]')
+
+		const PREFERRED_DEVICE = 'adt7410'
+		const manualOptionsTemplate = manualDeviceSelection?.querySelector('template')
+		manualDeviceSelection?.append(...I2C_GUESSES.map(({ addresses, name }) => {
+			const templateDoc = manualOptionsTemplate?.content.cloneNode(true)
+			const optionElem = templateDoc?.querySelector('option')
+			optionElem.setAttribute('value', name)
+			optionElem.innerText = name
+
+			if(name.includes(PREFERRED_DEVICE)) {
+				optionElem.selected = true
+				manualAddressInput.value = addresses[0]
+			}
+
+			return optionElem
+		}))
+
+
+
+		const toggleCaptureButton = root.querySelector('button[data-capture]')
+		toggleCaptureButton?.addEventListener('click', asyncEvent(async event => {
+			event.preventDefault()
+
+			toggleCaptureButton.disabled = true
+
+			const state = toggleCaptureButton.getAttribute('data-capture')
+
+			if(state === 'Start') {
+				if(this.#capture !== undefined) { this.#capture.abort() }
+				this.#capture = await startCapture(this.#port)
+
+				toggleCaptureButton.setAttribute('data-capture', 'Stop')
+				toggleCaptureButton.disabled = false
+
+				dataCaptureList?.querySelectorAll('li').forEach(li => li.remove())
+
+				let prevState = ''
+				const idleLike = state => (state === 'IDLE' || state === 'WARM')
+				const pipeline = this.#capture.pipeline
+
+				try {
+					for await (const event of pipeline) {
+						// console.log(event)
+
+						const {
+							state, address, mode, buffer
+						} = event
+
+
+						if(prevState === 'IDLE' && state === 'IDLE') {
+							continue
+						}
+
+						if(prevState === 'WARM' && state === 'WARM') {
+							continue
+						}
+
+						prevState = state
+
+						if(state === 'ADDRESSED_ACKED') {
+							const lastLi = dataCaptureList?.querySelector('li:last-child')
+							lastLi?.toggleAttribute('data-acked', true)
+							continue
+						}
+
+						const liElem = document.createElement('li')
+						liElem.dataset.state = state
+						liElem.dataset.address = address
+						liElem.dataset.mode = mode
+
+						const toHex = value => `0x${value.toString(16).toUpperCase().padStart(2, '0')}`
+
+						if(state === 'ADDRESSED') {
+							liElem.innerText = toHex(address)
+						}
+
+						if(state === 'TRANS_ACKED' || state === 'TRANS_NACK') {
+							liElem.toggleAttribute('data-acked', state === 'TRANS_ACKED')
+
+							const u8 = ArrayBuffer.isView(buffer) ?
+								new Uint8Array(buffer.buffer, buffer.byteOffset, buffer.byteLength) :
+								new Uint8Array(buffer)
+
+							liElem.innerText = [ ...u8 ].map(toHex).join(' ')
+						}
+
+
+
+
+						dataCaptureList?.append(liElem)
+
+					}
+				}
+				catch (e) {
+					// catch error in pipline for loop
+					console.warn(e)
+				}
+
+
+				console.log('After Capture', await pipeline.next())
+				toggleCaptureButton.setAttribute('data-capture', 'Start')
+				await initScript(this.#port)
+				toggleCaptureButton.disabled = false
+			}
+			else if (state === 'Stop'){
+				console.log('Stop')
+				if(this.#capture === undefined) { return }
+				await this.#capture.abort()
+				this.#capture = undefined
+			}
+		}))
+
+		const clearCaptureButton = root.querySelector('button[data-clear]')
+		clearCaptureButton?.addEventListener('click', asyncEvent(async event => {
+			event.preventDefault()
+
+			dataCaptureList?.querySelectorAll('li').forEach(li => li.remove())
+		}))
 
 		function uptimeToHuman(uptime) {
 			const trunc2 = t => Math.trunc(t * 100) / 100.0
-
 			if(uptime < 60) { return `${uptime} seconds` }
 			if(uptime < (60 * 60)) { return `${trunc2(uptime / 60.0)} minutes`}
-
 			return `${trunc2(uptime / 60.0 / 60.0)} hours`
 		}
 
-		function appendChildSlot(root, name, elem) {
-			elem.setAttribute('slot', name)
-			root.appendChild(elem)
+		const refresh = async () => {
+			// const internalState = await ExcameraLabsI2CDriver.internalState(this.#port)
+
+			const {
+				identifier,
+				serial,
+				uptime,
+				voltage,
+				current,
+				temperature,
+				mode,
+				sda,
+				scl,
+				speed,
+				pullups,
+				crc
+			} = await ExcameraLabsI2CDriver.transmitStatusInfo(this.#port)
+
+			// console.log({
+			// 	mode, speed, pullups
+			// })
+
+			const out = name => root.querySelector(`[data-info] output[name=${name}]`)
+
+			modeSelect.value = mode
+			speedSelect.value = speed
+			pullUpSelectSCL.value = pullups.sclValue
+			pullUpSelectSDA.value = pullups.sdaValue
+
+			out('model').innerText = identifier
+			out('serial').innerText = serial
+			out('uptime').innerText = `${uptime} (${uptimeToHuman(uptime)})`
+			out('voltage').innerText = voltage
+			out('current').innerText = current
+			out('temperature').innerText = temperature
+			out('sda').innerText = `${sda} (${sda === 1 ? 'Idle' : 'Active'})`
+			out('scl').innerText = `${scl} (${scl === 1 ? 'Idle' : 'Active'})`
+			out('crc').value = `0x${crc.toString(16).padStart(8, '0')}`
 		}
+
 
 		const self = this
 		function handelScan(event, addrDisp, devList) {
@@ -224,180 +414,22 @@ export class ExcameraI2CDriverUIBuilder {
 				})
 		}
 
+		const configForm = root.querySelector('[data-config]')
+		configForm?.addEventListener('change', asyncEvent(async event => {
+			const whatChanged = event.target.getAttribute('name')
 
-		function pullupOptions(value) {
-			const selected = v => v === value ? 'selected' : ''
-			return `
-				<option value="0" ${selected(0)}>0 K(no pull-up)</option>
-				<option value="1" ${selected(1)}>2.2 K</option>
-				<option value="2" ${selected(2)}>4.3 K</option>
-				<option value="3" ${selected(3)}>1.5 K</option>
-				<option value="4" ${selected(4)}>4.7 K</option>
-				<option value="5" ${selected(5)}>1.5 K</option>
-				<option value="6" ${selected(6)}>2.2 K</option>
-				<option value="7" ${selected(7)}>1.1 K</option>
-				`
+			if(whatChanged === 'speed') {
+				await ExcameraLabsI2CDriver.setSpeed(this.#port, parseInt(speedSelect.value))
+				await refresh()
 			}
+			else if(whatChanged === 'pullupSCL' || whatChanged === 'pullupSDA') {
+				await ExcameraLabsI2CDriver.setPullupControls(this.#port, parseInt(pullUpSelectSDA.value), parseInt(pullUpSelectSCL.value))
+				await refresh()
+			}
+		}))
 
-		const page = `
-			<excamera-i2cdriver>
-
-				<div class="tabs" slot="prefix">
-					<button data-tab="settings" data-active>Settings</button>
-					<button data-tab="scan">Scan</button>
-					<button disabled data-tab="capture">Capture</button>
-					<button disabled data-tab="bitbang">Bitbang</button>
-				</div>
-
-				<div data-for-tab="scan" class="tabsContent">
-					<button id="Scan">Scan 🔎</button>
-
-					<addr-display>
-					</addr-display>
-
-					<ul data-device-list>
-					</ul>
-
-					<form data-manual-add-form>
-						<label>Address</label>
-						<input name="ManualAddress" type="number" min="8" max="119" step="1" value="${32}" />
-
-						<label>Device</label>
-						<select name="ManualDeviceSelection">
-							${I2C_GUESSES.map(({ name }) => {
-								return `<option value="${name}" ${name === 'mcp230xx (Gpio)' ? 'selected' : ''}>${name}</option>`
-							}).join('')}
-						</select>
-
-						<button submit>Create 🕹</button>
-					</form>
-				</div>
-
-				<div data-for-tab="capture" class="tabsContent">
-					<button>Start ▶️</button>
-				</div>
-
-				<div data-for-tab="settings" class="tabsContent" data-active>
-					<form data-config>
-						<label for="">Mode</label>
-						<select name="mode">
-							<option value="0">I²C Host</option>
-							<option value="1">Bitbang</option>
-							<option value="2">Monitor</option>
-							<option value="3">Capture</option>
-						</select>
-
-						<label>Speed</label>
-						<select name="speed">
-							<option value="100" ${speed === 100 ? 'selected' : ''}>100kHz</option>
-							<option value="400" ${speed === 400 ? 'selected' : ''}>400kHz</option>
-						</select>
-
-						<label>Pullups SDA</label>
-						<select name="pullupSDA">
-							${pullupOptions(pullups.sdaValue)}
-						</select>
-
-						<label for="pullupSCL">Pullups SCL</label>
-						<select name="pullupSCL">
-							${pullupOptions(pullups.sclValue)}
-						</select>
-					</form>
-
-					<form data-info method="dialog">
-						<label>Model</label>
-						<output name="model">${identifier}</output>
-
-						<label>Serial</label>
-						<output name="serial">${serial}</output>
-
-						<label>Uptime (S)</label>
-						<output name="uptime">${uptime} (${uptimeToHuman(uptime)})</output>
-
-						<label>Voltage (V)</label>
-						<output name="voltage">${voltage}</output>
-
-						<label>Current (mA)</label>
-						<output name="current">${current}</output>
-
-						<label>Temperature (°C)</label>
-						<output name="temperature">${temperature}</output>
-
-						<label>SDA</label>
-						<output name="sda"></output>
-
-						<label>SCL</label>
-						<output name="scl"></output>
-
-						<button id="updateConfigInfo" type="button">Update</button>
-					</form>
-
-
-				</div>
-				<div data-for-tab="bitbang" class="tabsContent">
-					<form data-bitbang>
-						:)
-						<button id="sendBitbang">Go</button>
-					</form>
-			</excamera-i2cdriver>
-		`
-
-		const stuff = (new DOMParser()).parseFromString(page, 'text/html')
-
-
-		const configForm = stuff.querySelector('[data-config]')
-		// configForm.addEventListener('submit', event => {
-		// 	console.log('submt form', event)
-		// })
-
-		configForm.addEventListener('change', event => {
-			Promise.resolve()
-				.then(async () => {
-					// const data = new FormData(event.target.form)
-
-					// for (const [key, value] of data) {
-					// 	console.log(key, value)
-					// }
-
-					const form = event.target.form
-					const modeElem = form.querySelector('select[name="mode"]')
-					const mode = parseInt(modeElem.value, 10)
-
-					console.log(mode, modeElem)
-
-					if(mode === 0) {
-						// return to i2c
-						console.log('exit bitbang/monitor')
-						await ExcameraLabsI2CDriver.exitBitbangMode(this.#port)
-						await ExcameraLabsI2CDriver.exitMonitorMode(this.#port)
-						await ExcameraLabsI2CDriver.resetBus(this.#port)
-						await ExcameraLabsI2CDriver.setSpeed(this.#port, 400)
-					}
-					else if(mode === 1)
-					{
-						// bitbang
-						console.log('enter bitbang')
-						await ExcameraLabsI2CDriver.enterBitbangMode(this.#port)
-					}
-					else if(mode === 2)
-					{
-						// monitor
-						console.log('enter monitor')
-						await ExcameraLabsI2CDriver.enterMonitorMode(this.#port)
-					}
-					else if(mode === 3)
-					{
-						// capture
-						console.log('enter cpature')
-					}
-
-
-				})
-				.catch(e => console.warn(e))
-		})
-
-		const setnBBButton = stuff.getElementById('sendBitbang')
-		setnBBButton.addEventListener('click', event => {
+		const setnBBButton = doc.getElementById('sendBitbang')
+		setnBBButton?.addEventListener('click', asyncEvent(event => {
 			event.preventDefault()
 			event.stopPropagation()
 
@@ -405,8 +437,6 @@ export class ExcameraI2CDriverUIBuilder {
 				.then(async () => {
 
 					await ExcameraLabsI2CDriver.enterBitbangMode(this.#port)
-
-					const delayMs = ms => new Promise(resolve => setTimeout(resolve, ms))
 
 					function encodeBB(options) {
 						function encodePin(pin) {
@@ -511,109 +541,38 @@ export class ExcameraI2CDriverUIBuilder {
 
 				})
 				.catch(e => console.warn(e))
-		})
+		}))
 
-		const updateButton = stuff.getElementById('updateConfigInfo')
-		updateButton.addEventListener('click', event => {
+		const updateButton = root.querySelector('button[data-update]')
+		updateButton?.addEventListener('click', asyncEvent(async event => {
 			event.preventDefault()
 
 			updateButton.disabled = true
-			Promise.resolve()
-				.then(async () => {
 
-					const status = await ExcameraLabsI2CDriver.transmitStatusInfo(this.#port)
+			await refresh()
 
-					const {
-						identifier,
-						serial,
-						uptime,
-						voltage,
-						current,
-						temperature,
-						mode,
-						sda,
-						scl,
-						speed,
-						pullups,
-						crc
-					} = status
+			updateButton.disabled = false
+		}))
 
-					const humanUptime = uptimeToHuman(uptime)
+		const resetButton = root.querySelector('button[data-reset]')
+		resetButton?.addEventListener('click', asyncEvent(async event => {
+			event.preventDefault()
 
-					const exRoot = event.target.closest('excamera-i2cdriver')
-					const out = name => exRoot.querySelector(`[data-info] output[name=${name}]`)
+			await ExcameraLabsI2CDriver.resetBus(this.#port)
+			await refresh()
+		}))
 
-					out('model').innerText = identifier
-					out('serial').innerText = serial
-					out('uptime').innerText = `${uptime} (${humanUptime})`
-					out('voltage').innerText = voltage
-					out('current').innerText = current
-					out('temperature').innerText = temperature
-					out('sda').innerText = `${sda} (${sda === 1 ? 'Idle' : 'Active'})`
-					out('scl').innerText = `${scl} (${scl === 1 ? 'Idle' : 'Active'})`
+		const rebootButton = root.querySelector('button[data-reboot]')
+		rebootButton?.addEventListener('click', asyncEvent(async event => {
+			event.preventDefault()
 
-					updateButton.disabled = false
-				})
-				.catch(e => {
-					updateButton.disabled = false
-					console.warn(e)
-				})
-		})
+			await ExcameraLabsI2CDriver.reboot(this.#port)
+		}))
 
-
-		function selectTab(name, buttonElem) {
-			const driverDoc = buttonElem.closest('excamera-i2cdriver')
-
-			const tabButton = driverDoc.querySelector(`button[data-tab="${name}"]`)
-			tabButton.disabled = true
-
-			// remove content active
-			const activeOthers = driverDoc.querySelectorAll('.tabsContent[data-active]')
-			activeOthers.forEach(ao => ao.toggleAttribute('data-active', false))
-
-			// remove tab button active
-			const activeOthersTabsButtons = driverDoc.querySelectorAll('button[data-tab]')
-			activeOthersTabsButtons.forEach(ao => ao.toggleAttribute('data-active', false))
-
-			// set content active
-			const tabContentElem = driverDoc.querySelector(`[data-for-tab="${name}"]`)
-			tabContentElem.toggleAttribute('data-active', true)
-
-			// set tab button active
-			tabButton.toggleAttribute('data-active', true)
-
-			tabButton.disabled = false
-		}
-
-		const tabBitbang = stuff.querySelector('button[data-tab="bitbang"]')
-		tabBitbang.disabled = false
-		tabBitbang.addEventListener('click', event => {
-			selectTab('bitbang', event.target)
-		})
-
-		const tabSettings = stuff.querySelector('button[data-tab="settings"]')
-		tabSettings.addEventListener('click', event => {
-			selectTab('settings', event.target)
-		})
-
-
-		const foo = stuff.querySelector('button[data-tab="scan"]')
-		foo.addEventListener('click', event => {
-			selectTab('scan', event.target)
-		})
-
-
-
-		const addrDisp = stuff.querySelector('addr-display')
-		const devList = stuff.querySelector('[data-device-list]')
-		const manualAddForm = stuff.querySelector('[data-manual-add-form]')
-		const manualCreateDevice = manualAddForm?.querySelector('button[submit]')
-		const manualDeviceSelection = manualAddForm?.querySelector('select[name="ManualDeviceSelection"]')
-		const manualAddressInput = manualAddForm?.querySelector('input[name="ManualAddress"]')
-
-		const startScanButton = stuff.getElementById('Scan')
+		const addrDisp = root.querySelector('addr-display')
+		const devList = root.querySelector('[data-device-list]')
+		const startScanButton = root.querySelector('button[data-scan]')
 		startScanButton?.addEventListener('click', event => handelScan(event, addrDisp, devList))
-
 
 		manualCreateDevice?.addEventListener('click', event => {
 			event.preventDefault()
@@ -626,181 +585,88 @@ export class ExcameraI2CDriverUIBuilder {
 				port: self.#port,
 				type: deviceGuess,
 				bus: self.#vbus,
-				address: addr
+				address: parseInt(addr)
 			})
 		})
 
-		return stuff.body.firstChild
+
+		const tabButtons = root.querySelectorAll('button[data-tab]')
+		for (const tabButton of tabButtons) {
+			tabButton.addEventListener('click', event => {
+				event.preventDefault()
+
+				const { target } = event
+				const parent = target?.parentNode
+				const grandParent = parent.parentNode
+
+				const tabName = target.getAttribute('data-tab')
+
+				// remove content active
+				const activeOthers = grandParent.querySelectorAll(':scope > [data-active]')
+				activeOthers.forEach(ao => ao.toggleAttribute('data-active', false))
+
+				// remove tab button active
+				const activeOthersTabsButtons = parent.querySelectorAll(':scope > button[data-tab]')
+				activeOthersTabsButtons.forEach(ao => ao.toggleAttribute('data-active', false))
+
+				const tabContentElem = grandParent.querySelector(`:scope > [data-for-tab="${tabName}"]`)
+				if(tabContentElem === null) { console.warn('tab content not found', tabName) }
+				else {
+					tabContentElem.toggleAttribute('data-active', true)
+				}
+
+				tabButton.toggleAttribute('data-active', true)
+			})
+		}
 
 
-		const root = document.createElement('excamera-i2cdriver')
+		await refresh()
 
-		const ulElem = document.createElement('ul')
-		// ulElem.setAttribute('slot', 'vdevice-guess-list')
+		return root
 
-		const addressElem = document.createElement('addr-display')
-		// addressElem.setAttribute('slot', 'scan-display')
 
-		const scanButton = document.createElement('button')
-		// scanButton.setAttribute('slot', 'scan-display')
-		scanButton.textContent = 'Scan'
 
-		// const resetButton = root.shadowRoot.getElementById('reset')
-		// resetButton.addEventListener('click', e => {
-		// 	Promise.resolve()
-		// 		.then(async () => {
-		// 			await ExcameraLabsI2CDriver.endBitbangCommand(this.#port)
-		// 		})
-		// 		.catch(e => {
-		// 			console.warn(e)
-		// 		})
+		// function selectTab(name, buttonElem) {
+		// 	const driverDoc = buttonElem.closest('excamera-i2cdriver')
+
+		// 	const tabButton = driverDoc.querySelector(`button[data-tab="${name}"]`)
+		// 	tabButton.disabled = true
+
+		// 	// remove content active
+		// 	const activeOthers = driverDoc.querySelectorAll('.tabsContent[data-active]')
+		// 	activeOthers.forEach(ao => ao.toggleAttribute('data-active', false))
+
+		// 	// remove tab button active
+		// 	const activeOthersTabsButtons = driverDoc.querySelectorAll('button[data-tab]')
+		// 	activeOthersTabsButtons.forEach(ao => ao.toggleAttribute('data-active', false))
+
+		// 	// set content active
+		// 	const tabContentElem = driverDoc.querySelector(`[data-for-tab="${name}"]`)
+		// 	tabContentElem.toggleAttribute('data-active', true)
+
+		// 	// set tab button active
+		// 	tabButton.toggleAttribute('data-active', true)
+
+		// 	tabButton.disabled = false
+		// }
+
+		// const tabBitbang = stuff.querySelector('button[data-tab="bitbang"]')
+		// tabBitbang.disabled = false
+		// tabBitbang.addEventListener('click', event => {
+		// 	selectTab('bitbang', event.target)
 		// })
 
-		// const rebootElem = document.createElement('button')
-		// rebootElem.textContent = 'Reboot'
-
-		// const resetElem = document.createElement('button')
-		// resetElem.textContent = 'Reset Bus'
-
-		const captureStartElem = document.createElement('button')
-		const captureEndElem = document.createElement('button')
-
-		captureStartElem.textContent = 'Start Capture ▶️'
-		captureEndElem.textContent = 'Stop Capture ⏸'
-
-		appendChildSlot(root, 'capture-controls', captureStartElem)
-		appendChildSlot(root, 'capture-controls', captureEndElem)
+		// const tabSettings = stuff.querySelector('button[data-tab="settings"]')
+		// tabSettings.addEventListener('click', event => {
+		// 	selectTab('settings', event.target)
+		// })
 
 
-		captureStartElem.addEventListener('click', e => {
-			console.log('start capture')
-			captureStartElem.disabled = true
-			scanButton.disabled = true
-
-			Promise.resolve()
-				.then(async () => {
-					const controller = new AbortController()
-					const { signal } = controller
-
-					console.log('entering cpature mode')
-					// await ExcameraLabsI2CDriver.enterMonitorMode(this.#port)
-					await ExcameraLabsI2CDriver.enterCaptureMode(this.#port)
-
-					const defaultReader = this.#port.readable.getReader()
-					const pipeline = eventStreamFromReader(defaultReader, { signal })
-
-					captureEndElem.disabled = false
-
-					captureEndElem.addEventListener('click', e => {
-						controller.abort('user requested stop')
-						defaultReader.cancel('user request stop')
-						defaultReader.releaseLock()
-					}, { once: true })
+		// const foo = stuff.querySelector('button[data-tab="scan"]')
+		// foo.addEventListener('click', event => {
+		// 	selectTab('scan', event.target)
+		// })
 
 
-
-					console.log('strting reader loop')
-					let prevState = undefined
-					const idleLike = state => (state === 'IDLE' || state === 'WARM')
-					for await (const event of pipeline) {
-						if(idleLike(prevState) && idleLike(event.state)) { continue }
-
-						console.log(event)
-
-						prevState = event.state
-					}
-
-					const last = await pipeline.next()
-					console.log('this is the aftermath of the stream', last)
-				})
-				.catch(console.warn)
-		}, { once: true })
-
-		scanButton.addEventListener('click', e => {
-			scanButton.disabled = true
-
-			ExcameraLabsI2CDriver.scan(this.#port)
-				.then(results => {
-					const olds = addressElem.querySelectorAll('hex-display')
-					olds?.forEach(old => old.remove())
-
-					results.map(result => {
-						const {
-							dev: addr,
-							ack: acked,
-							to: timeout,
-							arb: arbitration
-						} = result
-
-						const hexElem = document.createElement('hex-display')
-
-						hexElem.setAttribute('slot', addr)
-
-						hexElem.toggleAttribute('acked', acked)
-						hexElem.toggleAttribute('arbitration', arbitration)
-						hexElem.toggleAttribute('timeout', timeout)
-
-						hexElem.textContent = addr.toString(16).padStart(2, '0')
-
-						const listElem = document.createElement('li')
-						listElem.textContent = addr
-
-						listElem.toggleAttribute('data-acked', acked)
-						listElem.toggleAttribute('data-arbitration', arbitration)
-						listElem.toggleAttribute('data-timeout', timeout)
-
-						const guesses = deviceGuessByAddress(addr)
-						const guessSelectElem = document.createElement('select')
-						guessSelectElem.disabled = (guesses.length <= 1)
-						guesses.forEach(guess => {
-							const guessOptionElem = document.createElement('option')
-							guessOptionElem.textContent = guess.name
-							guessSelectElem.appendChild(guessOptionElem)
-						})
-
-						const makeDeviceButton = document.createElement('button')
-						makeDeviceButton.textContent = 'Create Device 🕹'
-						listElem.appendChild(makeDeviceButton)
-						makeDeviceButton.addEventListener('click', e => {
-							makeDeviceButton.disabled = true
-							guessSelectElem.disabled = true
-
-							const deviceGuess = guessSelectElem.value
-
-							console.warn('allocing untracked vbus ... please cleanup hooks')
-							const vbus = VBusFactory.from({ port: this.#port })
-
-							this.#ui.addI2CDevice({
-								type: deviceGuess,
-								bus: vbus,
-								address: addr
-							})
-
-
-
-						}, { once: true })
-
-						listElem.appendChild(guessSelectElem)
-
-						return { hexElem, listElem }
-					})
-					.forEach(({ hexElem, listElem }) => {
-						addressElem.appendChild(hexElem)
-						ulElem.appendChild(listElem)
-					})
-
-					scanButton.disabled = false
-				})
-				.catch(console.warn)
-				.then(() => {
-					scanButton.disabled = false
-				})
-		}, { once: false })
-
-		root.appendChild(addressElem)
-		root.appendChild(ulElem)
-		root.appendChild(scanButton)
-		return root
 	}
 }
-

@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html>
+	<body>
+		<ds3502-config>
+			<div class="tabs">
+				<button data-tab="Values" data-active>Values</button>
+				<button data-tab="Scripts">Scripts</button>
+			</div>
+
+			<form data-value data-for-tab="Values" data-active class="tabsContent">
+				<label>Persist Writes</label>
+				<input name="persist" type="checkbox" />
+
+				<label>Wiper Value</label>
+				<div data-number-range>
+					<input name="wiperValueRange" type="range" value="64" min="0" max="127" />
+					<input name="wiperValueNumber" type="number" value="64" min="0" max="127" />
+				</div>
+			</form>
+
+			<form data-for-tab="Scripts" class="tabsContent">
+				<button data-script="wave">Wave</button>
+			</form>
+		</ds3502-config>
+	</body>
+</html>

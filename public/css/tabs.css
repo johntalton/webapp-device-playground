@@ -1,9 +1,11 @@
 
 .tabs {
 	display: flex;
+	flex-wrap: wrap;
 	gap: 0;
 	font-size: 1.25em;
 }
+
 
 .tabs button {
 	--disabled-accent: var(--color-disabled, red);
@@ -23,6 +25,8 @@
 	border-radius: 1em 1em 0 0;
 	padding-block: 0.75em;
 	padding-inline: 5ch;
+
+
 }
 
 .tabs button:first-child {
@@ -74,7 +78,6 @@
 	border-block-start: 0;
 
 	/* display: block; */
-
 }
 
 .tabsContent:not([data-active]) {
