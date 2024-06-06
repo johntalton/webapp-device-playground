@@ -1,66 +1,66 @@
 /* @property --color-accent--h {
-	syntax: '<number>';
+	syntax: "<number>";
   initial-value: 0;
   inherits: true;
 }
 
 @property --color-accent--s {
-	syntax: '<percent>';
+	syntax: "<percent>";
   initial-value: 50%;
   inherits: true;
 }
 
 @property --color-accent--l {
-	syntax: '<percent>';
+	syntax: "<percent>";
   initial-value: 50%;
   inherits: true;
 }
 
 @property --light-percentage {
-	syntax: '<percent>';
+	syntax: "<percent>";
 	initial-value: 10%;
 	inherits: true;
 }
 
 @property --lighter-percentage {
-	syntax: '<percent>';
+	syntax: "<percent>";
 	initial-value: 30%;
 	inherits: true;
 }
 
 @property --lightest-percentage {
-	syntax: '<percent>';
+	syntax: "<percent>";
 	initial-value: 40%;
 	inherits: true;
 }
 
 
 @property --dark-percentage {
-	syntax: '<percent>';
+	syntax: "<percent>";
 	initial-value: 15%;
 	inherits: true;
 }
 
 @property --darker-percentage {
-	syntax: '<percent>';
+	syntax: "<percent>";
 	initial-value: 20%;
 	inherits: true;
 } */
 
 @property --color-accent {
-  syntax: '<color>';
+  syntax: "<color>";
   initial-value: red;
   inherits: true;
 }
 
 @property --color-white {
-  syntax: '<color>';
+  syntax: "<color>";
   initial-value: white;
   inherits: true;
 }
 
 @property --color-black {
-  syntax: '<color>';
+  syntax: "<color>";
   initial-value: black;
   inherits: true;
 }

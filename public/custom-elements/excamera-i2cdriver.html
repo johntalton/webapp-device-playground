@@ -9,8 +9,79 @@
 				<button data-tab="scan">Host</button>
 				<button data-tab="capture">Capture</button>
 				<button disabled data-tab="bitbang">Bitbang</button>
+				<button data-tab="direct">Command</button>
 			</div>
 
+
+			<div data-for-tab="direct" class="tabsContent">
+				<table>
+					<thead>
+						<tr>
+							<th><span>op</span></th>
+							<th><span>time</span></th>
+							<th><span>size</span></th>
+							<th><span>dev</span></th>
+							<th><span>register</span></th>
+							<th><span>data</span></th>
+						</tr>
+					</thead>
+					<tbody>
+						<tr>
+							<td>⬅</td>
+							<td>00:00:00</td>
+							<td>1</td>
+							<td>0x77</td>
+							<td>0x00</td>
+							<td></td>
+						</tr>
+					</tbody>
+					<tfoot>
+						<tr>
+							<td>
+							<select name="direction" disabled>
+								<option>Read ⬅</option>
+								<option>Write ➡</option>
+							</select>
+							</td>
+
+							<td>
+								<input name="size" disabled>
+
+							<td>
+								<input name="device" type="number" min="8" max="119" step="1" readonly>
+							</td>
+
+							<td>
+								<input name="register" disabled>
+							</td>
+
+							<td>
+								<input name="data" disabled>
+							</td>
+
+							<td>
+								<button disabled>Read</button>
+								<button disabled>Write</button>
+							</td>
+						</tr>
+					</tfoot>
+				</table>
+
+				<!-- <form data-direct>
+					<select name="direction" disabled>
+						<option>Read ⬅</option>
+						<option>Write ➡</option>
+					</select>
+
+					<input name="size" disabled>
+					<input name="device" type="number" min="8" max="119" step="1" readonly>
+					<input name="register" disabled>
+					<input name="data" disabled>
+
+					<button disabled>Read</button>
+					<button disabled>Write</button>
+				</form> -->
+			</div>
 
 			<div data-for-tab="scan" class="tabsContent">
 				<div data-scan-group>

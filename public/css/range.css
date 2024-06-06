@@ -20,7 +20,7 @@ input[type="number"]:where(:focus-visible, :focus) {
 	outline-width: 5px;
 
 
-  /* color override isn't -text based */
+  /* color override is not -text based */
   background-color: var(--color-white, red);
   color: var(--color-black, red);
   /*  */

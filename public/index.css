@@ -1,39 +1,40 @@
-@import url('./css/layers.css');
-@import url('./css/defs.css') layer(defs);
+@import url("./css/layers.css");
+@import url("./css/defs.css") layer(defs);
 
-@import url('./css/addr-display.css') layer(libs);
+@import url("./css/addr-display.css") layer(libs);
 
-@import url('./css/checkbox.css') layer(libs);
-@import url('./css/select.css') layer(libs);
-@import url('./css/range.css') layer(libs);
+@import url("./css/checkbox.css") layer(libs);
+@import url("./css/select.css") layer(libs);
+@import url("./css/range.css") layer(libs);
 
-@import url('./css/ht16k33.css') layer(libs);
-@import url('./css/mcp2221.css') layer(libs);
-@import url('./css/adt7410.css') layer(libs);
-@import url('./css/tcs34725-config.css') layer(libs);
+@import url("./css/ht16k33.css") layer(libs);
+@import url("./css/mcp2221.css") layer(libs);
+@import url("./css/adt7410.css") layer(libs);
+@import url("./css/tcs34725-config.css") layer(libs);
 
-@import url('./css/device-list.css') layer(libs);
+@import url("./css/device-list.css") layer(libs);
 
-@import url('./css/app.css') layer(app);
-@import url('./css/tabs.css') layer(app);
+@import url("./css/app.css") layer(app);
+@import url("./css/tabs.css") layer(app);
 
-@import url('./css/excamera-i2cdriver.css') layer(app);
-@import url('./css/mash-mash.css') layer(app);
-@import url('./css/pcf8523.css') layer(app);
-@import url('./css/eeprom.css') layer(app);
-@import url('./css/adxl375.css') layer(app);
-@import url('./css/aht20.css') layer(app);
-@import url('./css/ds3231.css') layer(app);
-@import url('./css/pca9536.css') layer(app);
-@import url('./css/pcf8574.css') layer(app);
-@import url('./css/aw9523.css') layer(app);
-@import url('./css/mcp23.css') layer(app);
-@import url('./css/ds1841.css') layer(app);
-@import url('./css/ds3502.css') layer(app);
+@import url("./css/excamera-i2cdriver.css") layer(app);
+@import url("./css/mash-mash.css") layer(app);
+@import url("./css/pcf8523.css") layer(app);
+@import url("./css/eeprom.css") layer(app);
+@import url("./css/adxl375.css") layer(app);
+@import url("./css/aht20.css") layer(app);
+@import url("./css/ds3231.css") layer(app);
+@import url("./css/pca9536.css") layer(app);
+@import url("./css/pcf8574.css") layer(app);
+@import url("./css/aw9523.css") layer(app);
+@import url("./css/mcp23.css") layer(app);
+@import url("./css/ds1841.css") layer(app);
+@import url("./css/ds3502.css") layer(app);
+@import url("./css/tca9548.css") layer(app);
 
-@import url('./css/gpio.css') layer(app);
+@import url("./css/gpio.css") layer(app);
 
-@import url('./css/themes.css');
+@import url("./css/themes.css");
 
 @layer defs {
 	* {

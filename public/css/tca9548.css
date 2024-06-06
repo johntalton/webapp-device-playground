@@ -1,0 +1,44 @@
+tca9548-config {
+	margin-inline-end: 2em;
+
+  & form {
+
+		& fieldset {
+			display: flex;
+			flex-wrap: wrap;
+			gap: 2em;
+
+			padding: 1em;
+			padding-inline-start: 2em;
+
+			margin-block-end: 1em;
+			border-radius: 1em;
+			border-color: var(--color-accent--darker, red);
+
+			& label[data-nested] {
+				display: flex;
+				gap: 1em;
+    		align-items: center;
+
+				background-color: var(--color-accent--lightest, red);
+				color: var(--color-accent--lightest-text, red);
+
+				padding: 0.5em;
+				padding-inline: 1em;
+				border-radius: 0.5em;
+			}
+
+			& legend:not(:empty) {
+				font-weight: bold;
+				padding-inline: 1ch;
+			}
+		}
+
+		& input[type="checkbox"] {
+			accent-color: var(--color-accent--darker, red);
+			width: 1.25em;
+			height: 1.25em;
+			margin: 0.5em;
+		}
+	}
+}

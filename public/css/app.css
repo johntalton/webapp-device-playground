@@ -1,12 +1,12 @@
-@import url('app-nav.css');
-@import url('app-logo.css');
-@import url('app-aside.css');
-@import url('app-main.css');
+@import url("app-nav.css");
+@import url("app-logo.css");
+@import url("app-aside.css");
+@import url("app-main.css");
 
 body {
-	font-family: 'Tahoma';
+	font-family: "Tahoma";
 	/* font-family: fantasy; */
-	/* font-family: 'Brush Script MT',cursive; */
+	/* font-family: "Brush Script MT",cursive; */
 }
 
 body {

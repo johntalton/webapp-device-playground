@@ -2,13 +2,14 @@ pcf8574-config {
 	display: flex;
 	gap: 1em;
 	align-items: start;
+	margin-block-start: 2em;
 
 	& > form {
 		display: grid;
-		grid-template-columns: 1fr 1fr 1fr;
+		grid-template-columns: 1fr 1fr 2fr;
 
 		gap: 1em;
-		align-items: baseline;
+		align-items: center;
     justify-items: stretch;
 
     margin-inline-start: 1em;
@@ -17,6 +18,20 @@ pcf8574-config {
 		background-color: var(--color-accent--lightest, red);
 		border-radius: 1em;
 
+		& input[type="checkbox"] {
+			accent-color: var(--color-accent--darker, red);
+			width: 1.25em;
+			height: 1.25em;
+			margin: 0.5em;
+		}
+
+		& output[name ^= "gpio"] {
+			transition: transform 1s;
+		}
+		& output[name ^= "gpio"][data-high] {
+
+			transform: translate(2em, 0);
+		}
 	}
 
 

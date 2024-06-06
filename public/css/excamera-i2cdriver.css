@@ -4,6 +4,51 @@ excamera-i2cdriver {
 	flex-direction: column;
 	height: 100%;
 
+	& table {
+		/* display: grid; */
+
+		border-radius: 1em;
+		background-color: var(--color-accent--dark, red);
+		color: var(--color-accent--dark-text, red);
+
+		border-collapse: collapse;
+
+		& thead {
+
+			& th {
+				padding-inline: 4ch;
+				padding-block: 1em;
+
+				background-color: var(--color-accent--lighter, red);
+				color: var(--color-accent--lighter-text, red);
+
+				&:first-child {
+					border-start-start-radius: 1em;
+				}
+
+				&:last-child {
+					border-start-end-radius: 1em;
+				}
+			}
+		}
+
+		& tbody {
+			overflow-block: scroll;
+			max-height: fit-content;
+
+
+			& td {
+				padding: 1em;
+			}
+		}
+	}
+
+	& [data-for-tab="direct"] {
+		display: flex;
+		flex-direction: column;
+		gap: 1em;
+	}
+
 	& form[data-config] {
 		display: flex;
 		flex-grow: 1;
@@ -20,6 +65,12 @@ excamera-i2cdriver {
 
 		background-color: var(--color-accent--lighter, red);
 		color: var(--color-accent--lighter-text, red);
+	}
+
+	& form[data-direct] {
+		display: flex;
+		flex-direction: row;
+		gap: 0.5em;
 	}
 
 	/* & div.tabsContent select {
@@ -214,7 +265,7 @@ excamera-i2cdriver {
 				color: var(--color-accent--lighter-text, red);
 
 				&::after {
-					content: 'Z';
+					content: "Z";
 					display: flex;
 				}
 			}
@@ -224,7 +275,7 @@ excamera-i2cdriver {
 				color: var(--color-accent--lighter-text, red);
 
 				&::after {
-					content: 'Z';
+					content: "Z";
 					display: flex;
 				}
 			}
@@ -238,7 +289,7 @@ excamera-i2cdriver {
 					width: 2em;
 					height: 2em;
 					border-radius: 1em;
-					content: 'S';
+					content: "S";
 					align-items: center;
 					justify-content: center;
 				}
@@ -254,7 +305,7 @@ excamera-i2cdriver {
 					width: 2em;
 					height: 2em;
 					border-radius: 1em;
-					content: 'P';
+					content: "P";
 					align-items: center;
 					justify-content: center;
 				}
@@ -278,11 +329,11 @@ excamera-i2cdriver {
 				}
 
 				&[data-mode="read"]::before {
-					content: '◀';
+					content: "◀";
 				}
 
 				&[data-mode="write"]::before {
-					content: '▶';
+					content: "▶";
 				}
 
 				&::after {
@@ -291,7 +342,7 @@ excamera-i2cdriver {
 					bottom: 0.25em;
 					width: 1em;
 					height: 1em;
-					content: '●';
+					content: "●";
 					color: red;
 				}
 
@@ -315,7 +366,7 @@ excamera-i2cdriver {
 					bottom: 0.25em;
 					width: 1em;
 					height: 1em;
-					content: '●';
+					content: "●";
 					color: red;
 				}
 
@@ -325,7 +376,7 @@ excamera-i2cdriver {
 					bottom: 0.25em;
 					width: 1em;
 					height: 1em;
-					content: '●';
+					content: "●";
 
 					color: green;
 				}

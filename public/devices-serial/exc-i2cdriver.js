@@ -157,7 +157,7 @@ class RestrictiveBus {
 
 
 async function initScript(port) {
-	console.log('running i2cdriver init script')
+	// console.log('running i2cdriver init script')
 
 	// await ExcameraLabsI2CDriver.sendRecvTextCommand(port, '@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@', new ArrayBuffer(64), 64)
 
@@ -175,12 +175,12 @@ async function initScript(port) {
 	// await delayMs(500)
 
 	// echo some bytes to validate the connection
-	console.log('basic echo test for validity')
+	// console.log('basic echo test for validity')
 	const echoSig = [0x55, 0x00, 0xff, 0xaa]
 	for (let echoByte of echoSig) {
 		// console.log('echoByte', echoByte)
 		const result = await ExcameraLabsI2CDriver.echoByte(port, echoByte)
-		console.log({ echoByte, result })
+		// console.log({ echoByte, result })
 		if(echoByte !== result) { console.warn('EchoByte miss-match')}
 	}
 

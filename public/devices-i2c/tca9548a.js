@@ -1,6 +1,8 @@
 
 import { Tca9548a } from '@johntalton/tca9548a'
 import { I2CAddressedBus } from '@johntalton/and-other-delights'
+import { asyncEvent } from '../util/async-event.js'
+import { range } from '../util/range.js'
 
 export class TCA9548Builder {
 	#abus
@@ -16,9 +18,7 @@ export class TCA9548Builder {
 		this.#abus = new I2CAddressedBus(bus, address)
 	}
 
-
 	get title() { return 'TCA9548A Multiplexer' }
-
 
 	async open() {
 		this.#device = await Tca9548a.from(this.#abus, {})
@@ -29,31 +29,43 @@ export class TCA9548Builder {
 	signature() {}
 
 	async buildCustomView(selectionElem) {
-		const root = document.createElement('tca9548-config')
+		const response = await fetch('./custom-elements/tca9548.html')
+		if (!response.ok) { throw new Error('no html for view') }
+		const view = await response.text()
+		const doc = (new DOMParser()).parseFromString(view, 'text/html')
 
-		const initialChannels = await this.#device.getChannels()
-		console.log({ initialChannels })
+		const root = doc?.querySelector('tca9548-config')
+		if (root === null) { throw new Error('no root for template') }
 
-		initialChannels.forEach(ch => {
-			const chElem = root.shadowRoot.getElementById(`ch${ch}`)
-			chElem.checked = true
-		})
+		const allChannelInputs = root.querySelectorAll('input[name ^= "ch"]')
 
+		const refresh = async () => {
+			// allChannelInputs.forEach(i => i.disabled = true)
 
-		root.addEventListener('change', e => {
-			const { channels } = e
-			console.log('channel change request', channels)
+			const channels = await this.#device.getChannels()
 
-			Promise.resolve()
-				.then(async () => {
-
-				await this.#device.setChannels(channels)
-				const resultChannels = await this.#device.getChannels()
-				console.log({ resultChannels })
-
+			allChannelInputs.forEach(i => i.checked = false)
+			channels.forEach(ch => {
+				const chElem = root.querySelector(`input[name="ch${ch}"]`)
+				chElem.checked = true
 			})
-		})
 
+			allChannelInputs.forEach(i => i.disabled = false)
+		}
+
+		root.addEventListener('change', asyncEvent(async e => {
+			const channels = [ ...range(0, 7) ].map(ch => {
+				const chElem = root.querySelector(`input[name="ch${ch}"]`)
+				return chElem.checked ? ch : undefined
+			}).filter(ch => ch !== undefined)
+
+			await this.#device.setChannels(channels)
+
+			await refresh()
+		}))
+
+
+		await refresh()
 
 		return root
 	}

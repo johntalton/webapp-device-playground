@@ -138,7 +138,7 @@ export async function addSerialPort(port, signal) {
 
 	//
 	if(isExcameraLabs(info.usbVendorId, info.usbProductId)) {
-		console.log('adding excamera i2cdriver', port)
+		// console.log('adding excamera i2cdriver', port)
 
 		const builder = await ExcameraI2CDriverUIBuilder.builder(port, UI_HOOKS)
 		const demolisher = buildDeviceListItem(deviceListElem, builder)
@@ -194,7 +194,7 @@ export async function addHIDDevice(hid) {
 
 export async function addI2CDevice(definition) {
 	const deviceListElem = document.getElementById('deviceList')
-	console.log('i2c device to list', definition)
+	// console.log('i2c device to list', definition)
 	const builder = await I2CDeviceBuilderFactory.from(definition, UI_HOOKS)
 	const demolisher = buildDeviceListItem(deviceListElem, builder)
 
