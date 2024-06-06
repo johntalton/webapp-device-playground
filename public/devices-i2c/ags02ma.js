@@ -19,7 +19,7 @@ export class AGS02MABuilder {
 		this.#abus = new I2CAddressedBus(bus, address)
 	}
 
-	get title() { return 'AGS02MA' }
+	get title() { return 'AGS02MA (Gas)' }
 
 	async open() {
 		this.#device = AGS02MA.from(this.#abus)

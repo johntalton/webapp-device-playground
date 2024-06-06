@@ -40,12 +40,16 @@ export const UI_HOOKS = {
 
 export function buildDeviceSection(builder) {
 	//
-	const sectionElem = document.createElement('section')
-	sectionElem.toggleAttribute('data-loading', true)
+	const mainElem = document.querySelector('main')
+	const { content } = mainElem?.querySelector(':scope > template')
+	const clone = content.cloneNode(true)
+	const sectionElem = clone.querySelector('section')
+
 
 	Promise.resolve()
 		.then(async () => builder.open())
 		.then(async () => {
+			sectionElem.toggleAttribute('data-error', false)
 
 			const controller = new AbortController()
 			const signal = controller.signal
@@ -65,15 +69,16 @@ export function buildDeviceSection(builder) {
 export function buildDeviceListItem(deviceListElem, builder) {
 	const mainElem = document.querySelector('main')
 
-	const liElem = document.createElement('li')
-	//
-	const buttonElem = document.createElement('button')
-	buttonElem.textContent = builder.title
-	liElem.appendChild(buttonElem)
-	deviceListElem.appendChild(liElem)
+	const { content } = deviceListElem?.querySelector(':scope > template')
+	const clone = content.cloneNode(true)
+	const liElem = clone.querySelector('li')
+	const buttonElem = liElem.querySelector('button')
 
-	//
+	buttonElem.textContent = builder.title
+
 	const sectionElem = buildDeviceSection(builder)
+
+	deviceListElem.appendChild(liElem)
 	mainElem.appendChild(sectionElem)
 
 	//

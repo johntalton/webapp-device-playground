@@ -346,13 +346,15 @@ export class ExcameraI2CDriverUIBuilder {
 				const pipeline = this.#capture.pipeline
 
 				try {
-					for await (const event of pipeline) {
-						// console.log(event)
+					const { content } = dataCaptureList?.querySelector(':scope > template')
 
+					//
+					// loop until quit of pipeline
+					//
+					for await (const event of pipeline) {
 						const {
 							state, address, mode, buffer
 						} = event
-
 
 						if(prevState === 'IDLE' && state === 'IDLE') {
 							continue
@@ -370,7 +372,8 @@ export class ExcameraI2CDriverUIBuilder {
 							continue
 						}
 
-						const liElem = document.createElement('li')
+						const clone = content.cloneNode(true)
+						const liElem = clone.querySelector('li')
 						liElem.dataset.state = state
 						liElem.dataset.address = address
 						liElem.dataset.mode = mode
@@ -390,9 +393,6 @@ export class ExcameraI2CDriverUIBuilder {
 
 							liElem.innerText = [ ...u8 ].map(toHex).join(' ')
 						}
-
-
-
 
 						dataCaptureList?.append(liElem)
 

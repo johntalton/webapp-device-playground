@@ -1,60 +1,35 @@
 import { I2CAddressedBus } from '@johntalton/and-other-delights'
 import { AHT20 } from '@johntalton/aht20'
 
+import { asyncEvent } from '../util/async-event.js'
+
 export class AHT20Builder {
 	#abus
 	#device
 
-	static async builder(definition, ui) {
-		return new AHT20Builder(definition, ui)
-	}
+	static async builder(definition, ui) { return new AHT20Builder(definition, ui) }
 
 	constructor(definition, ui) {
 		const { bus, address } = definition
-
 		this.#abus = new I2CAddressedBus(bus, address)
 	}
 
 	get title() { return 'AHT20' }
 
-	async open() {
-		this.#device = AHT20.from(this.#abus)
-	}
+	async open() { this.#device = AHT20.from(this.#abus) }
 
 	async close() { }
 
 	signature() { }
 
 	async buildCustomView() {
-		const root = document.createElement('aht20-config')
+		const response = await fetch('./custom-elements/aht20.html')
+		if(!response.ok) { throw new Error('no html for view') }
+		const view = await response.text()
+		const doc = (new DOMParser()).parseFromString(view, 'text/html')
 
-		root.innerHTML = `
-			<form data-form-buttons method="dialog">
-				<button type="button" data-reset>Reset</button>
-				<button data-state>State</button>
-				<!-- button data-init >Init</button -->
-				<button data-trigger>Trigger</button>
-				<button data-measurement>Measurement</button>
-			</form>
-
-			<label>Initialized</label>
-			<output data-state-initialized>-</output>
-
-			<label>Ready</label>
-			<output data-state-ready>-</output>
-
-			<label>Calibrated</label>
-			<output data-state-calibrated>-</output>
-
-			<label>Measurement Humidity (RH%)</label>
-			<output data-measurement-humidity>-</output>
-
-			<label>Measurement Temperature (°C)</label>
-			<output data-measurement-temperature>-</output>
-
-			<label>Measurement CRC</label>
-			<output data-measurement-crc>-</output>
-		`
+		const root = doc?.querySelector('aht20-config')
+		if(root === null) { throw new Error('no root for template')}
 
 		const buttonReset = root.querySelector('button[data-reset]')
 		const buttonState = root.querySelector('button[data-state]')
@@ -69,27 +44,27 @@ export class AHT20Builder {
 		const outTemp = root.querySelector('output[data-measurement-temperature]')
 		const outCRC = root.querySelector('output[data-measurement-crc]')
 
-		buttonReset.addEventListener('click', async e => { // async into the void
+		buttonReset?.addEventListener('click', asyncEvent(async e => {
 			await this.#device.reset()
-		})
+		}))
 
-		buttonState.addEventListener('click', async e => { // async into the void
+		buttonState?.addEventListener('click', asyncEvent(async e => {
 			const state = await this.#device.getState()
 
 			outInit.innerText = state.initialized ? '👍' : '👎'
 			outReady.innerText = state.busy ? '👎' : '👍'
 			outCali.innerText = state.calibrated ? '👍' : '👎'
-		})
+		}))
 
-		buttonInit?.addEventListener('click', async e => { // async into the void
+		buttonInit?.addEventListener('click', asyncEvent(async e => {
 			await this.#device.initialize()
-		})
+		}))
 
-		buttonTrigger.addEventListener('click', async e => { // async into the void
+		buttonTrigger?.addEventListener('click', asyncEvent(async e => {
 			await this.#device.triggerMeasurement()
-		})
+		}))
 
-		buttonMeasurement.addEventListener('click', async e => { // async into the void
+		buttonMeasurement?.addEventListener('click', asyncEvent(async e => {
 			const result = await this.#device.getMeasurement()
 
 			if(true) {
@@ -101,7 +76,7 @@ export class AHT20Builder {
 			outHumi.innerText = Math.trunc(result.humidityRH * 100) / 100
 			outTemp.innerText = Math.trunc(result.temperatureC * 100) / 100
 			outCRC.innerText = result.validCRC ? '👍' : '👎'
-		})
+		}))
 
 		return root
 	}

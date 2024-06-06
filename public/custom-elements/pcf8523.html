@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html>
+	<body>
+		<pcf8523-config lang="us-EN">
+			<details>
+				<summary part="summary">Control (1) Settings</summary>
+
+				<form data-control1-form method="dialog" part="form">
+					<slot>
+						<label>Capacitor Selection</label>
+						<select name="capacitorSelection" data-capacitor-selection readonly>
+							<option value="7pF">7 pF</option>
+							<option value="12.5pF">12.5 pF</option>
+						</select>
+					</slot>
+
+					<label>Oscillator Status</label>
+					<output data-stop></output>
+
+					<label>Mode</label>
+					<select name="ampm" data-ampm>
+						<option name="twelve" value="12">12 hour mode (AM/PM)</option>
+						<option name="twentyFour" value="24">24 hour mode</option>
+					</select>
+
+					<label>Second Interrupt Enabled</label>
+					<input name="secondInterruptEnabled" data-second-interrupt-enabled type="checkbox" />
+
+					<label>Alarm Interrupt Enabled</label>
+					<input name="alarmInterruptEnabled" data-alarm-interrupt-enabled type="checkbox"></input>
+
+					<label>Correction Interrupt Enabled</label>
+					<input name="correctionInterruptEnabled" data-correction-interrupt-enabled type="checkbox"></input>
+
+					<button data-refresh-control1 type="button">refresh</button>
+					<button data-save-control1 type="submit" disabled>save</button>
+				</form>
+			</details>
+
+			<details>
+				<summary part="summary">Control (2) Settings</summary>
+
+				<form data-control2-form method="dialog" part="form">
+					<label>Watchdog Timer A Interrupt</label>
+					<output data-watchdog-flag></output>
+
+					<label>Countdown Timer A Interrupt</label>
+					<output data-countdownA-flag></output>
+
+					<label>Countdown Timer B Interrupt</label>
+					<output data-countdownB-flag></output>
+
+					<label>Second Interrupt</label>
+					<output data-second-flag></output>
+
+					<label>Alarm Interrupt</label>
+					<output data-alarm-flag></output>
+
+
+					<label>Watchdog Timer A Interrupt Enabled</label>
+					<input data-watchdog-enabled type="checkbox"></input>
+
+					<label>Countdown Timer A Interrupt Enabled</label>
+					<input data-countdownA-enabled type="checkbox"></input>
+
+					<label>Countdown Timer B Interrupt Enabled</label>
+					<input data-countdownB-enabled type="checkbox"></input>
+
+					<button data-refresh-control2 type="button">refresh (and clear watchdog)</button>
+					<button data-save-control2 disabled type="submit">save</button>
+				</form>
+			</details>
+
+			<details>
+				<summary part="summary">Control (3) Settings</summary>
+
+				<form method="dialog" part="form">
+					<label>Power Mode</label>
+
+					<fieldset>
+						<select disabled>
+							<option>switch-over enabled</option>
+							<option>switch-over disabled</option>
+						</select>
+						<select disabled>
+							<option>standard-mode</option>
+							<option>direct-mode</option>
+						</select>
+						<select disabled>
+							<option>detection enabled</option>
+							<option>detection disabled</option>
+						</select>
+					</fieldset>
+
+
+					<label>Battery Switchover Interrupt</label>
+					<output data-battery-switchover-flag></output>
+
+					<label>Battery Status Low Interrupt</label>
+					<output data-battery-low-flag></output>
+
+					<label>Battery Switchover Interrupt Enabled</label>
+					<input type="checkbox" disabled data-switchover-enable></input>
+
+					<label>Battery Status Low Interrupt Enabled</label>
+					<input type="checkbox" disabled data-status-low-enable></input>
+
+					<button data-refresh-control3>refresh</button>
+					<button disabled>save</button>
+				</form>
+			</details>
+
+			<details>
+				<summary part="summary">Offset Settings</summary>
+
+				<form method="dialog" part="form">
+					<button>refresh</button>
+					<button disabled>save</button>
+				</form>
+			</details>
+
+			<details>
+				<summary part="summary">Alarm Settings</summary>
+
+				<form method="dialog" part="form">
+					<button>refresh</button>
+					<button disabled>save</button>
+				</form>
+			</details>
+
+			<details>
+				<summary part="summary">Timer Settings</summary>
+
+				<form method="dialog" part="form">
+					<button data-refresh-timer>refresh</button>
+					<button disabled>save</button>
+				</form>
+			</details>
+
+			<details open>
+				<summary part="summary">Utilities</summary>
+
+				<form method="dialog" part="form">
+					<button data-poll-time>⏱️ Poll Time</button>
+					<button data-reset>⚡️ Reset</button>
+					<button data-toggle-oscillator--start>Start Oscillator</button>
+					<button data-toggle-oscillator--stop>Stop Oscillator</button>
+					<button data-set-time-now>Set Time Now</button>
+					<button data-on-battery-mode>Enable Battery and Monitor</button>
+				</form>
+			</details>
+
+			<form method="dialog">
+				<output data-display-integrity></output>
+				<output data-display-time></output>
+			</form>
+
+		</pcf8523-config>
+	</body>
+</html>

@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="en">
+	<body>
+		<aht20-config>
+			<form data-form-buttons method="dialog">
+				<button type="button" data-reset>Reset</button>
+				<button data-state>State</button>
+				<!-- button data-init >Init</button -->
+				<button data-trigger>Trigger</button>
+				<button data-measurement>Measurement</button>
+			</form>
+
+
+			<label>Initialized</label>
+			<output data-state-initialized>-</output>
+
+			<label>Ready</label>
+			<output data-state-ready>-</output>
+
+			<label>Calibrated</label>
+			<output data-state-calibrated>-</output>
+
+			<label>Measurement Humidity (RH%)</label>
+			<output data-measurement-humidity>-</output>
+
+			<label>Measurement Temperature (°C)</label>
+			<output data-measurement-temperature>-</output>
+
+			<label>Measurement CRC</label>
+			<output data-measurement-crc>-</output>
+
+		</aht20-config>
+	</body>
+</html>

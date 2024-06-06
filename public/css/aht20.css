@@ -3,9 +3,10 @@ aht20-config {
 	grid-template-columns: 1fr 1fr;
 	gap: 1em;
 
+
 	max-width: fit-content;
 	min-width: 50%;
-	justify-self: center;
+	align-self: center !important;
 
   & > form[data-form-buttons] {
 		grid-column: 1 / -1;

@@ -4,7 +4,6 @@ import { I2CAddressDisplayElement } from '../custom-elements/address-display.js'
 import { MCP2221ConfigElement } from '../custom-elements/mcp2221-config.js'
 import { CaptureEventElement } from '../custom-elements/capture-event.js'
 import { TCA9548ConfigElement } from '../custom-elements/tca9548-config.js'
-import { PCF8523ConfigElement } from '../custom-elements/pcf8523-config.js'
 
 export function hydrateCustomeElementTemplateImport(importElemId, name, konstructor) {
 	const element = document.getElementById(importElemId)
@@ -39,5 +38,4 @@ export async function hydrateCustomElements() {
 	hydrateCustomeElementTemplateImport('addr-display', 'addr-display', I2CAddressDisplayElement)
 	hydrateCustomeElementTemplateImport('mcp2221-config', 'mcp2221-config', MCP2221ConfigElement)
 	hydrateCustomeElementTemplateImport('tca9548-config', 'tca9548-config', TCA9548ConfigElement)
-	hydrateCustomeElementTemplateImport('pcf8523-config', 'pcf8523-config', PCF8523ConfigElement)
 }
