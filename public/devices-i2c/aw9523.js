@@ -2,6 +2,7 @@ import { I2CAddressedBus } from '@johntalton/and-other-delights'
 import { AW9523, DEFAULT, DEVICE_ID, INTERRUPT_ENABLE, INTERRUPT_DISABLE, MODE_LED, DIRECTION_OUTPUT } from '@johntalton/aw9523'
 import { range } from '../util/range.js'
 import { asyncEvent } from '../util/async-event.js'
+import { bindTabRoot } from '../util/tabs.js'
 
 export class AW9523Builder {
 	#abus
@@ -196,30 +197,8 @@ export class AW9523Builder {
 			refreshInputs(input01)
 		}))
 
-		const tabButtons = root.querySelectorAll('button[data-tab]')
-		for (const tabButton of tabButtons) {
-			tabButton.addEventListener('click', event => {
-				event.preventDefault()
 
-				const { target } = event
-				const parent = target?.parentNode.parentNode
-
-				const tabName = target.getAttribute('data-tab')
-
-				// remove content active
-				const activeOthers = parent.querySelectorAll('[data-active]')
-				activeOthers.forEach(ao => ao.toggleAttribute('data-active', false))
-
-				// remove tab button active
-				const activeOthersTabsButtons = parent.querySelectorAll('button[data-tab]')
-				activeOthersTabsButtons.forEach(ao => ao.toggleAttribute('data-active', false))
-
-				const tabContentElem = parent.querySelector(`[data-for-tab="${tabName}"]`)
-				tabContentElem.toggleAttribute('data-active', true)
-
-				tabButton.toggleAttribute('data-active', true)
-			})
-		}
+		bindTabRoot(root)
 
 		await refresh()
 

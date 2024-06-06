@@ -3,14 +3,10 @@ import { I2CAddressedBus } from '@johntalton/and-other-delights'
 
 import {
 	ADT7410,
-
-	OPERATION_MODE,
-	FAULT_QUEUE_COUNT,
-	RESOLUTION,
-	INT_CT_MODE
 } from '@johntalton/adt7410'
 import { asyncEvent } from '../util/async-event.js'
 import { delayMs } from '../util/delay.js'
+import { bindTabRoot } from '../util/tabs.js'
 
 
 export class ADT7410Builder {
@@ -466,35 +462,7 @@ export class ADT7410Builder {
 
 		// root.appendChild(controlsElem)
 
-
-		const tabButtons = root.querySelectorAll('button[data-tab]')
-		for (const tabButton of tabButtons) {
-			tabButton.addEventListener('click', event => {
-				event.preventDefault()
-
-				const { target } = event
-				const parent = target?.parentNode
-				const grandParent = parent.parentNode
-
-				const tabName = target.getAttribute('data-tab')
-
-				// remove content active
-				const activeOthers = grandParent.querySelectorAll(':scope > [data-active]')
-				activeOthers.forEach(ao => ao.toggleAttribute('data-active', false))
-
-				// remove tab button active
-				const activeOthersTabsButtons = parent.querySelectorAll(':scope > button[data-tab]')
-				activeOthersTabsButtons.forEach(ao => ao.toggleAttribute('data-active', false))
-
-				const tabContentElem = grandParent.querySelector(`:scope > [data-for-tab="${tabName}"]`)
-				if(tabContentElem === null) { console.warn('tab content not found', tabName) }
-				else {
-					tabContentElem.toggleAttribute('data-active', true)
-				}
-
-				tabButton.toggleAttribute('data-active', true)
-			})
-		}
+		bindTabRoot(root)
 
 
 		await refreshConfig()

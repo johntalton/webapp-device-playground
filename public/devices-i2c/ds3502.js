@@ -3,6 +3,8 @@ import { DS3502 } from '@johntalton/ds3502'
 
 import { Waves } from '../util/wave.js'
 import { delayMs} from '../util/delay.js'
+import { asyncEvent } from '../util/async-event.js'
+import { bindTabRoot } from '../util/tabs.js'
 
 async function potScript(device, options) {
 	await device.setControl({ persist: false})
@@ -126,34 +128,7 @@ export class DS3502Builder {
 
 
 
-		const tabButtons = root.querySelectorAll('button[data-tab]')
-		for (const tabButton of tabButtons) {
-			tabButton.addEventListener('click', event => {
-				event.preventDefault()
-
-				const { target } = event
-				const parent = target?.parentNode
-				const grandParent = parent.parentNode
-
-				const tabName = target.getAttribute('data-tab')
-
-				// remove content active
-				const activeOthers = grandParent.querySelectorAll(':scope > [data-active]')
-				activeOthers.forEach(ao => ao.toggleAttribute('data-active', false))
-
-				// remove tab button active
-				const activeOthersTabsButtons = parent.querySelectorAll(':scope > button[data-tab]')
-				activeOthersTabsButtons.forEach(ao => ao.toggleAttribute('data-active', false))
-
-				const tabContentElem = grandParent.querySelector(`:scope > [data-for-tab="${tabName}"]`)
-				if(tabContentElem === null) { console.warn('tab content not found', tabName) }
-				else {
-					tabContentElem.toggleAttribute('data-active', true)
-				}
-
-				tabButton.toggleAttribute('data-active', true)
-			})
-		}
+		bindTabRoot(root)
 
 		await refresh()
 

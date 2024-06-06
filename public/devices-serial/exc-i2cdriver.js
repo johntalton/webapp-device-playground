@@ -10,11 +10,156 @@ import { 	eventStreamFromReader } from '@johntalton/excamera-i2cdriver/capture'
 import { deviceGuessByAddress, I2C_GUESSES } from '../devices-i2c/guesses.js'
 import { delayMs} from '../util/delay.js'
 import { asyncEvent } from '../util/async-event.js'
+import { bindTabRoot } from '../util/tabs.js'
 
 export const EXCAMERA_LABS_USB_FILTER = { usbVendorId: EXCAMERA_LABS_VENDOR_ID }
 
+class RateLimitBus {
+	#bus
+	#readTokens = Infinity
+	#writeTokens = Infinity
+
+	static from(bus) { return new RateLimitBus(bus) }
+	constructor(bus) {
+		this.#bus = bus
+
+		// setInterval(() => {
+		// 	this.#readTokens += 50
+		// 	this.#writeTokens += 0
+		// }, 1000 * 10)
+	}
+
+	get name() { return `RateLimited(${this.#bus.name})` }
+
+	close() { return this.#bus.close() }
+
+	#canTakeReadToken() {
+		if(this.#readTokens <= 0) { throw new Error('no read tokens') }
+		this.#readTokens -= 1
+	}
+
+	#canTakeWriteToken() {
+		if(this.#writeTokens <= 0) { throw new Error('no write tokens') }
+		this.#writeTokens -= 1
+	}
+
+	async sendByte(address, byteValue) { throw new Error('never used ?') }
+
+	async readI2cBlock(address, cmd, length, bufferSource) {
+		this.#canTakeReadToken()
+		return this.#bus.readI2cBlock(address, cmd, length)
+	}
+
+	async writeI2cBlock(address, cmd, length, bufferSource) {
+		this.#canTakeWriteToken()
+		return this.#bus.writeI2cBlock(address, cmd, length, bufferSource)
+	}
+
+	async i2cRead(address, length, bufferSource) {
+		this.#canTakeReadToken()
+		return this.#bus.i2cRead(address, length, bufferSource)
+	}
+
+	async i2cWrite(address, length, bufferSource) {
+		this.#canTakeWriteToken()
+		return this.#bus.i2cWrite(address, length, bufferSource)
+	}
+}
+
+
+class RestrictiveBus {
+	#bus
+	static from(bus) { return new RestrictiveBus(bus) }
+	constructor(bus) { this.#bus = bus }
+
+	get name() { return `Restricted(${this.#bus.name})` }
+
+	close() { return this.#bus.close() }
+
+	#canReadInGeneral() {
+		// throw new Error('no read')
+	}
+
+	#canWriteInGeneral() {
+		// throw new Error('no write')
+	}
+
+	#canAddress(address) {
+		if(address < 0x08) { throw new Error('address restricted minimum') }
+		if(address > 0x77) { throw new Error('address restricted maximum') }
+	}
+
+	#canReadAddress(address) {
+		this.#canAddress(address)
+	}
+
+	#canWriteAddress(address) {
+		this.#canAddress(address)
+	}
+
+	#canWriteLength(address) {
+		if(length > 64) { throw new Error('restricted write length') }
+	}
+
+	#canReadLength(length) {
+		if(length > 64) { throw new Error('restricted read length') }
+	}
+
+
+	#canReadBlock(address, cmd, length) {
+		this.#canReadInGeneral()
+		this.#canReadAddress(address)
+		this.#canReadLength(length)
+	}
+
+	#canWriteBlock(address, cmd, length) {
+		this.#canWriteInGeneral()
+		this.#canWriteAddress(address)
+		this.#canWriteLength(length)
+	}
+
+	#canRead(address, length) {
+		this.#canReadInGeneral()
+		this.#canReadAddress(address)
+		this.#canReadLength(length)
+	}
+
+	#canWrite(address, length) {
+		this.#canWriteInGeneral()
+		this.#canWriteAddress(address)
+		this.#canWriteLength(length)
+	}
+
+
+
+	async sendByte(address, byteValue) { throw new Error('never used ?') }
+
+	async readI2cBlock(address, cmd, length, bufferSource) {
+		this.#canReadBlock(address, cmd, length)
+		return this.#bus.readI2cBlock(address, cmd, length)
+	}
+
+	async writeI2cBlock(address, cmd, length, bufferSource) {
+		this.#canWriteBlock(address, cmd, length)
+		return this.#bus.writeI2cBlock(address, cmd, length, bufferSource)
+	}
+
+	async i2cRead(address, length, bufferSource) {
+		this.#canRead(address, length)
+		return this.#bus.i2cRead(address, length, bufferSource)
+	}
+
+	async i2cWrite(address, length, bufferSource) {
+		this.#canWrite(address, length)
+		return this.#bus.i2cWrite(address, length, bufferSource)
+	}
+}
+
+
 async function initScript(port) {
 	console.log('running i2cdriver init script')
+
+	// await ExcameraLabsI2CDriver.sendRecvTextCommand(port, '@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@', new ArrayBuffer(64), 64)
 
 	// exit and return to i2x mode if not in it already
 	await ExcameraLabsI2CDriver.endBitbangCommand(port)
@@ -27,7 +172,7 @@ async function initScript(port) {
 	// end more (64) bytes of @ to flush the connection
 	// ?
 
-	await delayMs(500)
+	// await delayMs(500)
 
 	// echo some bytes to validate the connection
 	console.log('basic echo test for validity')
@@ -39,7 +184,7 @@ async function initScript(port) {
 		if(echoByte !== result) { console.warn('EchoByte miss-match')}
 	}
 
-	// await ExcameraLabsI2CDriver.setSpeed(port, 100)
+	//await ExcameraLabsI2CDriver.setSpeed(port, 400)
 }
 
 async function startCapture(port) {
@@ -93,6 +238,7 @@ async function startCapture(port) {
 export class ExcameraI2CDriverUIBuilder {
 	#port
 	#ui
+	#i2cDriver
 	#vbus
 	#capture
 
@@ -122,9 +268,13 @@ export class ExcameraI2CDriverUIBuilder {
 		await initScript(this.#port)
 
 		console.warn('allocing untracked vbus ... please cleanup hooks')
-		const I2C = ExcameraLabsI2CDriverI2C.from({ port: this.#port })
-		const exbus = I2CBusExcameraI2CDriver.from(I2C)
-		this.#vbus = I2CTransactionBus.from(exbus)
+		this.#i2cDriver = ExcameraLabsI2CDriverI2C.from({ port: this.#port })
+		const exbus = I2CBusExcameraI2CDriver.from(this.#i2cDriver)
+		this.#vbus = I2CTransactionBus.from(RestrictiveBus.from(RateLimitBus.from(exbus)))
+
+		const { crc } = await ExcameraLabsI2CDriver.transmitStatusInfo(this.#port)
+		this.#i2cDriver.crc = crc
+
 	}
 
 	async close() { return this.#port.close() }
@@ -281,7 +431,7 @@ export class ExcameraI2CDriverUIBuilder {
 			return `${trunc2(uptime / 60.0 / 60.0)} hours`
 		}
 
-		const refresh = async () => {
+		const refresh = async () => this.#vbus.transaction(async () => {
 			// const internalState = await ExcameraLabsI2CDriver.internalState(this.#port)
 
 			const {
@@ -318,8 +468,8 @@ export class ExcameraI2CDriverUIBuilder {
 			out('temperature').innerText = temperature
 			out('sda').innerText = `${sda} (${sda === 1 ? 'Idle' : 'Active'})`
 			out('scl').innerText = `${scl} (${scl === 1 ? 'Idle' : 'Active'})`
-			out('crc').value = `0x${crc.toString(16).padStart(8, '0')}`
-		}
+			out('crc').value = `0x${crc.toString(16).padStart(4, '0')} (0x${this.#i2cDriver.crc.toString(16).padStart(4, '0')})`
+		})
 
 
 		const self = this
@@ -574,8 +724,12 @@ export class ExcameraI2CDriverUIBuilder {
 		const startScanButton = root.querySelector('button[data-scan]')
 		startScanButton?.addEventListener('click', event => handelScan(event, addrDisp, devList))
 
-		manualCreateDevice?.addEventListener('click', event => {
+		manualCreateDevice?.addEventListener('click', asyncEvent(async event => {
 			event.preventDefault()
+
+			// const foo = await I2CBusExcameraI2CDriver.from(this.#i2cDriver).readI2cBlock(0x48, 0x0B, 1)
+			// console.log({ foo })
+			// return
 
 			const addr = manualAddressInput?.value
 			const deviceGuess = manualDeviceSelection?.value
@@ -587,37 +741,10 @@ export class ExcameraI2CDriverUIBuilder {
 				bus: self.#vbus,
 				address: parseInt(addr)
 			})
-		})
+		}))
 
 
-		const tabButtons = root.querySelectorAll('button[data-tab]')
-		for (const tabButton of tabButtons) {
-			tabButton.addEventListener('click', event => {
-				event.preventDefault()
-
-				const { target } = event
-				const parent = target?.parentNode
-				const grandParent = parent.parentNode
-
-				const tabName = target.getAttribute('data-tab')
-
-				// remove content active
-				const activeOthers = grandParent.querySelectorAll(':scope > [data-active]')
-				activeOthers.forEach(ao => ao.toggleAttribute('data-active', false))
-
-				// remove tab button active
-				const activeOthersTabsButtons = parent.querySelectorAll(':scope > button[data-tab]')
-				activeOthersTabsButtons.forEach(ao => ao.toggleAttribute('data-active', false))
-
-				const tabContentElem = grandParent.querySelector(`:scope > [data-for-tab="${tabName}"]`)
-				if(tabContentElem === null) { console.warn('tab content not found', tabName) }
-				else {
-					tabContentElem.toggleAttribute('data-active', true)
-				}
-
-				tabButton.toggleAttribute('data-active', true)
-			})
-		}
+		bindTabRoot(root)
 
 
 		await refresh()

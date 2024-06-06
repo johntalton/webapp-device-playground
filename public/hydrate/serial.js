@@ -7,6 +7,29 @@ export const SUPPORTED_SERIAL_FILTER = [
 	MASH_USB_FILTER
 ]
 
+
+
+	// function makeListItem() {
+	// 	const liElem = document.createElement('li')
+	// 	//
+	// 	const buttonElem = document.createElement('button')
+	// 	buttonElem.textContent = builder.title
+	// 	liElem.appendChild(buttonElem)
+	// 	deviceListElem.appendChild(liElem)
+
+	// 	return liElem
+	// }
+
+
+	// const serialWorker = new Worker('./workers/serial-worker.js', { type: 'module' })
+	// serialWorker.onmessage = msg => console.log('from serial worker', msg)
+	//serialWorker.postMessage({ go: true })
+
+
+
+
+
+
 const handleSerialPortConnect = e => console.log('port connect', e)
 function build_handleSerialPortDisconnect(controller) {
 	return e => {

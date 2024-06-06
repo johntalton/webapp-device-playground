@@ -15,6 +15,7 @@ import { I2CAddressedTransactionBus } from '@johntalton/and-other-delights'
 import { range } from '../util/range.js'
 import { delayMs} from '../util/delay.js'
 import { asyncEvent } from '../util/async-event.js'
+import { bindTabRoot } from '../util/tabs.js'
 
 // import { data } from '../custom-elements/mcp23.html' with { type: 'html' }
 
@@ -593,34 +594,8 @@ export class MCP23Builder {
 			}, 1000 * timeout)
 		}))
 
-		const tabButtons = root.querySelectorAll('button[data-tab]')
-		for (const tabButton of tabButtons) {
-			tabButton.addEventListener('click', event => {
-				event.preventDefault()
 
-				const { target } = event
-				const parent = target?.parentNode
-				const grandParent = parent.parentNode
-
-				const tabName = target.getAttribute('data-tab')
-
-				// remove content active
-				const activeOthers = grandParent.querySelectorAll(':scope > [data-active]')
-				activeOthers.forEach(ao => ao.toggleAttribute('data-active', false))
-
-				// remove tab button active
-				const activeOthersTabsButtons = parent.querySelectorAll(':scope > button[data-tab]')
-				activeOthersTabsButtons.forEach(ao => ao.toggleAttribute('data-active', false))
-
-				const tabContentElem = grandParent.querySelector(`:scope > [data-for-tab="${tabName}"]`)
-				if(tabContentElem === null) { console.warn('tab content not found', tabName) }
-				else {
-					tabContentElem.toggleAttribute('data-active', true)
-				}
-
-				tabButton.toggleAttribute('data-active', true)
-			})
-		}
+		bindTabRoot(root)
 
 		await refreshControl()
 

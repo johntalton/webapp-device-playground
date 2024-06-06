@@ -2,7 +2,6 @@ import { deviceGuessByAddress } from '../devices-i2c/guesses.js'
 
 export const MASH_USB_FILTER = { usbVendorId: 9114 }
 
-const delayMs = ms => new Promise(resolve => setTimeout(resolve, ms))
 
 export class MashBus {
 	#port
@@ -80,7 +79,6 @@ async function transfer(port, out_buff, targetCount) {
 			count += value.byteLength
 
 			if(done) { break }
-			// delayMs(100)
 		}
 
 		return in_buff.buffer

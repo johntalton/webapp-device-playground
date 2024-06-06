@@ -12,10 +12,11 @@
 
 		<title>Web I²C Playground</title>
 
-		<!-- link rel="manifest" href="manifest.json" / -->
+		<link rel="manifest" href="manifest.json" />
 		<script type="importmap">
 			{
 				"imports": {
+
 					"@johntalton/and-other-delights": "/node_modules/@johntalton/and-other-delights/lib/index.js",
 					"@johntalton/bitsmush": "/node_modules/@johntalton/bitsmush/lib/bitsmush.js",
 
@@ -74,11 +75,21 @@
 		<aside>
 			<ul id="deviceList">
 				<!--  -->
+				<template>
+					<li>
+						<button name="title"></button>
+					</li>
+				</template>
 			</ul>
 		</aside>
 
 		<main>
 			<!--  -->
+			<template>
+				<section data-loading>
+
+				</section>
+			</template>
 		</main>
 	</body>
 </html>
