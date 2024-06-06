@@ -16,7 +16,7 @@
     "@johntalton/ds1841": "^2.0.0",
     "@johntalton/ds3231": "^1.1.1",
     "@johntalton/ds3502": "^5.0.0",
-    "@johntalton/excamera-i2cdriver": "^2.0.0",
+    "@johntalton/excamera-i2cdriver": "^2.0.1",
     "@johntalton/ht16k33": "^1.0.3",
     "@johntalton/i2c-bus-excamera-i2cdriver": "^2.0.1",
     "@johntalton/i2c-bus-mcp2221": "^2.0.1",
