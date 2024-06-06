@@ -142,9 +142,10 @@ export class AW9523Builder {
 		}
 
 		for (const { port, form } of [ { port: 0, form: form0 }, { port: 1, form: form1 } ]) {
+			const dimmingSliders = form?.querySelectorAll('input[name="dimming"]')
+
 			form?.addEventListener('change', asyncEvent(async event => {
 				event.preventDefault()
-
 
 				const whatChanged = event.target.getAttribute('name')
 
@@ -175,6 +176,27 @@ export class AW9523Builder {
 
 				await refresh()
 			}))
+
+			dimmingSliders?.forEach(dimmingSlider => {
+				const detailsElem = dimmingSlider.closest('details[data-gpio]')
+				const gpioStr = detailsElem.getAttribute('data-gpio')
+				const gpio = parseInt(gpioStr)
+				const pin = (gpio >= 8) ? gpio - 8 : gpio
+
+				let future = undefined
+				let target = 0
+
+				dimmingSlider?.addEventListener('input', event => {
+					//console.log('fast slider')
+
+					target = parseInt(event.target.value)
+
+					if(future) { return }
+
+					future = this.#device.setDimming(port, pin, target)
+					future.finally(() => { future = undefined })
+				})
+			})
 		}
 
 		const resetButton = root.querySelector('button[data-reset]')
