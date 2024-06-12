@@ -173,7 +173,7 @@ excamera-i2cdriver {
 			background-color: var(--color-accent--lighter, red);
 			color: var(--color-accent--lighter-text, red);
 
-			& legend {
+			& legend:not(:empty) {
 				font-weight: bold;
 				padding-inline: 1ch;
 			}

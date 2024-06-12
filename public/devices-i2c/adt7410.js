@@ -28,13 +28,6 @@ export class ADT7410Builder {
 
 	async open() {
 		this.#device = ADT7410.from(this.#abus)
-
-		this.#id = await this.#device.getId()
-
-		if(!this.#id.matchedVendor) {
-			throw new Error('Vendor ID miss-match')
-		}
-
 	}
 
 	async close() { }
@@ -80,26 +73,48 @@ export class ADT7410Builder {
 
 
 		//
-		idOutput.value = `Manufacture: 0x${this.#id.manufactureId.toString(16).padStart(2, '0')}, Revision ${this.#id.revisionId}`
+		const refreshId = async () => {
+			this.#id = await this.#device.getId()
+				.catch(e => ({ manufactureId: NaN, revisionId: NaN, matchedVendor: false }))
+
+			idOutput.value = `Manufacture: 0x${this.#id.manufactureId.toString(16).padStart(2, '0')}, Revision ${this.#id.revisionId} ${this.#id.matchedVendor ? '' : '🛑'}`
+		}
 
 
 		const refreshStatus = async () => {
-			const {
-				high, low, critical, ready
-			} = await this.#device.getStatus()
+			if(!this.#id.matchedVendor) {
+				await refreshId()
+			}
 
-			highOutput.value = high ? '🔔 (true)' : ' 🔕'
-			lowOutput.value = low ? '🔔 (true)' : ' 🔕'
-			criticalOutput.value = critical ? '🔔 (true)' : ' 🔕'
-			readyOutput.value = ready ? '👍 (true)' : ' 🛑 (false)'
+			try {
+				const {
+					high, low, critical, ready
+				} = await this.#device.getStatus()
+
+				highOutput.value = high ? '🔔 (true)' : ' 🔕'
+				lowOutput.value = low ? '🔔 (true)' : ' 🔕'
+				criticalOutput.value = critical ? '🔔 (true)' : ' 🔕'
+				readyOutput.value = ready ? '👍 (true)' : ' 🛑 (false)'
+
+			}
+			catch(e) {
+				highOutput.value =  '-'
+				lowOutput.value =  '-'
+				criticalOutput.value = '-'
+				readyOutput.value = '-'
+			}
 		}
 
 		const refreshOutput = async () => {
 			const resolution = root.getAttribute('data-resolution')
 			const mode16 = resolution === '16'
-			const { temperatureC, high, low, critical } = await this.#device.getTemperature(mode16)
 
-			temperatureOutput.value = `${temperatureC} ℃`
+			const { temperatureC, high, low, critical } = await this.#device.getTemperature(mode16).catch(e => {
+				console.log('getTemperature error', e)
+				return {}
+			})
+
+			temperatureOutput.value = (temperatureC !== undefined) ? `${temperatureC} ℃` : '-'
 
 			if(high !== undefined) { highOutput.value = high ? '🔔 (true)' : ' 🔕' } else { highOutput.value = '-' }
 			if(low !== undefined) { lowOutput.value = low ? '🔔 (true)' : ' 🔕' } else { lowOutput.value = '-' }
@@ -109,35 +124,42 @@ export class ADT7410Builder {
 
 
 		const refreshSetPoints = async () => {
-			const high = await this.#device.getSetPointHigh()
-			const low = await this.#device.getSetPointLow()
-			const critical = await this.#device.getSetPointCritical()
-			const hysteria = await this.#device.getSetPointHysteria()
+			try {
+				const high = await this.#device.getSetPointHigh()
+				const low = await this.#device.getSetPointLow()
+				const critical = await this.#device.getSetPointCritical()
+				const hysteria = await this.#device.getSetPointHysteria()
 
-			highNumber.value = high
-			lowNumber.value = low
-			criticalNumber.value = critical
-			hysteriaNumber.value = hysteria
+				highNumber.value = high
+				lowNumber.value = low
+				criticalNumber.value = critical
+				hysteriaNumber.value = hysteria
+			}
+			catch(e) {
+				console.warn(e)
+			}
 		}
 
 		const refreshConfig = async () => {
-			const {
-				faultQueueLength,
-				polarityCTActiveHigh,
-				polarityINTActiveHigh,
-				comparison,
-				mode,
-				resolution
-			} = await this.#device.getConfiguration()
+			return this.#device.getConfiguration()
+				.then(({
+					faultQueueLength,
+					polarityCTActiveHigh,
+					polarityINTActiveHigh,
+					comparison,
+					mode,
+					resolution
+				}) => {
+					modeSelect.value = mode
+					intCtModeSelect.value = comparison
+					faultQueueSelect.value = faultQueueLength
+					resolutionSelect.value = resolution
+					intPolaritySelect.value = polarityINTActiveHigh
+					ctPolaritySelect.value = polarityCTActiveHigh
 
-			modeSelect.value = mode
-			intCtModeSelect.value = comparison
-			faultQueueSelect.value = faultQueueLength
-			resolutionSelect.value = resolution
-			intPolaritySelect.value = polarityINTActiveHigh
-			ctPolaritySelect.value = polarityCTActiveHigh
-
-			root.setAttribute('data-resolution', resolution)
+					root.setAttribute('data-resolution', resolution)
+				})
+				.catch(e => console.warn(e))
 		}
 
 
@@ -154,6 +176,7 @@ export class ADT7410Builder {
 				mode: Number.parseInt(modeSelect.value),
 				resolution: Number.parseInt(resolutionSelect.value)
 			})
+				.catch(e => console.warn(e))
 
 			if(modeSelect.value === '1') {
 				await delayMs(240) // delay per spec after OneShot
@@ -170,6 +193,7 @@ export class ADT7410Builder {
 			resetButton.disabled = true
 
 			await this.#device.reset()
+				.catch(e => console.warn(e))
 
 			await refreshConfig()
 			await refreshSetPoints()
@@ -215,7 +239,7 @@ export class ADT7410Builder {
 
 		bindTabRoot(root)
 
-
+		await refreshId()
 		await refreshConfig()
 		await refreshSetPoints()
 

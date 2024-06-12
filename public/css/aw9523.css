@@ -31,7 +31,7 @@ aw9523-config {
 			border-radius: 1em;
 			border-color: var(--color-accent--darker, red);
 
-			& legend {
+			& legend:not(:empty) {
 				font-weight: bold;
 				padding-inline: 1ch;
 			}

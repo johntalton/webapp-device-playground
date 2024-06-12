@@ -283,6 +283,9 @@ export class PCF8523Builder {
 
 		const pollTimeButton = root.querySelector('button[data-poll-time]')
 		pollTimeButton.addEventListener('click', event => {
+			const outputIntegrity = root.querySelector('output[data-display-integrity]')
+			const outputTime = root.querySelector('output[data-display-time]')
+
 			Promise.resolve()
 				.then(async () => {
 					const time = await this.#device.getTime(false, century)
@@ -298,14 +301,16 @@ export class PCF8523Builder {
 
 					console.log(time.integrity ? '👍' : '👎', date)
 
-					const outputIntegrity = root.querySelector('output[data-display-integrity]')
-					outputIntegrity.value = time.integrity ? '👍' : '👎'
 
-					const outputTime = root.querySelector('output[data-display-time]')
+					outputIntegrity.value = time.integrity ? '👍' : '👎'
 					outputTime.value = date.toString() // date.toLocaleString('en-US')
 
 				})
-				.catch(e => console.warn(e))
+				.catch(e => {
+					console.warn(e)
+					outputIntegrity.value = `🛑`
+					outputTime.value = '-'
+				})
 		})
 
 		return root

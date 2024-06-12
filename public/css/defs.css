@@ -1,51 +1,5 @@
-/* @property --color-accent--h {
-	syntax: "<number>";
-  initial-value: 0;
-  inherits: true;
-}
-
-@property --color-accent--s {
-	syntax: "<percent>";
-  initial-value: 50%;
-  inherits: true;
-}
-
-@property --color-accent--l {
-	syntax: "<percent>";
-  initial-value: 50%;
-  inherits: true;
-}
-
-@property --light-percentage {
-	syntax: "<percent>";
-	initial-value: 10%;
-	inherits: true;
-}
-
-@property --lighter-percentage {
-	syntax: "<percent>";
-	initial-value: 30%;
-	inherits: true;
-}
-
-@property --lightest-percentage {
-	syntax: "<percent>";
-	initial-value: 40%;
-	inherits: true;
-}
 
 
-@property --dark-percentage {
-	syntax: "<percent>";
-	initial-value: 15%;
-	inherits: true;
-}
-
-@property --darker-percentage {
-	syntax: "<percent>";
-	initial-value: 20%;
-	inherits: true;
-} */
 
 @property --color-accent {
   syntax: "<color>";
@@ -65,11 +19,18 @@
   inherits: true;
 }
 
-/* BASE PERCENT - STABLE */
-:root {
-	--color-accent--h: 0;
-	--color-accent--s: 100%;
-	--color-accent--l: 10%;
+@property --color-gray {
+  syntax: "<color>";
+  initial-value: gray;
+  inherits: true;
+}
+
+
+
+[data-theme] {
+	/*  */
+	--color-disabled: var(--color-gray);
+	--color-opaque-black: rgba(50 50 50 / 0.25);
 
 	--light-percentage: 10%;
 	--lighter-percentage: 30%;
@@ -77,26 +38,11 @@
 
 	--dark-percentage: 15%;
 	--darker-percentage: 20%;
-}
 
-[data-theme] {
-	/*  */
-	--color-accent--complement: hsl(
-		calc(var(--color-accent--h) + 180),
-		var(--color-accent--s),
-		var(--color-accent--l));
+	--color-accent--h: 0;
+	--color-accent--s: 100%;
+	--color-accent--l: 10%;
 
-	--color-accent--triad1: hsl(
-		calc(var(--color-accent--h) + 120),
-		var(--color-accent--s),
-		var(--color-accent--l));
-
-	--color-accent--triad2: hsl(
-		calc(var(--color-accent--h) + 240),
-		var(--color-accent--s),
-		var(--color-accent--l));
-
-	/*  */
 	--color-accent: hsl(
 		var(--color-accent--h),
 		var(--color-accent--s),
@@ -104,45 +50,54 @@
 	--color-accent-text: var(--color-white, red);
 
 	/*  */
+
+	/* --color-accent--lighter: hsl(from var(--color-accent, red) h s var(--lighter-percentage, 1)); */
+	/* --color-accent--lightest: hsl(from var(--color-accent, red) h s var(--lightest-percentage, 1)); */
+	/* --color-accent--light: hsl(from var(--color-accent, red) h s var(--light-percentage, 1)); */
+
+	--color-accent--light-text: var(--color-black, red);
+	--color-accent--lighter-text: var(--color-black, red);
+	--color-accent--lightest-text: var(--color-black, red);
+
+	/* --color-accent--dark: hsl(from var(--color-accent, red) h s var(--dark-percentage, 1));
+	--color-accent--darker: hsl(from var(--color-accent, red) h s var(--darker-percentage, 1)); */
+
+	--color-accent--dark-text: var(--color-white, red);
+	--color-accent--darker-text: var(--color-white, red);
+
+
+
+
+
+
 	--color-accent--light: hsl(
 		var(--color-accent--h),
 		var(--color-accent--s),
 		calc(var(--color-accent--l) + var(--light-percentage)));
-	--color-accent--light-text: var(--color-black, red);
 
 	--color-accent--lighter: hsl(
 		var(--color-accent--h),
 		var(--color-accent--s),
 		calc(var(--color-accent--l) + var(--lighter-percentage)));
-	--color-accent--lighter-text: var(--color-black, red);
 
 	--color-accent--lightest: hsl(
 		var(--color-accent--h),
 		var(--color-accent--s),
 		calc(var(--color-accent--l) + var(--lightest-percentage)));
-	--color-accent--lightest-text: var(--color-black, red);
 
-	/*  */
-	--color-accent--dark: hsl(
-		var(--color-accent--h),
-		var(--color-accent--s),
-		calc(var(--color-accent--l) - var(--dark-percentage)));
-	--color-accent--dark-text: var(--color-white, red);
+		--color-accent--dark: hsl(
+			var(--color-accent--h),
+			var(--color-accent--s),
+			calc(var(--color-accent--l) - var(--dark-percentage)));
 
-	--color-accent--darker: hsl(
-		var(--color-accent--h),
-		var(--color-accent--s),
-		calc(var(--color-accent--l) - var(--darker-percentage)));
-	--color-accent--darker-text: var(--color-white, red);
+		--color-accent--darker: hsl(
+			var(--color-accent--h),
+			var(--color-accent--s),
+			calc(var(--color-accent--l) - var(--darker-percentage)));
 
-	/*  */
-	--color-disabled: grey;
-	--color-opaque-black: rgba(50 50 50 / 0.25);
 
-	/*  */
-	--base-accent-background-color: var(--color-accent--dark, red);
-	--base-accent-text-color: var(--color-accent--dark-text, red);
 
-	--base-page-background-color: var(--color-accent--lighter, red);
-	--base-page-text-color: var(--color-black, red);
+
+
+
 }

@@ -1,6 +1,7 @@
 import { I2CTransactionBus } from '@johntalton/and-other-delights'
 import {
 	ExcameraLabsI2CDriver,
+	CoreExcameraLabsI2CDriver,
 	EXCAMERA_LABS_VENDOR_ID,
 	ExcameraLabsI2CDriverI2C
 } from '@johntalton/excamera-i2cdriver'
@@ -13,6 +14,64 @@ import { asyncEvent } from '../util/async-event.js'
 import { bindTabRoot } from '../util/tabs.js'
 
 export const EXCAMERA_LABS_USB_FILTER = { usbVendorId: EXCAMERA_LABS_VENDOR_ID }
+
+class TestPort extends EventTarget {
+	#port
+	offset = 0
+
+	constructor(port) {
+		super()
+		this.#port = port
+	}
+
+	open(options) { return this.#port.open(options) }
+
+	get readable() {
+		let offset = this.offset
+
+		return new ReadableStream({
+			type: 'bytes',
+			start(controller) {
+				console.log('START')
+				const buffer = Uint8Array.from([ 0x55, 0x00, 0xff, 0xaa ])
+				const tailReader = async () => {
+
+					await delayMs(100)
+
+					console.log('enquuee2', this.offset)
+					this.offset += 1
+
+					if(this.offset >= buffer.byteLength) {
+						console.log('CLOSE', this.offset, buffer)
+						controller.close()
+						return
+					}
+
+					controller.enqueue(buffer.slice(this.offset, 1))
+
+					return tailReader()
+				}
+
+				tailReader()
+			},
+			async pull(controller) {
+
+			},
+			cancel() {
+
+			}
+		})
+	}
+
+	get writable() {
+		return {
+			getWriter: () => {
+				return this.#port.writable.getWriter()
+			}
+		}
+	}
+}
+
 
 class RateLimitBus {
 	#bus
@@ -45,9 +104,9 @@ class RateLimitBus {
 
 	async sendByte(address, byteValue) { throw new Error('never used ?') }
 
-	async readI2cBlock(address, cmd, length, bufferSource) {
+	async readI2cBlock(address, cmd, length, readBuffer) {
 		this.#canTakeReadToken()
-		return this.#bus.readI2cBlock(address, cmd, length)
+		return this.#bus.readI2cBlock(address, cmd, length, readBuffer)
 	}
 
 	async writeI2cBlock(address, cmd, length, bufferSource) {
@@ -55,9 +114,9 @@ class RateLimitBus {
 		return this.#bus.writeI2cBlock(address, cmd, length, bufferSource)
 	}
 
-	async i2cRead(address, length, bufferSource) {
+	async i2cRead(address, length, readBuffer) {
 		this.#canTakeReadToken()
-		return this.#bus.i2cRead(address, length, bufferSource)
+		return this.#bus.i2cRead(address, length, readBuffer)
 	}
 
 	async i2cWrite(address, length, bufferSource) {
@@ -134,9 +193,9 @@ class RestrictiveBus {
 
 	async sendByte(address, byteValue) { throw new Error('never used ?') }
 
-	async readI2cBlock(address, cmd, length, bufferSource) {
+	async readI2cBlock(address, cmd, length, readBuffer) {
 		this.#canReadBlock(address, cmd, length)
-		return this.#bus.readI2cBlock(address, cmd, length)
+		return this.#bus.readI2cBlock(address, cmd, length, readBuffer)
 	}
 
 	async writeI2cBlock(address, cmd, length, bufferSource) {
@@ -144,9 +203,9 @@ class RestrictiveBus {
 		return this.#bus.writeI2cBlock(address, cmd, length, bufferSource)
 	}
 
-	async i2cRead(address, length, bufferSource) {
+	async i2cRead(address, length, readBuffer) {
 		this.#canRead(address, length)
-		return this.#bus.i2cRead(address, length, bufferSource)
+		return this.#bus.i2cRead(address, length, readBuffer)
 	}
 
 	async i2cWrite(address, length, bufferSource) {
@@ -159,7 +218,7 @@ class RestrictiveBus {
 async function initScript(port) {
 	// console.log('running i2cdriver init script')
 
-	// await ExcameraLabsI2CDriver.sendRecvTextCommand(port, '@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@', new ArrayBuffer(64), 64)
+	// await CoreExcameraLabsI2CDriver.sendRecvTextCommand(port, '@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@', new ArrayBuffer(64), 64)
 
 	// exit and return to i2x mode if not in it already
 	await ExcameraLabsI2CDriver.endBitbangCommand(port)
@@ -180,7 +239,7 @@ async function initScript(port) {
 	for (let echoByte of echoSig) {
 		// console.log('echoByte', echoByte)
 		const result = await ExcameraLabsI2CDriver.echoByte(port, echoByte)
-		// console.log({ echoByte, result })
+		console.log({ echoByte, result })
 		if(echoByte !== result) { console.warn('EchoByte miss-match')}
 	}
 
@@ -239,6 +298,7 @@ export class ExcameraI2CDriverUIBuilder {
 	#port
 	#ui
 	#i2cDriver
+	#tbus
 	#vbus
 	#capture
 
@@ -261,7 +321,8 @@ export class ExcameraI2CDriverUIBuilder {
 			baudRate: 1000000,
 			dataBits: 8,
 			parity: 'none',
-			stopBits: 1
+			stopBits: 1,
+			// bufferSize: 1
 		})
 
 		// device author provided init script
@@ -270,7 +331,8 @@ export class ExcameraI2CDriverUIBuilder {
 		console.warn('allocing untracked vbus ... please cleanup hooks')
 		this.#i2cDriver = ExcameraLabsI2CDriverI2C.from({ port: this.#port })
 		const exbus = I2CBusExcameraI2CDriver.from(this.#i2cDriver)
-		this.#vbus = I2CTransactionBus.from(RestrictiveBus.from(RateLimitBus.from(exbus)))
+		this.#tbus = I2CTransactionBus.from(exbus)
+		this.#vbus = RestrictiveBus.from(RateLimitBus.from(this.#tbus))
 
 		const { crc } = await ExcameraLabsI2CDriver.transmitStatusInfo(this.#port)
 		this.#i2cDriver.crc = crc
@@ -306,7 +368,7 @@ export class ExcameraI2CDriverUIBuilder {
 
 		const dataCaptureList = root.querySelector('[data-capture-list]')
 
-		const PREFERRED_DEVICE = 'adt7410'
+		const PREFERRED_DEVICE = 'pcf8523'
 		const manualOptionsTemplate = manualDeviceSelection?.querySelector('template')
 		manualDeviceSelection?.append(...I2C_GUESSES.map(({ addresses, name }) => {
 			const templateDoc = manualOptionsTemplate?.content.cloneNode(true)
@@ -431,7 +493,7 @@ export class ExcameraI2CDriverUIBuilder {
 			return `${trunc2(uptime / 60.0 / 60.0)} hours`
 		}
 
-		const refresh = async () => this.#vbus.transaction(async () => {
+		const refresh = async () => {
 			// const internalState = await ExcameraLabsI2CDriver.internalState(this.#port)
 
 			const {
@@ -447,7 +509,7 @@ export class ExcameraI2CDriverUIBuilder {
 				speed,
 				pullups,
 				crc
-			} = await ExcameraLabsI2CDriver.transmitStatusInfo(this.#port)
+			} = await this.#tbus.transaction(async () => ExcameraLabsI2CDriver.transmitStatusInfo(this.#port))
 
 			// console.log({
 			// 	mode, speed, pullups
@@ -469,12 +531,11 @@ export class ExcameraI2CDriverUIBuilder {
 			out('sda').innerText = `${sda} (${sda === 1 ? 'Idle' : 'Active'})`
 			out('scl').innerText = `${scl} (${scl === 1 ? 'Idle' : 'Active'})`
 			out('crc').value = `0x${crc.toString(16).padStart(4, '0')} (0x${this.#i2cDriver.crc.toString(16).padStart(4, '0')})`
-		})
+		}
 
 
 		const self = this
-		function handelScan(event, addrDisp, devList) {
-			console.log('handelScan')
+		function handleScan(event, addrDisp, devList) {
 			const button = event.target
 
 			button.disabled = true
@@ -485,7 +546,7 @@ export class ExcameraI2CDriverUIBuilder {
 			const existingLis = devList.querySelectorAll('li')
 			existingLis.forEach(el => el.remove())
 
-			ExcameraLabsI2CDriver.scan(self.#port)
+			self.#tbus.transaction(async () => ExcameraLabsI2CDriver.scan(self.#port)
 				.then(results => {
 					results
 						.forEach(result => {
@@ -562,6 +623,7 @@ export class ExcameraI2CDriverUIBuilder {
 				.then(() => {
 					button.disabled = false
 				})
+			)
 		}
 
 		const configForm = root.querySelector('[data-config]')
@@ -569,11 +631,11 @@ export class ExcameraI2CDriverUIBuilder {
 			const whatChanged = event.target.getAttribute('name')
 
 			if(whatChanged === 'speed') {
-				await ExcameraLabsI2CDriver.setSpeed(this.#port, parseInt(speedSelect.value))
+				await this.#tbus.transaction(async () => ExcameraLabsI2CDriver.setSpeed(this.#port, parseInt(speedSelect.value)))
 				await refresh()
 			}
 			else if(whatChanged === 'pullupSCL' || whatChanged === 'pullupSDA') {
-				await ExcameraLabsI2CDriver.setPullupControls(this.#port, parseInt(pullUpSelectSDA.value), parseInt(pullUpSelectSCL.value))
+				this.#tbus.transaction(async () => ExcameraLabsI2CDriver.setPullupControls(this.#port, parseInt(pullUpSelectSDA.value), parseInt(pullUpSelectSCL.value)))
 				await refresh()
 			}
 		}))
@@ -708,7 +770,7 @@ export class ExcameraI2CDriverUIBuilder {
 		resetButton?.addEventListener('click', asyncEvent(async event => {
 			event.preventDefault()
 
-			await ExcameraLabsI2CDriver.resetBus(this.#port)
+			await this.#tbus.transaction(async () => ExcameraLabsI2CDriver.resetBus(this.#port))
 			await refresh()
 		}))
 
@@ -716,20 +778,16 @@ export class ExcameraI2CDriverUIBuilder {
 		rebootButton?.addEventListener('click', asyncEvent(async event => {
 			event.preventDefault()
 
-			await ExcameraLabsI2CDriver.reboot(this.#port)
+			await this.#tbus.transaction(async () => ExcameraLabsI2CDriver.reboot(this.#port))
 		}))
 
 		const addrDisp = root.querySelector('addr-display')
 		const devList = root.querySelector('[data-device-list]')
 		const startScanButton = root.querySelector('button[data-scan]')
-		startScanButton?.addEventListener('click', event => handelScan(event, addrDisp, devList))
+		startScanButton?.addEventListener('click', event => handleScan(event, addrDisp, devList))
 
 		manualCreateDevice?.addEventListener('click', asyncEvent(async event => {
 			event.preventDefault()
-
-			// const foo = await I2CBusExcameraI2CDriver.from(this.#i2cDriver).readI2cBlock(0x48, 0x0B, 1)
-			// console.log({ foo })
-			// return
 
 			const addr = manualAddressInput?.value
 			const deviceGuess = manualDeviceSelection?.value

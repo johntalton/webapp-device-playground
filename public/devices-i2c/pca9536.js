@@ -97,8 +97,6 @@ export class PCA9536Builder {
 			const polarity = await this.#device.getPolarityInversion()
 			const config = await this.#device.getConfiguration()
 
-			console.log('refresh', { value, output, polarity, config })
-
 			elements.gpio0.direction.value = config.gpio0
 			elements.gpio1.direction.value = config.gpio1
 			elements.gpio2.direction.value = config.gpio2

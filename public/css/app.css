@@ -19,11 +19,11 @@ body {
 	grid-template-rows: 5em 1fr;
 	grid-template-columns: max-content 1fr;
 
-	background-color: var(--base-accent-background-color, red);
-	color: var(--base-accent-text-color, red);
+	background-color: var(--color-accent--dark, red);
+	color: var(--color-accent--dark-text, red);
 }
 
-body:not([data-view ^= "aside"]) {
+body:not([data-view ~= "aside"]) {
 	/* grid-template-areas:
 		"nav"
 		"main";

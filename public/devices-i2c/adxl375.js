@@ -34,14 +34,15 @@ export class ADXL375Builder {
 		await this.#device.setBitrateAndPowerMode({
 			reducedPowerMode: false,
 			// rate: 0b0100 // 1Hz
-			rate: 7 // 12HZ
+			// rate: 7 // 12HZ
+			rate: 5 //
 		})
 
 
 		await this.#device.setFIFOControl({
 			mode: 'Stream',
 			triggerLinkInterrupt2: false,
-			samples: 10 // watermark
+			samples: 0 // watermark
 		})
 
 		await this.#device.setPowerControl({
@@ -111,7 +112,7 @@ export class ADXL375Builder {
 
 
 
-			const SAMPLE_COUNT = 100
+			const SAMPLE_COUNT = 50
 
 			function renderGraph(canvas, context, points, max) {
 				context.clearRect(0, 0, canvas.width, canvas.height)
@@ -155,7 +156,9 @@ export class ADXL375Builder {
 
 					if(entries === 0) {
 						// console.log('delay')
-						await delayMs(1)
+						requestAnimationFrame(render)
+
+						await delayMs(10)
 						continue
 					}
 
@@ -177,6 +180,7 @@ export class ADXL375Builder {
 					requestAnimationFrame(render)
 				}
 			})
+			.catch(e => console.warn(e))
 
 
 			// let q = Promise.resolve()

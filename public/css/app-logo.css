@@ -19,7 +19,7 @@ h1 {
   color: var(--logo-color-text, red);
 }
 
-/* [data-view ^= "aside"] {
+/* [data-view ~= "aside"] {
   & h1 {
     grid-column: 1 / -1;
 

@@ -1,0 +1,324 @@
+<!DOCTYPE html>
+<html>
+	<body>
+		<ht16k33-config layout="" font="" display-type>
+			<div class="tabs">
+				<button data-tab="config" data-active>Config</button>
+				<button data-tab="segmented">Segmented</button>
+				<button data-tab="display">Display</button>
+				<button data-tab="direct">Direct</button>
+			</div>
+
+
+			<form data-config data-for-tab="config" data-active class="tabsContent">
+				<fieldset>
+					<legend></legend>
+
+					<label>Enable Oscillator</label>
+					<input name="enableOscillator" type="checkbox">
+
+					<label>Enable Display</label>
+					<input name="enable" type="checkbox">
+
+					<label>Blink Rate</label>
+					<select name="blinkRate">
+						<option value="off">None</option>
+						<option value="0.5hz">0.5 Hz</option>
+						<option value="1hz">1 Hz</option>
+						<option value="2hz">2 Hz</option>
+					</select>
+
+					<label>Dimming</label>
+					<input name="dimming" type="range" min="0" max="15">
+
+					<button data-set-config>Set</button>
+				</fieldset>
+			</form>
+
+			<form data-direct data-for-tab="direct" class="tabsContent">
+				<table>
+					<thead>
+						<tr>
+							<th></th>
+							<th>0</th>
+							<th>1</th>
+							<th>2</th>
+							<th>3</th>
+							<th>4</th>
+							<th>5</th>
+							<th>6</th>
+							<th>7</th>
+						</tr>
+					</thead>
+					<tbody>
+						<tr>
+							<th>0</th>
+
+							<td><input name="col0row0" type="checkbox"></td>
+							<td><input name="col1row0" type="checkbox"></td>
+							<td><input name="col2row0" type="checkbox"></td>
+							<td><input name="col3row0" type="checkbox"></td>
+							<td><input name="col4row0" type="checkbox"></td>
+							<td><input name="col5row0" type="checkbox"></td>
+							<td><input name="col6row0" type="checkbox"></td>
+							<td><input name="col7row0" type="checkbox"></td>
+						</tr>
+
+						<tr>
+							<th>1</th>
+
+							<td><input name="col0row1" type="checkbox"></td>
+							<td><input name="col1row1" type="checkbox"></td>
+							<td><input name="col2row1" type="checkbox"></td>
+							<td><input name="col3row1" type="checkbox"></td>
+							<td><input name="col4row1" type="checkbox"></td>
+							<td><input name="col5row1" type="checkbox"></td>
+							<td><input name="col6row1" type="checkbox"></td>
+							<td><input name="col7row1" type="checkbox"></td>
+						</tr>
+
+						<tr>
+							<th>2</th>
+
+							<td><input name="col0row2" type="checkbox"></td>
+							<td><input name="col1row2" type="checkbox"></td>
+							<td><input name="col2row2" type="checkbox"></td>
+							<td><input name="col3row2" type="checkbox"></td>
+							<td><input name="col4row2" type="checkbox"></td>
+							<td><input name="col5row2" type="checkbox"></td>
+							<td><input name="col6row2" type="checkbox"></td>
+							<td><input name="col7row2" type="checkbox"></td>
+						</tr>
+
+						<tr>
+							<th>3</th>
+
+							<td><input name="col0row3" type="checkbox"></td>
+							<td><input name="col1row3" type="checkbox"></td>
+							<td><input name="col2row3" type="checkbox"></td>
+							<td><input name="col3row3" type="checkbox"></td>
+							<td><input name="col4row3" type="checkbox"></td>
+							<td><input name="col5row3" type="checkbox"></td>
+							<td><input name="col6row3" type="checkbox"></td>
+							<td><input name="col7row3" type="checkbox"></td>
+						</tr>
+
+						<tr>
+							<th>4</th>
+
+							<td><input name="col0row4" type="checkbox"></td>
+							<td><input name="col1row4" type="checkbox"></td>
+							<td><input name="col2row4" type="checkbox"></td>
+							<td><input name="col3row4" type="checkbox"></td>
+							<td><input name="col4row4" type="checkbox"></td>
+							<td><input name="col5row4" type="checkbox"></td>
+							<td><input name="col6row4" type="checkbox"></td>
+							<td><input name="col7row4" type="checkbox"></td>
+						</tr>
+
+						<tr>
+							<th>5</th>
+
+							<td><input name="col0row5" type="checkbox"></td>
+							<td><input name="col1row5" type="checkbox"></td>
+							<td><input name="col2row5" type="checkbox"></td>
+							<td><input name="col3row5" type="checkbox"></td>
+							<td><input name="col4row5" type="checkbox"></td>
+							<td><input name="col5row5" type="checkbox"></td>
+							<td><input name="col6row5" type="checkbox"></td>
+							<td><input name="col7row5" type="checkbox"></td>
+						</tr>
+
+						<tr>
+							<th>6</th>
+
+							<td><input name="col0row6" type="checkbox"></td>
+							<td><input name="col1row6" type="checkbox"></td>
+							<td><input name="col2row6" type="checkbox"></td>
+							<td><input name="col3row6" type="checkbox"></td>
+							<td><input name="col4row6" type="checkbox"></td>
+							<td><input name="col5row6" type="checkbox"></td>
+							<td><input name="col6row6" type="checkbox"></td>
+							<td><input name="col7row6" type="checkbox"></td>
+						</tr>
+
+						<tr>
+							<th>7</th>
+
+							<td><input name="col0row7" type="checkbox"></td>
+							<td><input name="col1row7" type="checkbox"></td>
+							<td><input name="col2row7" type="checkbox"></td>
+							<td><input name="col3row7" type="checkbox"></td>
+							<td><input name="col4row7" type="checkbox"></td>
+							<td><input name="col5row7" type="checkbox"></td>
+							<td><input name="col6row7" type="checkbox"></td>
+							<td><input name="col7row7" type="checkbox"></td>
+						</tr>
+
+						<tr>
+							<th>8</th>
+
+							<td><input name="col0row8" type="checkbox"></td>
+							<td><input name="col1row8" type="checkbox"></td>
+							<td><input name="col2row8" type="checkbox"></td>
+							<td><input name="col3row8" type="checkbox"></td>
+							<td><input name="col4row8" type="checkbox"></td>
+							<td><input name="col5row8" type="checkbox"></td>
+							<td><input name="col6row8" type="checkbox"></td>
+							<td><input name="col7row8" type="checkbox"></td>
+						</tr>
+
+						<tr>
+							<th>9</th>
+
+							<td><input name="col0row9" type="checkbox"></td>
+							<td><input name="col1row9" type="checkbox"></td>
+							<td><input name="col2row9" type="checkbox"></td>
+							<td><input name="col3row9" type="checkbox"></td>
+							<td><input name="col4row9" type="checkbox"></td>
+							<td><input name="col5row9" type="checkbox"></td>
+							<td><input name="col6row9" type="checkbox"></td>
+							<td><input name="col7row9" type="checkbox"></td>
+						</tr>
+
+						<tr>
+							<th>10</th>
+
+							<td><input name="col0row10" type="checkbox"></td>
+							<td><input name="col1row10" type="checkbox"></td>
+							<td><input name="col2row10" type="checkbox"></td>
+							<td><input name="col3row10" type="checkbox"></td>
+							<td><input name="col4row10" type="checkbox"></td>
+							<td><input name="col5row10" type="checkbox"></td>
+							<td><input name="col6row10" type="checkbox"></td>
+							<td><input name="col7row10" type="checkbox"></td>
+						</tr>
+
+						<tr>
+							<th>11</th>
+
+							<td><input name="col0row11" type="checkbox"></td>
+							<td><input name="col1row11" type="checkbox"></td>
+							<td><input name="col2row11" type="checkbox"></td>
+							<td><input name="col3row11" type="checkbox"></td>
+							<td><input name="col4row11" type="checkbox"></td>
+							<td><input name="col5row11" type="checkbox"></td>
+							<td><input name="col6row11" type="checkbox"></td>
+							<td><input name="col7row11" type="checkbox"></td>
+						</tr>
+
+						<tr>
+							<th>12</th>
+
+							<td><input name="col0row12" type="checkbox"></td>
+							<td><input name="col1row12" type="checkbox"></td>
+							<td><input name="col2row12" type="checkbox"></td>
+							<td><input name="col3row12" type="checkbox"></td>
+							<td><input name="col4row12" type="checkbox"></td>
+							<td><input name="col5row12" type="checkbox"></td>
+							<td><input name="col6row12" type="checkbox"></td>
+							<td><input name="col7row12" type="checkbox"></td>
+						</tr>
+
+						<tr>
+							<th>13</th>
+
+							<td><input name="col0row13" type="checkbox"></td>
+							<td><input name="col1row13" type="checkbox"></td>
+							<td><input name="col2row13" type="checkbox"></td>
+							<td><input name="col3row13" type="checkbox"></td>
+							<td><input name="col4row13" type="checkbox"></td>
+							<td><input name="col5row13" type="checkbox"></td>
+							<td><input name="col6row13" type="checkbox"></td>
+							<td><input name="col7row13" type="checkbox"></td>
+						</tr>
+
+						<tr>
+							<th>14</th>
+
+							<td><input name="col0row14" type="checkbox"></td>
+							<td><input name="col1row14" type="checkbox"></td>
+							<td><input name="col2row14" type="checkbox"></td>
+							<td><input name="col3row14" type="checkbox"></td>
+							<td><input name="col4row14" type="checkbox"></td>
+							<td><input name="col5row14" type="checkbox"></td>
+							<td><input name="col6row14" type="checkbox"></td>
+							<td><input name="col7row14" type="checkbox"></td>
+						</tr>
+
+						<tr>
+							<th>15</th>
+
+							<td><input name="col0row15" type="checkbox"></td>
+							<td><input name="col1row15" type="checkbox"></td>
+							<td><input name="col2row15" type="checkbox"></td>
+							<td><input name="col3row15" type="checkbox"></td>
+							<td><input name="col4row15" type="checkbox"></td>
+							<td><input name="col5row15" type="checkbox"></td>
+							<td><input name="col6row15" type="checkbox"></td>
+							<td><input name="col7row15" type="checkbox"></td>
+						</tr>
+
+					</tbody>
+				</table>
+			</form>
+
+			<div data-segment data-for-tab="segmented" class="tabsContent">
+				<form>
+					<select name="productSegmented">
+						<!--  -->
+					</select>
+
+					<select name="font">
+						<!--  -->
+					</select>
+
+					<label>Product URL</label>
+					<a target="_blank"><output name="productUrl"></output></a>
+				</form>
+
+
+				<div data-product="4x14featherwing">
+					<segment-display fourteen segments=""></segment-display>
+					<segment-display fourteen segments=""></segment-display>
+					<segment-display fourteen segments=""></segment-display>
+					<segment-display fourteen segments=""></segment-display>
+				</div>
+
+				<div data-active data-product="4x7backpack">
+					<segment-display name="one" seven segments="A E F"></segment-display>
+					<segment-display name="two" seven segments="A D E F G"></segment-display>
+					<segment-display name="three" seven segments="A C D F G"></segment-display>
+					<segment-display name="four" seven segments="A E F DP"></segment-display>
+				</div>
+
+				<form>
+					<fieldset>
+						<legend></legend>
+
+						<label>Output</label>
+						<select name="outputType">
+							<option value="text">Text</option>
+							<option value="time" selected>Time</option>
+						</select>
+
+						<label data-output-type="text">Text</label>
+						<input data-output-type="text" name="segmentText" type="text" disabled />
+					</fieldset>
+
+					<button data-segment-set>Set</button>
+				</form>
+
+			</div>
+
+			<div data-for-tab="display" class="tabsContent">
+				<input type="color" value="blue" readonly>
+				<input type="color" value="orange" readonly>
+				<input type="color" value="green" readonly>
+
+				<canvas width="8" height="8"></canvas>
+			</div>
+
+		</ht16k33-config>
+	</body>
+</html>

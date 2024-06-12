@@ -242,6 +242,9 @@
 	--color-accent--darker: oklab(0.68 -0.1 -0.17);
 	--color-accent--darker-text: white;
 
+	--color-set: oklab(0.73 -0.26 0.17);
+  --color-unset: rgb(41 41 41);
+
 	@media (prefers-color-scheme: dark) {
 		--color-accent: oklab(0.27 0 0);
     --color-accent-text: white;
@@ -256,5 +259,6 @@
     --color-accent--darker: oklab(0.68 -0.1 -0.17);
     --color-accent--darker-text: white;
 	}
+
 }
 

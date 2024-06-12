@@ -2,8 +2,8 @@
 aside {
   grid-area: aside;
 
-  background-color: var(--base-accent-background-color, red);
-  color: var(--base-accent-text-color, red);
+  background-color: var(--color-accent--dark, red);
+  color: var(--color-accent--dark-text, red);
 
   display: flex;
   flex-direction: column;
