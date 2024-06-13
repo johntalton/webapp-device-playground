@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html>
+	<body>
+		<mcp2221-config>
+			<div class="tabs">
+				<button data-tab="status" data-active>Status</button>
+				<button data-tab="config">Config</button>
+				<button data-tab="gpio">Gpio</button>
+				<button data-tab="i2c">I²C Host</button>
+				<button data-tab="password">Password</button>
+			</div>
+
+			<form data-active data-for-tab="status" class="tabsContent">
+				<button data-status>Status</button>
+
+				setSpeedByte?: number, // extra
+				speedDividerByte?: number,
+				setSpeedRequested?: boolean,
+				setSpeedSuccessfull?: boolean,
+
+				interruptEdgeDetectorState: boolean,
+
+
+				<label>Revision</label>
+				<output></output>
+
+				<fieldset>
+					<legend>I²C</legend>
+
+					<label>Cancelled</label>
+					<output>false</output>
+
+					<label>Clock</label>
+					<output></output>
+
+					<label>address</label>
+					<output></output>
+
+					<label>requestedTransferLength</label>
+					<output></output>
+
+					<label>transferredBytes</label>
+					<output></output>
+
+					<label>dataBufferCounter</label>
+					<output></output>
+
+					<label>communicationSpeedDivider</label>
+					<output></output>
+
+					<label>timeoutMs</label>
+					<output></output>
+
+					<label>SCL</label>
+					<output></output>
+
+					<label>SDA</label>
+					<output></output>
+
+					<label>ACKed</label>
+					<output></output>
+
+					<label>pendingValue</label>
+					<output></output>
+				</fieldset>
+
+				<fieldset>
+					<legend>ADC</legend>
+
+					<label>Ch 0</label>
+					<output></output>
+
+					<label>Ch 1</label>
+					<output></output>
+
+					<label>Ch 2</label>
+					<output></output>
+
+				</fieldset>
+			</form>
+
+			<form data-for-tab="config" class="tabsContent">
+				<button data-reset>Reset</button>
+
+				<fieldset>
+					<legend></legend>
+
+					<label>Security</label>
+					<select readonly>
+						<option>Permanently Locked</option>
+						<option>Password Protected</option>
+						<option>Unsecured</option>
+					</select>
+
+					<label>CDC Serial Emulation</label>
+					<input type="checkbox" />
+
+					<label>Clock</label>
+					<select>
+						<option>Off</option>
+					</select>
+
+					<label>Interrupt Edge</label>
+					<select>
+						<option>Positive</option>
+						<option>Negative</option>
+						<option>Both</option>
+						<option>Off</option>
+					</select>
+				</fieldset>
+
+				<fieldset>
+					<legend>DAC</legend>
+
+						referenceVoltage: Voltage,
+						referenceOptions: VoltageOption,
+
+						initialValue: number
+
+				</fieldset>
+
+				<fieldset>
+					<legend>ADC</legend>
+
+						referenceVoltage: Voltage,
+						referenceOptions: VoltageOption,
+
+				</fieldset>
+
+				<fieldset>
+					<legend>USB</legend>
+
+					<label>USB Manufacturer</label>
+					<input name="usbManufacturer" type="text" />
+
+					<label>USB Product</label>
+					<input name="usbProduct" type="text" />
+
+					<label>USB Serial Number</label>
+					<input name="usbSN" type="text" />
+
+					<label>FactorySerialNumber</label>
+					<input name="factorySN" type="text" />
+
+				</fieldset>
+
+				<fieldset>
+					<legend>USB</legend>
+
+					<label>vendorId</label>
+					<input />
+
+					<label>productId</label>
+					<input />
+
+					<label>powerAttribute</label>
+					<input />
+
+					<label>mARequested</label>
+					<input />
+
+				</fieldset>
+
+				<fieldset>
+					<legend>Runtime</legend>
+
+					<label>UART LED Rx</label>
+					<input type="checkbox" />
+
+					<label>UART LED Tx</label>
+					<input type="checkbox" />
+
+					<label>I²C LED</label>
+					<input type="checkbox" />
+
+					<label>Suspend</label>
+					<input type="checkbox" />
+
+					<label>USB Config</label>
+					<input type="checkbox" />
+				</fieldset>
+			</form>
+
+			<div data-for-tab="password" class="tabsContent">
+
+			</div>
+
+			<div data-for-tab="gpio" class="tabsContent">
+				<form>
+					<fieldset>
+						<legend>Gpio 0</legend>
+					</fieldset>
+
+					<fieldset>
+						<legend>Gpio 1</legend>
+					</fieldset>
+
+					<fieldset>
+						<legend>Gpio 2</legend>
+					</fieldset>
+
+					<fieldset>
+						<legend>Gpio 3</legend>
+					</fieldset>
+				</form>
+			</div>
+
+			<div data-for-tab="i2c" class="tabsContent">
+				<fieldset>
+					<button data-cancel>Cancel</button>
+				</fieldset>
+
+				<button data-scan>Scan</button>
+
+				<addr-display name="scanResults">
+					<!--  -->
+				</addr-display>
+
+				<ul data-device-list>
+					<template>
+						<li></li>
+					</template>
+				</ul>
+			</div>
+
+
+		</mcp2221-config>
+	</body>
+</html>

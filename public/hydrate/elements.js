@@ -1,7 +1,6 @@
 import { HTMLImportElement } from '../custom-elements/html-import.js'
 
 import { I2CAddressDisplayElement } from '../custom-elements/address-display.js'
-import { MCP2221ConfigElement } from '../custom-elements/mcp2221-config.js'
 
 export function hydrateCustomeElementTemplateImport(importElemId, name, konstructor) {
 	const element = document.getElementById(importElemId)
@@ -33,5 +32,4 @@ export async function hydrateCustomElements() {
 	customElements.define('html-import', HTMLImportElement)
 
 	hydrateCustomeElementTemplateImport('addr-display', 'addr-display', I2CAddressDisplayElement)
-	hydrateCustomeElementTemplateImport('mcp2221-config', 'mcp2221-config', MCP2221ConfigElement)
 }

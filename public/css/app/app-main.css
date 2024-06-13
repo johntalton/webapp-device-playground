@@ -1,0 +1,43 @@
+main {
+  grid-area: main;
+  height: 100%;
+
+  border-radius: 2.5em 2.5em 2.5em 2.5em;
+  padding-inline-start: 3em;
+  padding-block-start: 2em;
+
+  background-color: var(--color-accent--lighter, red);
+  color: var(--color-accent--lighter-text, red);
+
+  /* overflow-y: scroll; */
+}
+
+
+main > section {
+  display: flex;
+  flex-direction: column;
+  /* flex-wrap: wrap; */
+  align-content: flex-start;
+
+  /* display: grid;
+
+  grid-template-areas: "controls custom";
+  grid-template-columns: max-content 1fr; */
+
+  align-items: start;
+  gap: 1em;
+  height: 100%;
+  width: 100%;
+
+  & > :not(button) {
+    align-self: stretch;
+  }
+
+  &[data-loading] {
+    display: none;
+  }
+}
+
+main > section:not([data-active]) {
+  display: none;
+}

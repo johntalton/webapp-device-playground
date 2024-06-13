@@ -1,0 +1,144 @@
+form {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1em;
+
+  align-items: center;
+  align-self: stretch;
+
+
+
+  & fieldset {
+    grid-column: 1 / -1;
+
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1em;
+
+    padding: 2em;
+    margin-block-end: 1em;
+    border-radius: 1em;
+    border-color: var(--color-accent--darker, red);
+
+    justify-self: stretch;
+    justify-items: start;
+    align-items: center;
+
+    & legend:not(:empty) {
+      font-weight: bold;
+      padding-inline: 1ch;
+    }
+  }
+
+
+  & button {
+    justify-self: start;
+    align-self: flex-start;
+    min-width: 15ch;
+  }
+
+  & progress {
+    accent-color: var(--color-accent--darker, red);
+  }
+
+
+
+  & select {
+    appearance: none;
+
+    background-color: var(--color-accent--lighter, red);
+    color: var(--color-accent--lighter-text, red);
+
+    min-width: 20ch;
+
+    margin-inline: 0;
+
+    padding-inline: 1em;
+    padding-block: 0.5em;
+
+    border-radius: 1em;
+    border-style: dashed;
+    border-style: solid;
+    border-color: transparent;
+  }
+
+  select:where(:active, :hover) {
+    box-shadow: 0 0 5px var(--color-opaque-black, red);
+  }
+
+  select:where(:focus-visible, :focus) {
+    outline-color: var(--color-accent, red);
+    outline-width: 5px;
+  }
+
+
+
+
+  & input[type="checkbox"] {
+    accent-color: var(--color-accent--darker, red);
+    width: 1.25em;
+    height: 1.25em;
+    margin: 0.5em;
+    aspect-ratio: 1 / 1;
+  }
+
+
+
+
+  & input[type="number"] {
+    min-width: 7ch;
+    font-size: 1.5em;
+
+    padding-inline-start: 1ch;
+
+    border-radius: .25em;
+    border-style: dashed;
+    border-style: solid;
+    border-color: transparent;
+
+    background-color: var(--color-accent--lightest, red);
+    color: var(--color-accent--lightest-text, red);
+  }
+
+  & input[type="number"]:not(:where(:focus-visible, :focus)) {
+    background-color: var(--color-accent--lighter, red);
+  }
+
+  & input[type="number"]:where(:focus-visible, :focus) {
+    background-color: var(--color-white, red);
+    color: var(--color-black, red);
+
+    outline-color: var(--color-accent, red);
+    outline-width: 5px;
+  }
+
+
+
+  & input[type="range"] {
+    min-height: 3em;
+    accent-color: var(--color-accent--darker, red);
+  }
+
+
+
+  & input[type="text"] {
+    accent-color: var(--color-accent--darker, red);
+    border: 0;
+
+    border-radius: 2em;
+    padding-inline-start: 1em;
+    padding-block: .5em;
+
+    &:not(:focus-visible) {
+      background-color: var(--color-accent--lighter, red);
+      color: var(--color-accent--lighter-text, red);
+    }
+
+    &:disabled {
+      border: 0;
+      background-color: #00000014;
+    }
+  }
+
+
+}

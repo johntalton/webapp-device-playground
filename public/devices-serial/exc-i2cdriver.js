@@ -339,7 +339,9 @@ export class ExcameraI2CDriverUIBuilder {
 
 	}
 
-	async close() { return this.#port.close() }
+	async close() {
+		return this.#port.close()
+	}
 
 	signature() {
 		const info =  this.#port.getInfo()

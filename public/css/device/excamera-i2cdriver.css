@@ -44,9 +44,12 @@ excamera-i2cdriver {
 	}
 
 	& [data-for-tab="direct"] {
-		display: flex;
 		flex-direction: column;
 		gap: 1em;
+
+		&[data-active] {
+			display: flex;
+		}
 	}
 
 	& form[data-config] {
@@ -62,7 +65,6 @@ excamera-i2cdriver {
 		border-radius: 1em;
 		margin-block-start: 1em;
 
-
 		background-color: var(--color-accent--lighter, red);
 		color: var(--color-accent--lighter-text, red);
 	}
@@ -73,10 +75,6 @@ excamera-i2cdriver {
 		gap: 0.5em;
 	}
 
-	/* & div.tabsContent select {
-    background-color: pink;
-    color: black;
-  } */
 
 	& form[data-info] {
 		display: grid;
@@ -99,18 +97,20 @@ excamera-i2cdriver {
 	}
 
 
-	& div.tabsContent {
-		display: flex;
+	& [data-for-tab] {
 		align-items: flex-start;
 		align-content: flex-start;
 		justify-content: flex-start;
 		gap: 3em;
 		flex-wrap: wrap;
+
+		&[data-active] {
+			display: flex;
+		}
 	}
 
 
-	& div.tabsContent[data-for-tab="settings"] {
-		/* display: flex; */
+	& [data-for-tab="settings"] {
 		flex-direction: row;
 		align-content: flex-start;
 		overflow-y: scroll;
@@ -149,38 +149,14 @@ excamera-i2cdriver {
 	}
 
 	& form[data-manual-add-form] {
-		display: grid;
-		grid-template-columns: 1fr 1fr;
-		gap: 1em;
-
-		/* padding-inline: 2em; */
-		/* padding-block: 1em; */
-
-		align-items: center;
-
 
 		& fieldset {
-			grid-column: 1 / -1;
-
-			display: grid;
-			grid-template-columns: 1fr 1fr;
-			gap: 1em;
-
-			padding: 2em;
-			border-radius: 1em;
-			border-color: var(--color-accent--darker, red);
-
 			background-color: var(--color-accent--lighter, red);
 			color: var(--color-accent--lighter-text, red);
-
-			& legend:not(:empty) {
-				font-weight: bold;
-				padding-inline: 1ch;
-			}
 		}
 	}
 
-	& .tabsContent[data-for-tab="scan"] {
+	& [data-for-tab="scan"] {
 		grid-template-columns: 1fr;
 		grid-template-rows: 1fr min-content;
 		justify-items: start;
@@ -198,7 +174,7 @@ excamera-i2cdriver {
 		}
 	}
 
-	& .tabsContent[data-for-tab="capture"] {
+	& [data-for-tab="capture"] {
 
 		flex-direction: column;
 		gap: 1em;

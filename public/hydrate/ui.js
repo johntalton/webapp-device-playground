@@ -184,7 +184,7 @@ export async function addHIDDevice(hid) {
 		if(hid.productId == MCP2221_USB_FILTER.productId) {
 			//console.log('adding mcp2221', hid)
 
-			const builder = await MCP2221UIBuilder.builder(hid, ui)
+			const builder = await MCP2221UIBuilder.builder(hid, UI_HOOKS)
 			buildDeviceListItem(deviceListElem, builder)
 			return
 		}

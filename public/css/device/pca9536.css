@@ -14,26 +14,10 @@ pca9536-config {
       border-radius: 1em;
       border-color: var(--color-accent--darker, red);
 
-      & > label {
-        /* margin-block-end: .5em; */
-      }
-
       & > :where(input, select) {
         /* margin-block-end: 1em; */
         justify-self: start;
       }
-
-      & input[type="checkbox"] {
-        width: 1.25em;
-        aspect-ratio: 1 / 1;
-        accent-color: var(--color-accent--darker, red);
-      }
-    }
-
-    & fieldset[data-output] {
-      grid-column: 1 / -1;
-
-      grid-template-columns: 1fr 1fr;
     }
 
     & fieldset[data-actions] {

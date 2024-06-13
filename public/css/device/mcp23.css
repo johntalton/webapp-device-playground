@@ -107,47 +107,6 @@ mcp23-config {
 
 	& form {
 		flex-grow: 1;
-
-		display: grid;
-		grid-template-columns: 1fr 1fr;
-		gap: 1em;
-
-		align-items: center;
-
-		/* border: 1px solid var(--color-accent--light, red);
-    border-radius: 1em;
-    padding: 1em;
-    margin: 0; */
-    align-self: stretch;
-
-		& fieldset {
-			grid-column: 1 / -1;
-
-			display: grid;
-			grid-template-columns: 1fr 1fr;
-			gap: 1em;
-
-			padding: 2em;
-			border-radius: 1em;
-			border-color: var(--color-accent--darker, red);
-
-			& legend:not(:empty) {
-				font-weight: bold;
-				padding-inline: 1ch;
-			}
-		}
-
-		& select {
-			background-color: var(--color-accent--lighter, red);
-			color: var(--color-accent--lighter-text, red);
-		}
-
-		& input[type="checkbox"] {
-			accent-color: var(--color-accent--darker, red);
-			width: 1.25em;
-			height: 1.25em;
-			margin: 0.5em;
-		}
 	}
 
 
@@ -157,9 +116,7 @@ mcp23-config {
 		margin-block-end: 2em;
     gap: 2em;
 
-		& progress {
-			accent-color: var(--color-accent--darker, red);
-		}
+
 	}
 
 	& form[data-status] {
@@ -169,10 +126,6 @@ mcp23-config {
 
 		& fieldset {
 			flex-grow: 1;
-
-			display: grid;
-			grid-template-columns: 1fr 1fr 1fr;
-			gap: 1em;
 
 
 			& output[data-flag="false"] {

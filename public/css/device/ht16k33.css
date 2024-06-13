@@ -1,0 +1,79 @@
+ht16k33-config {
+	padding: 1em;
+	height: 100%;
+
+	& [data-product] {
+		display: flex;
+		flex-direction: row;
+		flex-wrap: nowrap;
+
+		margin: 2em;
+
+		&:not([data-active]) {
+			display: none;
+		}
+	}
+
+	& [data-segment] {
+		display: flex;
+		flex-direction: row;
+		flex-wrap: wrap;
+		gap: 1em;
+
+		& form {
+			flex-grow: 1;
+		}
+	}
+
+	& table {
+		border-collapse: collapse;
+	}
+
+
+	& th {
+		font-size: 0.5em;
+		min-width: 4ch;
+	}
+
+	& tr:nth-child(even) > td {
+		background-color: var(--color-accent--lighter, red);
+	}
+
+	& td {
+		min-width: 3em;
+	}
+
+}
+
+/*  */
+ht16k33-config canvas {
+	display: block;
+	background-color: var(--color-white, red);
+	border-radius: 1em;
+	margin-inline: 1em;
+
+	height: 15em;
+
+	image-rendering: auto;
+  image-rendering: crisp-edges;
+  image-rendering: pixelated;
+}
+
+
+
+
+:root {
+	--segment-orange: oklab(0.79 0.08 0.18);
+	--segment-green: oklab(0.76 -0.25 0.15)
+}
+
+segment-display { display: contents; }
+segment-display::part(segments) {
+	background-color: inherit;
+
+	--color-set: var(--segment-orange);
+	--color-unset: rgba(255 255 255 / 0.2);
+
+	--color: var(--color-unset);
+	color: var(--color);
+}

@@ -28,17 +28,6 @@ tca9548-config {
 				border-radius: 0.5em;
 			}
 
-			& legend:not(:empty) {
-				font-weight: bold;
-				padding-inline: 1ch;
-			}
-		}
-
-		& input[type="checkbox"] {
-			accent-color: var(--color-accent--darker, red);
-			width: 1.25em;
-			height: 1.25em;
-			margin: 0.5em;
 		}
 	}
 }

@@ -1,0 +1,33 @@
+button {
+  display: block;
+  font-size: 1em;
+
+  padding-inline: 1em;
+  padding-block: 0.5em;
+  margin-inline: 0;
+  border-radius: 2.5em;
+  border: 0;
+
+  white-space: nowrap;
+
+  border: 1px dashed transparent;
+  background-color: var(--color-accent--darker, red);
+  color: var(--color-accent--darker-text);
+}
+
+button:not([disabled]):hover {
+  background-color: var(--color-accent, red);
+  color: var(--color-accent-text);
+}
+
+button:not([disabled]):active {
+  background-color: var(--color-accent--darker, red);
+  color: var(--color-accent--darker-text);
+}
+
+button[disabled] {
+  border: 1px dashed var(--color-accent--lighter);
+
+  background-color: var(--color-accent--lightest, red);
+  color: var(--color-disabled, red);
+}

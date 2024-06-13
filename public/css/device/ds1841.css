@@ -1,0 +1,63 @@
+ds1841-config {
+
+	& [data-shadow-warning] {
+		display: none;
+	}
+
+	&[data-enable ~= "shadow"] {
+
+		& [data-shadow-warning] {
+			display: flex;
+			grid-column: -2 / -1;
+
+			font-weight: bold;
+
+			/* background: repeating-linear-gradient(
+				-45deg,
+				#0000000f,
+				#ffffff 5px,
+				transparent 5px,
+				transparent 25px
+			); */
+		}
+	}
+
+	& ol[data-lut-list] {
+		grid-column: 1 / -1;
+
+		display: grid;
+    grid-template-columns: repeat(auto-fill, 30%);
+    /* justify-items: center; */
+		justify-self: stretch;
+
+
+    gap: 1em;
+		list-style: none;
+
+		& li {
+			display: grid;
+			gap: 1em;
+			grid-template-columns: 1fr 1fr;
+			align-items: center;
+
+			border: 0.25em solid transparent;
+
+			padding: .5em;
+			padding-inline-start: 1em;
+			background-color: var(--color-accent--lighter, red);
+			border-radius: 1em;
+		}
+
+		& li[data-active] {
+			border-color: var(--color-accent--darker, red);
+		}
+	}
+
+
+
+	& [data-number-range] {
+		display: flex;
+		gap: 1em;
+	}
+
+}

@@ -3,14 +3,6 @@ ds3231-config {
   flex-direction: column;
   margin-inline-end: 2em;
 
-  & > form input[type="checkbox"] {
-    justify-self: start;
-    accent-color: var(--color-accent--darker, red);
-    width: 1.25em;
-    height: 1.25em;
-    margin: 0.5em;
-  }
-
   & > form[data-output] {
     font-size: 1em;
     margin-block-end: 1em;

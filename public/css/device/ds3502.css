@@ -1,0 +1,7 @@
+ds3502-config {
+
+	& form {
+		flex-grow: 1;
+
+	}
+}

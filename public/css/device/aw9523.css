@@ -7,10 +7,6 @@ aw9523-config {
 		display: grid;
 		grid-template-columns: 1fr 1fr;
 
-		& select {
-			background-color: var(--color-accent--lighter, red);
-			color: var(--color-accent--lighter-text, red);
-		}
 	}
 
 	& form[data-status] {
@@ -20,25 +16,7 @@ aw9523-config {
 
 		& fieldset {
 			flex-grow: 1;
-
-			display: grid;
-			grid-template-columns: 1fr 1fr;
-			gap: 2em;
-
 			justify-items: center;
-
-			padding: 2em;
-			border-radius: 1em;
-			border-color: var(--color-accent--darker, red);
-
-			& legend:not(:empty) {
-				font-weight: bold;
-				padding-inline: 1ch;
-			}
-		}
-
-		& button {
-			align-self: flex-start;
 		}
 	}
 
@@ -49,21 +27,6 @@ aw9523-config {
 		justify-items: stretch;
 
 		margin-inline-end: 2em;
-
-		& input[type="number"]:not(:where(:focus-visible, :focus)) {
-			background-color: var(--color-accent--lighter, red);
-		}
-
-		& input[type="range"] {
-			min-height: 3em;
-		}
-
-		& input[type="checkbox"] {
-			accent-color: var(--color-accent--darker, red);
-			width: 1.25em;
-			height: 1.25em;
-			margin: 0.5em;
-		}
 	}
 
 	& details {
@@ -124,10 +87,6 @@ aw9523-config {
 		}
 
 		& > fieldset {
-			display: grid;
-			grid-template-columns: 1fr 1fr;
-			align-items: center;
-			gap: 1em;
 			padding: 1em;
 			padding-block: 2em;
 			padding-inline-start: 2em;

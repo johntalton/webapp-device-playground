@@ -4,113 +4,51 @@ import { dumpHIDDevice } from '../util/hid-info.js'
 import { range } from '../util/range.js'
 import { deviceGuessByAddress } from '../devices-i2c/guesses.js'
 import { delayMs} from '../util/delay.js'
+import { HIDStreamSource } from '../util/hid-stream.js'
+import { bindTabRoot } from '../util/tabs.js'
 
-class WaitableQueue {
-	#latchResolve = () => {}
-	#dataLatch
-	#dataQ = []
+export function makeHIDStreamBinding(hid) {
+	const source = new HIDStreamSource(hid)
 
-	constructor() {
-		this.#dataLatch = new Promise(this.#pendingLatchFor())
-	}
+	return {
+		async read(count) {
+			if (source.readable === null) { throw new Error('null readable') }
+			if (source.readable.locked) { throw new Error('locked reader') }
 
-	#pendingLatchFor() {
-		return (resolve, _reject) => {
-			this.#latchResolve = data => {
-				resolve(data)
-				this.#dataLatch = new Promise(this.#pendingLatchFor())
-			}
-		}
-	}
+			const reader = source.readable.getReader({ mode: 'byob' })
 
-	push(data) {
-		this.#dataQ.push(data)
-		this.#latchResolve(data)
-	}
+			let buffer = new ArrayBuffer(count)
+			let readBytes = 0
 
-	pull() {
-		if(this.#dataQ.length > 0) {
-			return this.#dataQ.splice(0)[0] // remove from array (modifies array) and index into single result - yuk
-		}
+			try {
+				while(readBytes < count) {
+					const { value, done } = await reader.read(new Uint8Array(buffer, readBytes, count - readBytes))
+					if(done) { break }
 
-		return undefined
-	}
+					buffer = value.buffer
+					readBytes += buffer.byteLength
 
-	get waitForPull() { return this.#dataLatch }
-}
-
-class BindingFactory {
-	static from(hidDevice) {
-		const REPORT_ID = 0
-		const waitableQueue = new WaitableQueue()
-
-		hidDevice.addEventListener('inputreport', e => {
-			const { returnValue, reportId, data, device } = e
-
-			waitableQueue.push({
-				reportId, returnValue,
-				data
-			})
-		})
-
-		return {
-			read: async length => {
-				const READ_TIMEOUT_MS = 1000
-
-				const optimisticItem = waitableQueue.pull()
-				if(optimisticItem !== undefined) {
-					if(optimisticItem.data.byteOffset !== 0) { console.warn('returning buffer from view with non-zero offset') }
-					return optimisticItem.data.buffer
+					if(readBytes >= count) { break }
 				}
+			}
+			finally {
+				reader.releaseLock()
+			}
 
-				let timer = undefined
-				const timeoutRejectMs = (ms) => new Promise((resolve, reject) => { timer = setTimeout(reject, ms, new Error('timeout')) })
+			return buffer
+		},
 
-				await Promise.race([timeoutRejectMs(READ_TIMEOUT_MS), waitableQueue.waitForPull])
-
-				clearTimeout(timer)
-
-				const item = waitableQueue.pull()
-				if(item === undefined) { throw new Error('no data after wait?') }
-				if(item.data.byteOffset !== 0) { console.warn('returning buffer from view with non-zero offset') }
-				return item.data.buffer
-			},
-			write: async bufferSource => {
-				// console.log('xfer', bufferSource)
-				return hidDevice.sendReport(REPORT_ID, bufferSource)
+		async write(buffer) {
+			const writer = source.writable.getWriter()
+			try {
+				writer.write(buffer)
+			}
+			finally {
+				await writer.ready
+				writer.releaseLock()
 			}
 		}
 	}
-
-	// async function onceInputReport(hid, timeoutMs) {
-	// 	return new Promise((resolve, reject) => {
-	// 		const tout = setTimeout(() => reject(new Error('HID input report timedout')), timeoutMs)
-	// 		hid.addEventListener('inputreport', e => {
-	// 			clearTimeout(tout)
-	// 			resolve(e)
-	// 		}, { once: true })
-	// 	})
-	// }
-	// const binding = {
-	// 	read: async length => {
-	// 		// console.log('usbRead', length)
-
-	// 		// this is a risky approuch as the binding to the
-	// 		// single trigger event may be added after the
-	// 		// actaully importreport event has been triggered
-	// 		// this should be more coupled with the write command
-	// 		// and, like other usb wappers, expos a transfer function
-	// 		const { returnValue, reportId, data, device } = await onceInputReport(this.#hidDevice, 5000)
-	// 		if(reportId !== 0) { throw new Error('always reprot zero') }
-	// 		if(!returnValue) { throw new Error('no return value') }
-	// 		return data.buffer
-	// 	},
-	// 	write: async bufferSource => {
-	// 		// console.log('usbWrite', bufferSource)
-	// 		await this.#hidDevice.sendReport(0, bufferSource)
-	// 		return bufferSource.bytesLength
-	// 	}
-	// }
 }
 
 export class MCP2221UIBuilder {
@@ -131,26 +69,24 @@ export class MCP2221UIBuilder {
 
 	async open() {
 
-
 		await this.#hidDevice.open()
 
-		//dumpHIDDevice(this.#hidDevice)
+		const binding = makeHIDStreamBinding(this.#hidDevice)
 
-		const binding = BindingFactory.from(this.#hidDevice)
 		this.#device = await MCP2221A.from(binding)
 
 		//await this.#device.common.reset()
 
-		const status = await this.#device.common.status({ })
-		console.log({ status })
+		// const status = await this.#device.common.status({ })
+		// console.log({ status })
 		// await delayMs(100)
 
-		if(status.i2cState !== 0) {
-			console.log('cancle on open')
-			const result = await this.#device.common.status({ cancelI2c: true })
-			console.log({ result })
-			await delayMs(100)
-		}
+		// if(status.i2cState !== 0) {
+		// 	console.log('cancle on open')
+		// 	const result = await this.#device.common.status({ cancelI2c: true })
+		// 	console.log({ result })
+		// 	await delayMs(100)
+		// }
 
 		// const speed = await this.#device.common.status({ opaque: '', i2cClock: 100 })
 		// console.log({ speed })
@@ -246,37 +182,27 @@ export class MCP2221UIBuilder {
 	}
 
 	async buildCustomView() {
-		const root = document.createElement('mcp2221-config')
+		const response = await fetch('./custom-elements/mcp2221.html')
+		if (!response.ok) { throw new Error('no html for view') }
+		const view = await response.text()
+		const doc = (new DOMParser()).parseFromString(view, 'text/html')
 
-		const tabs = document.createElement('div')
-		tabs.setAttribute('slot', 'i2c-tabs')
-		tabs.classList.add('tabs')
+		const root = doc?.querySelector('mcp2221-config')
+		if (root === null) { throw new Error('no root for template') }
 
-		const resetI2CButton = document.createElement('button')
-		resetI2CButton.textContent = 'reset'
-		resetI2CButton.setAttribute('slot', 'i2c-controls')
-		tabs.appendChild(resetI2CButton)
+		const scanButton = root.querySelector('button[data-scan]')
+		const cancelI2CButton = root.querySelector('button[data-cancel]')
+		const resetI2CButton = root.querySelector('button[data-reset]')
+		const statusI2CButton = root.querySelector('button[data-status]')
+		const addressElem = root.querySelector('addr-display[name="scanResults"]')
+		const deviceList = root.querySelector('[data-device-list]')
 
-		const statusI2CButton = document.createElement('button')
-		statusI2CButton.textContent = 'status'
-		statusI2CButton.setAttribute('slot', 'i2c-controls')
-		tabs.appendChild(statusI2CButton)
 
-		const cancelI2CButton = document.createElement('button')
-		cancelI2CButton.textContent = 'cancel'
-		cancelI2CButton.setAttribute('slot', 'i2c-controls')
-		tabs.appendChild(cancelI2CButton)
 
-		const scanButton = document.createElement('button')
-		scanButton.textContent = 'scan'
-		scanButton.setAttribute('slot', 'i2c-controls')
-		tabs.appendChild(scanButton)
 
-		root.appendChild(tabs)
 
-		const addressElem = document.createElement('addr-display')
-		addressElem.setAttribute('slot', 'scan-display')
-		root.appendChild(addressElem)
+
+
 
 		scanButton.addEventListener('click', e => {
 			scanButton.disabled = true
@@ -373,7 +299,7 @@ export class MCP2221UIBuilder {
 
 						}, { once: true })
 
-						root.appendChild(listElem)
+						deviceList.appendChild(listElem)
 					})
 
 					scanButton.disabled = false
@@ -610,6 +536,9 @@ export class MCP2221UIBuilder {
 				})
 		})
 
+		bindTabRoot(root)
+
 		return root
 	}
 }
+
