@@ -6,6 +6,7 @@ import { deviceGuessByAddress } from '../devices-i2c/guesses.js'
 import { delayMs} from '../util/delay.js'
 import { HIDStreamSource } from '../util/hid-stream.js'
 import { bindTabRoot } from '../util/tabs.js'
+import { appendDeviceListItem } from '../util/device-list.js'
 
 export function makeHIDStreamBinding(hid) {
 	const source = new HIDStreamSource(hid)
@@ -269,24 +270,12 @@ export class MCP2221UIBuilder {
 						listElem.toggleAttribute('data-acked', true)
 
 						const guesses = deviceGuessByAddress(addr)
-						const guessSelectElem = document.createElement('select')
-						guessSelectElem.disabled = (guesses.length <= 1)
-						guesses.forEach(guess => {
-							const guessOptionElem = document.createElement('option')
-							guessOptionElem.textContent = guess.name
-							guessSelectElem.appendChild(guessOptionElem)
-						})
-						listElem.appendChild(guessSelectElem)
+						const item = appendDeviceListItem(deviceList, addr, { guesses })
 
-						const makeDeviceButton = document.createElement('button')
-						makeDeviceButton.textContent = 'Create Device 🕹'
-						makeDeviceButton.disabled = (guesses.length === 0)
-						listElem.appendChild(makeDeviceButton)
-
-						makeDeviceButton.addEventListener('click', e => {
+						item.button.addEventListener('click', e => {
 							//
 							console.log('making Virtual Bus from MCP2221')
-							const deviceGuess = guessSelectElem.value
+							const deviceGuess = item.select.value
 							const vbus = I2CBusMCP2221.from(this.#device, {})
 
 							this.#ui.addI2CDevice({
@@ -299,7 +288,6 @@ export class MCP2221UIBuilder {
 
 						}, { once: true })
 
-						deviceList.appendChild(listElem)
 					})
 
 					scanButton.disabled = false

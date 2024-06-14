@@ -62,11 +62,11 @@ form {
     border-color: transparent;
   }
 
-  select:where(:active, :hover) {
+  & select:where(:active, :hover) {
     box-shadow: 0 0 5px var(--color-opaque-black, red);
   }
 
-  select:where(:focus-visible, :focus) {
+  & select:where(:focus-visible, :focus) {
     outline-color: var(--color-accent, red);
     outline-width: 5px;
   }

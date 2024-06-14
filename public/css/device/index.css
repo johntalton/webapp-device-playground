@@ -1,5 +1,13 @@
 @import url("./addr-display.css");
+@import url('./device-list.css');
+@import url("./gpio.css");
 
+/*  */
+@import url("./excamera-i2cdriver.css");
+@import url("./mcp2221.css");
+@import url("./mash-mash.css");
+
+/*  */
 @import url("./adt7410.css");
 @import url("./adxl375.css");
 @import url("./aht20.css");
@@ -8,12 +16,8 @@
 @import url("./ds3231.css");
 @import url("./ds3502.css");
 @import url("./eeprom.css");
-@import url("./excamera-i2cdriver.css");
-@import url("./gpio.css");
 @import url("./ht16k33.css");
-@import url("./mash-mash.css");
 @import url("./mcp23.css");
-@import url("./mcp2221.css");
 @import url("./pca9536.css");
 @import url("./pcf8523.css");
 @import url("./pcf8574.css");

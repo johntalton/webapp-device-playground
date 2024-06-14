@@ -1,0 +1,32 @@
+ ul[data-device-list] {
+	display: flex;
+	flex-direction: column;
+	gap: 0.25em;
+}
+
+ul[data-device-list] > li {
+	display: none;
+}
+
+ul[data-device-list] > li > form {
+	display: contents;
+}
+
+ul[data-device-list] > li[data-acked] {
+	display: grid;
+	grid-template-columns: 5ch 1fr max-content;
+	gap: 1em;
+
+	background-color: var(--color-accent--lighter, red);
+	color: var(--color-accent--lighter-text, red);
+
+	font-weight: bolder;
+
+	border-radius: 2em;
+	padding-inline: 2em;
+	padding-block: 0.5em;
+
+	align-items: center;
+	flex-wrap: nowrap;
+
+}

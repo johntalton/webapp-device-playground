@@ -5,7 +5,8 @@ pca9536-config {
     gap: 1em;
     margin-inline-end: 2em;
 
-    & fieldset {
+    & > fieldset {
+      grid-column: auto;
       display: grid;
       gap: 1em;
 
@@ -18,6 +19,11 @@ pca9536-config {
         /* margin-block-end: 1em; */
         justify-self: start;
       }
+    }
+
+    & fieldset[data-output] {
+      grid-column: 1 / -1;
+      gap: 0.5em;
     }
 
     & fieldset[data-actions] {

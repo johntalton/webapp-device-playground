@@ -12,6 +12,7 @@ import { deviceGuessByAddress, I2C_GUESSES } from '../devices-i2c/guesses.js'
 import { delayMs} from '../util/delay.js'
 import { asyncEvent } from '../util/async-event.js'
 import { bindTabRoot } from '../util/tabs.js'
+import { appendDeviceListItem } from '../util/device-list.js'
 
 export const EXCAMERA_LABS_USB_FILTER = { usbVendorId: EXCAMERA_LABS_VENDOR_ID }
 
@@ -578,30 +579,12 @@ export class ExcameraI2CDriverUIBuilder {
 
 							addrDisp.appendChild(elem)
 
-
 							//
 							const guesses = deviceGuessByAddress(addr)
+							const item = appendDeviceListItem(devList, addr, { acked, guesses })
 
-							const template2 = `
-								<li ${acked ? 'data-acked' : '' }>
-								${addr}
-									<select>
-										${guesses.map(guess => {
-											return `<option value="${guess.name}">${guess.name}</option>`
-										}).join('')}
-									</select>
-
-									<button>Create 🕹</button>
-								</li>
-								`
-
-							const node2 = (new DOMParser()).parseFromString(template2, 'text/html')
-							const elem2 = node2.body.firstChild
-							devList.appendChild(elem2)
-
-
-							const makeDeviceButton = elem2.querySelector('button')
-							const guessSelectElem = elem2.querySelector('select')
+							const makeDeviceButton = item.button
+							const guessSelectElem = item.select
 
 							makeDeviceButton.addEventListener('click', event => {
 								makeDeviceButton.disabled = true
