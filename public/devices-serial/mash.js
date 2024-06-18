@@ -158,7 +158,8 @@ export class MashUIBuilder {
 		})
 	}
 
-	async close() {
+	async close(forget = false) {
+		if(forget) { await this.#port.forget() }
 		return this.#port.close()
 	}
 

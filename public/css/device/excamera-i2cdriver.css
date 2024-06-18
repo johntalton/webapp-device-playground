@@ -134,14 +134,6 @@ excamera-i2cdriver {
 		&[data-active] {
 			display: grid
 		}
-
-		& [data-scan-group] {
-			display: flex;
-			flex-direction: row;
-			gap: 1em;
-			align-items: start;
-			flex-wrap: wrap;
-		}
 	}
 
 	& [data-for-tab="capture"] {

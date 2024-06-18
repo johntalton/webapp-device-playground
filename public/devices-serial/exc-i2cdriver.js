@@ -240,7 +240,7 @@ async function initScript(port) {
 	for (let echoByte of echoSig) {
 		// console.log('echoByte', echoByte)
 		const result = await ExcameraLabsI2CDriver.echoByte(port, echoByte)
-		console.log({ echoByte, result })
+		//console.log({ echoByte, result })
 		if(echoByte !== result) { console.warn('EchoByte miss-match')}
 	}
 
@@ -340,7 +340,8 @@ export class ExcameraI2CDriverUIBuilder {
 
 	}
 
-	async close() {
+	async close(forget = false) {
+		if(forget) { await this.#port.forget() }
 		return this.#port.close()
 	}
 

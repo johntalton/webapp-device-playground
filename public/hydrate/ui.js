@@ -13,6 +13,7 @@ import {
 	EXCAMERA_LABS_PRODUCT_ID,
 	EXCAMERA_LABS_MINI_PRODUCT_ID
 } from '@johntalton/excamera-i2cdriver'
+import { asyncEvent } from '../util/async-event.js'
 
 
 const MCP2221_USB_FILTER = {
@@ -82,7 +83,14 @@ export function buildDeviceListItem(deviceListElem, builder) {
 	mainElem.appendChild(sectionElem)
 
 	//
-	liElem.addEventListener('click', e => {
+	liElem.addEventListener('click', asyncEvent(async event => {
+		if(event.shiftKey) {
+			await builder.close(event.metaKey)
+			liElem.remove()
+			sectionElem.remove()
+			return
+		}
+
 		const transition = document.startViewTransition(() => {
 			deviceListElem.querySelectorAll(':scope > li').forEach(li => {
 				li.removeAttribute('data-active')
@@ -97,7 +105,7 @@ export function buildDeviceListItem(deviceListElem, builder) {
 
 			sectionElem.toggleAttribute('data-active', true)
 		})
-	}, { once: false })
+	}), { once: false })
 
 	// demolisher
 	return () => {

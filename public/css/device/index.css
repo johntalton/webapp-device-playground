@@ -1,6 +1,7 @@
 @import url("./addr-display.css");
 @import url('./device-list.css');
 @import url("./gpio.css");
+@import url("./scan-group.css");
 
 /*  */
 @import url("./excamera-i2cdriver.css");

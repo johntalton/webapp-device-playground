@@ -46,8 +46,10 @@ form {
   & select {
     appearance: none;
 
-    background-color: var(--color-accent--lighter, red);
-    color: var(--color-accent--lighter-text, red);
+    /* background-color: var(--color-accent--lighter, red);
+    color: var(--color-accent--lighter-text, red); */
+    background-color: var(--color-accent--darker, red);
+    color: var(--color-accent--darker-text);
 
     min-width: 20ch;
 

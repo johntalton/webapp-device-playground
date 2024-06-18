@@ -1,0 +1,7 @@
+[data-scan-group] {
+  display: flex;
+  flex-direction: row;
+  gap: 1em;
+  align-items: start;
+  flex-wrap: wrap;
+}
