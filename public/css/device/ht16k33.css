@@ -2,6 +2,11 @@ ht16k33-config {
 	padding: 1em;
 	height: 100%;
 
+	& [data-direct] {
+		display: flex;
+		flex-direction: column;
+	}
+
 	& [data-product] {
 		display: flex;
 		flex-direction: row;
@@ -32,7 +37,7 @@ ht16k33-config {
 
 	& th {
 		font-size: 0.5em;
-		min-width: 4ch;
+		min-width: 10ch;
 	}
 
 	& tr:nth-child(even) > td {

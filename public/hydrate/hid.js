@@ -21,12 +21,21 @@ async function hydrateHIDBackgroundDevices(addDevice) {
 	devices.forEach(addDevice)
 }
 
-const handleHIDConnect = e => console.log(e)
-const handleHIDDisconnect = e => console.log(e)
 
 async function hydrateHIDEvents(addDevice) {
-	navigator.hid.addEventListener('connect', handleHIDConnect)
-  navigator.hid.addEventListener('disconnect', handleHIDDisconnect)
+	navigator.hid.addEventListener('connect', event => {
+		const { device } = event
+
+		// async off into nothing
+		addDevice(device)
+			.catch(e => console.warn(e))
+	})
+
+  navigator.hid.addEventListener('disconnect', event => {
+		const { device } = event
+		// hid devices are responsible for their own cleanup
+		console.log('hid device disconnected')
+	})
 }
 
 async function requestHIDDevice(filters) {
@@ -44,7 +53,7 @@ function requestHIDHandler(addDevice, event) {
 
 const build_requestHIDHandler = addDevice => event => requestHIDHandler(addDevice, event)
 
-async function hydrateHIDReqeustButton(requestHIDButton, addDevice) {
+async function hydrateHIDRequestButton(requestHIDButton, addDevice) {
 	requestHIDButton.addEventListener('click', build_requestHIDHandler(addDevice), { once: false })
 	requestHIDButton.disabled = false
 }
@@ -56,6 +65,6 @@ export async function hydrateHID(requestHIDButton, ui) {
 	return Promise.all([
 		hydrateHIDBackgroundDevices(add),
 		hydrateHIDEvents(add),
-		hydrateHIDReqeustButton(requestHIDButton, add)
+		hydrateHIDRequestButton(requestHIDButton, add)
 	])
 }

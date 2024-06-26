@@ -85,7 +85,7 @@ async function hydrateSerialBackgroundPorts(add) {
 function build_handleSerialConnect(add) {
 	return e => {
 		// connect from previously requested port
-		console.log('reconnect previous port')
+		// console.log('reconnect previous port')
 		const { target: port } = e
 
 		add(port)
@@ -96,7 +96,8 @@ function build_handleSerialConnect(add) {
 function build_handleSerialDisconnect(add) {
 	return e => {
 		const { target: port } = e
-
+		// devices are responsible for their own cleanup
+		console.log('serial port disconnected', port)
 	}
 }
 

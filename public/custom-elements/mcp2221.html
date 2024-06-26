@@ -111,20 +111,26 @@
 			</form>
 
 			<form data-flash data-for-tab="config" class="tabsContent">
-				<button data-save-flash>Write Cofnig to FLASH</button>
+				<!-- <label>Write Mode</label>
+				<select name="writeMode">
+					<option value="flash">FLASH</option>
+					<option value="sram">SRAM</option>
+				</select> -->
 
-				<fieldset>
+				<fieldset data-change-group="interrupt">
 					<legend></legend>
 
-					<label>Security</label>
-					<select name="security" disabled>
-						<option value="permanently-locked">Permanently Locked</option>
-						<option value="password-protected">Password Protected</option>
-						<option value="unsecured">Unsecured</option>
+					<label>Interrupt Edge</label>
+					<select name="interruptEdge">
+						<option value="positive">Positive</option>
+						<option value="negative">Negative</option>
+						<option value="both">Both</option>
+						<option value="off">Off</option>
 					</select>
+				</fieldset>
 
-					<label>CDC Serial Emulation</label>
-					<input name="cdcSerialEmulation" type="checkbox" />
+				<fieldset data-change-group="clock">
+					<legend>Clock</legend>
 
 					<label>Clock Duty Cycle</label>
 					<select name="clockDutyCycle">
@@ -136,22 +142,67 @@
 
 					<label>Clock Rate</label>
 					<select name="clockDivider">
-						<option value="375 kHz">375 kHz</option>
-						<option value="750 kHz">750 kHz</option>
-						<option value="1.5 MHz">1.5 MHz</option>
-						<option value="3 MHz">3 MHz</option>
-						<option value="6 MHz">6 MHz</option>
+						<option value="375 kHz">   375 kHz</option>
+						<option value="750 kHz">   750 kHz</option>
+						<option value="1.5 MHz"> 1.5 MHz</option>
+						<option value="3 MHz"> 3 MHz</option>
+						<option value="6 MHz"> 6 MHz</option>
 						<option value="12 MHz">12 MHz</option>
 						<option value="24 MHz">24 MHz</option>
 					</select>
 
-					<label>Interrupt Edge</label>
-					<select name="interruptEdge">
-						<option value="positive">Positive</option>
-						<option value="negative">Negative</option>
-						<option value="both">Both</option>
-						<option value="off">Off</option>
+				</fieldset>
+
+				<fieldset data-change-group="dac">
+					<legend>DAC</legend>
+
+					<label>Reference Voltage</label>
+					<select name="dacReferenceVoltage">
+						<option value="4.096V">4.096 V</option>
+						<option value="2.048V">2.048 V</option>
+						<option value="1.024V">1.024 V</option>
+						<option value="Off">Off</option>
 					</select>
+
+					<label>Options</label>
+					<select name="dacReferenceOptions">
+						<option value="Vdd">Vdd</option>
+						<option value="Vrm">Vrm</option>
+					</select>
+
+					<label>Initial Value</label>
+					<input name="dacInitialValue" type="number" />
+				</fieldset>
+
+				<fieldset data-change-group="adc">
+					<legend>ADC</legend>
+
+					<label>Reference Voltage</label>
+					<select name="adcReferenceVoltage">
+						<option value="4.096V">4.096 V</option>
+						<option value="2.048V">2.048 V</option>
+						<option value="1.024V">1.024 V</option>
+						<option value="Off">Off</option>
+					</select>
+
+					<label>Options</label>
+					<select name="adcReferenceOptions">
+						<option value="Vdd">Vdd</option>
+						<option value="Vrm">Vrm</option>
+					</select>
+				</fieldset>
+
+				<fieldset>
+					<label>Security</label>
+					<select name="security" disabled>
+						<option value="permanently-locked">Permanently Locked</option>
+						<option value="password-protected">Password Protected</option>
+						<option value="unsecured">Unsecured</option>
+					</select>
+
+					<label>CDC Serial Emulation</label>
+					<input name="cdcSerialEmulation" type="checkbox" />
+
 				</fieldset>
 
 				<fieldset>
@@ -174,46 +225,7 @@
 				</fieldset>
 
 				<fieldset>
-					<legend>DAC</legend>
-
-					<label>Reference Voltage</label>
-					<select name="dacReferenceVoltage">
-						<option value="4.096V">4.096 V</option>
-						<option value="2.048V">2.048 V</option>
-						<option value="1.024V">1.024 V</option>
-						<option value="Off">Off</option>
-					</select>
-
-					<label>Options</label>
-					<select name="dacReferenceOptions">
-						<option value="Vdd">Vdd</option>
-						<option value="Vrm">Vrm</option>
-					</select>
-
-					<label>Initial Value</label>
-					<input name="dacInitialValue" type="number" />
-				</fieldset>
-
-				<fieldset>
-					<legend>ADC</legend>
-
-					<label>Reference Voltage</label>
-					<select name="adcReferenceVoltage">
-						<option value="4.096V">4.096 V</option>
-						<option value="2.048V">2.048 V</option>
-						<option value="1.024V">1.024 V</option>
-						<option value="Off">Off</option>
-					</select>
-
-					<label>Options</label>
-					<select name="adcReferenceOptions">
-						<option value="Vdd">Vdd</option>
-						<option value="Vrm">Vrm</option>
-					</select>
-				</fieldset>
-
-				<fieldset>
-					<legend>USB (Flash only)</legend>
+					<legend>USB</legend>
 
 					<label>USB Manufacturer</label>
 					<input name="usbManufacturer" type="text" />
@@ -366,7 +378,15 @@
 			<div data-for-tab="i2c" class="tabsContent">
 				<form>
 					<fieldset>
-						<button data-cancel>Cancel</button>
+						<label>Speed</label>
+						<select name="busSpeed">
+							<option value="50">50 MHz</option>
+							<option value="100">100 MHz</option>
+							<option value="400">400 MHz</option>
+							<option value="custom" data-custom disabled>-</option>
+						</select>
+
+						<!-- <button data-cancel>Cancel</button> -->
 					</fieldset>
 				</form>
 

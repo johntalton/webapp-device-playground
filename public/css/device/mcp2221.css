@@ -23,5 +23,9 @@ mcp2221-config {
     align-items: flex-start;
 		gap: 1em;
 	}
+
+	& select[name="busSpeed"] > option[data-custom]:disabled {
+		display: none;
+	}
 }
 

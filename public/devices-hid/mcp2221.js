@@ -86,48 +86,6 @@ export class MCP2221UIBuilder {
 		this.#device = await MCP2221A.from(binding)
 		this.#vbus = I2CBusMCP2221.from(this.#device, {})
 
-		// await this.#device.flash.writeGPSettings({
-		// 	gpio0: {
-		// 		outputValue: 0,
-		// 		direction: 'in',
-		// 		designation: 'Gpio'
-		// 	},
-		// 	gpio1: {
-		// 		outputValue: 0,
-		// 		direction: 'in',
-		// 		designation: 'Gpio'
-		// 	},
-		// 	gpio2: {
-		// 		outputValue: 0,
-		// 		direction: 'in',
-		// 		designation: 'Gpio'
-		// 	},
-		// 	gpio3: {
-		// 		outputValue: 0,
-		// 		direction: 'in',
-		// 		designation: 'Gpio'
-		// 	}
-		// })
-
-		// await this.#device.flash.writeChipSettings({
-		// 	chip: {
-		// 		enabledCDCSerialEnumeration: true,
-		// 		security: 'unsecured'
-		// 	},
-		// 	gp: {
-		// 		clock: { dutyCycle: '25%', divider: Divider00375 },
-		// 		dac: { referenceVoltage: VoltageOff, referenceOptions: 'Vdd' },
-		// 		adc: { referenceVoltage: VoltageOff, referenceOptions: 'Vdd' },
-		// 		interrupt: { edge: 'Off' }
-		// 	},
-		// 	usb: {
-		// 		vendorId: 1240,
-		// 		productId: 221,
-		// 		powerAttribute: 0,
-		// 		mARequested: 0
-		// 	},
-		// 	password: ''
-		// })
 	}
 
 	async close(forget = false) {
@@ -157,6 +115,9 @@ export class MCP2221UIBuilder {
 
 		const addressElem = root.querySelector('addr-display[name="scanResults"]')
 		const deviceList = root.querySelector('[data-device-list]')
+
+		const busSpeedSelect = root.querySelector('select[name="busSpeed"]')
+
 
 		const commonForm = root.querySelector('form[data-common]')
 
@@ -291,16 +252,23 @@ export class MCP2221UIBuilder {
 			interruptEdgeDetectorStateOutput.value = `${interruptEdgeDetectorState ? '🔔' : '🔕'} (${interruptEdgeDetectorState})`
 
 
+			function i2cClockTokHz(divider) {
+				return Math.round(1 / ((divider + 2) / 12_000_000) / 1000)
+			}
+
+			const communicationSpeedkHz = i2cClockTokHz(communicationSpeedDivider)
+			const annotationAboutSpeed = (communicationSpeedkHz < 50) ? '🐢' : (communicationSpeedkHz > 400) ? '🔥' : '✓'
+
 			i2cConfusedOutput.value = `${i2cConfused} ${i2cConfused ? '🛑' : ''}`
 			i2cInitializedOutput.value = `${i2cInitialized} ${i2cInitialized ? '' : '⚠️'}`
 			i2cStateOutput.value = `${i2cStateName} (${i2cState})`
 			i2cCancelledOutput.value = i2cCancelled
-			i2cClockOutput.value = i2cClock
+			i2cClockOutput.value = (i2cClock === undefined) ? '-' : `${i2cClock} (${i2cClockTokHz(i2cClock)} kHz)`
 			addressOutput.value = `${addressHex} (${address7RW})`
 			requestedTransferLengthOutput.value = requestedTransferLength
 			transferredBytesOutput.value = transferredBytes
 			dataBufferCounterOutput.value = dataBufferCounter
-			communicationSpeedDividerOutput.value = communicationSpeedDivider
+			communicationSpeedDividerOutput.value = `${communicationSpeedDivider} (${communicationSpeedkHz} kHz ${annotationAboutSpeed})`
 			timeoutMsOutput.value = `${timeoutMs} Ms`
 			sclOutput.value = SCL
 			sdaOutput.value = SDA
@@ -398,7 +366,7 @@ export class MCP2221UIBuilder {
 		}
 
 		const _refreshGPIO = async ({ gpio0, gpio1, gpio2, gpio3 }) => {
-			console.log('_refreshGpio', { gpio0, gpio1, gpio2, gpio3 })
+			// console.log('_refreshGpio', { gpio0, gpio1, gpio2, gpio3 })
 
 			function isDesignationGpio(designation) {
 				return [
@@ -415,8 +383,8 @@ export class MCP2221UIBuilder {
 						const isGpio = isDesignationGpio(gpio.designation)
 
 						gpioDesignationSelect.value = gpio.designation
-						gpioDirectionSelect.disabled = !isGpio
-						gpioOutputValue.disabled = !isGpio
+						// gpioDirectionSelect.disabled = !isGpio
+						// gpioOutputValue.disabled = !isGpio
 					}
 
 					if(gpio?.direction !== undefined) { gpioDirectionSelect.value = gpio.direction }
@@ -436,6 +404,65 @@ export class MCP2221UIBuilder {
 		}
 
 
+
+
+
+
+		flashForm?.addEventListener('change', asyncEvent(async event => {
+			event.preventDefault()
+
+
+			const changeGroupElem = event.target.closest('[data-change-group]')
+			if(changeGroupElem === null) {
+				// flash update
+				console.log('non change group')
+				return
+			}
+
+			const changeGroup = changeGroupElem.getAttribute('data-change-group')
+
+			if(changeGroup === 'interrupt') {
+				const edge = interruptEdgeSelect.value
+
+				console.log('set edge', edge)
+				await this.#device.sram.set({ gp: { interrupt: { edge, clear: false }} })
+				await refreshSRAM()
+			}
+			else if(changeGroup === 'clock') {
+				const dutyCycle = clockDutyCycleSelect.value
+				const divider = clockDividerSelect.value
+
+				console.log('setting clock', { dutyCycle, divider })
+				await this.#device.sram.set({ clock: { dutyCycle, divider } })
+				await refreshSRAM()
+			}
+			else if(changeGroup === 'dac') {
+				// todo whatChange === initial value fast path
+				const referenceVoltage = dacReferenceVoltageSelect.value
+				const referenceOptions = dacReferenceOptionsSelect.value
+				const initialValue = parseInt(dacInitialValueNumber.value)
+
+				await this.#device.sram.set({ gp: { dac: {
+					referenceVoltage,
+					referenceOptions,
+					initialValue
+				} } })
+				await refreshSRAM()
+			}
+			else if(changeGroup === 'adc') {
+				const referenceVoltage = adcReferenceVoltageSelect.value
+				const referenceOptions = adcReferenceOptionsSelect.value
+
+				await this.#device.sram.set({ gp: { adc: {
+					referenceVoltage,
+					referenceOptions
+				} } })
+				await refreshSRAM()
+			}
+			else { console.warn('unknown change group', changeGroup) }
+
+		}))
+
 		const gpioForms = [
 			{ form: gpio0Form, name: 'gpio0' },
 			{ form: gpio1Form, name: 'gpio1' },
@@ -448,23 +475,43 @@ export class MCP2221UIBuilder {
 				event.preventDefault()
 				const whatChanged = event.target.getAttribute('name')
 
-				const designationSelect = form?.querySelector('select[name="designation"]')
-				const directionSelect = form?.querySelector('select[name="direction"]')
-				const outputValueText = form?.querySelector('select[name="outputValue"]')
-
-				const designation = designationSelect.value
-				const direction = directionSelect.value === 'in' ? GpioDirectionIn : GpioDirectionOut
-				const outputValue = outputValueText.value === '1' ? Logic1 : Logic0
-
 				if(whatChanged === 'designation') {
-					// await this.#device.sram.set({
-
-					// })
+					console.log('update designation',  gpio0DesignationSelect.value)
+					await this.#device.sram.set({
+						gpio0: {
+							designation: gpio0DesignationSelect.value,
+							direction: gpio0DirectionSelect.value === 'in' ? GpioDirectionIn : GpioDirectionOut,
+							outputValue: gpio0OutputValue.value === '1' ? Logic1 : Logic0
+						},
+						gpio1: {
+							designation: gpio1DesignationSelect.value,
+							direction: gpio1DirectionSelect.value === 'in' ? GpioDirectionIn : GpioDirectionOut,
+							outputValue: gpio1OutputValue.value === '1' ? Logic1 : Logic0
+						},
+						gpio2: {
+							designation: gpio2DesignationSelect.value,
+							direction: gpio2DirectionSelect.value === 'in' ? GpioDirectionIn : GpioDirectionOut,
+							outputValue: gpio2OutputValue.value === '1' ? Logic1 : Logic0
+						},
+						gpio3: {
+							designation: gpio3DesignationSelect.value,
+							direction: gpio3DirectionSelect.value === 'in' ? GpioDirectionIn : GpioDirectionOut,
+							outputValue: gpio3OutputValue.value === '1' ? Logic1 : Logic0
+						},
+					})
 
 					await refreshSRAM()
 				}
-				else {
+				else
+				{
+					const directionSelect = form?.querySelector('select[name="direction"]')
+					const outputValueText = form?.querySelector('select[name="outputValue"]')
+
+					const direction = directionSelect.value === 'in' ? GpioDirectionIn : GpioDirectionOut
+					const outputValue = outputValueText.value === '1' ? Logic1 : Logic0
+
 					console.log('setting gpio', name, direction, outputValue)
+
 					const result = await this.#device.gpio.set({
 						[name]: {
 							direction,
@@ -473,16 +520,26 @@ export class MCP2221UIBuilder {
 					})
 
 					await _refreshGPIO(result)
+					await refreshGPIO()
 				}
 
 			}))
 		}
+
+		busSpeedSelect?.addEventListener('change', asyncEvent(async event => {
+			event.preventDefault()
+
+			const speed = parseInt(busSpeedSelect.value)
+
+			await refreshStatus({ i2cClock: speed })
+		}))
 
 		clearInterruptButton?.addEventListener('click', asyncEvent(async event => {
 			event.preventDefault()
 			clearInterruptButton.disabled = true
 
 			await this.#device.sram.set({ gp: { interrupt: { clear: true } } })
+			await refreshStatus()
 
 			clearInterruptButton.disabled = false
 		}))
@@ -511,17 +568,22 @@ export class MCP2221UIBuilder {
 			const existingLis = root.querySelectorAll('li')
 			existingLis.forEach(el => el.remove())
 
-			await refreshStatus({ i2cClock: 50 })
-			await delayMs(100)
+			// await refreshStatus({ i2cClock: 100 })
+			// await delayMs(100)
+			let first = true
 
 			const futureScans = [ ...range(0x08, 0x77) ].map(addr => {
 				return async () => {
-					const status = await this.#device.common.status({ cancelI2c: true })
-					// await delayMs(1)
-					const result = await this.#device.i2c.writeData({ address: addr, buffer: Uint8Array.from([ 0x00 ]) })
-					// await delayMs(1)
+					if(!first) {
+						const status = await this.#device.common.status({ cancelI2c: true })
+					}
+
+					first = false
+
+					const result = await this.#device.i2c.writeData({ address: addr, buffer: Uint8Array.from([  ]) })
 					const statusAfter = await this.#device.common.status()
-					return { addr, acked: statusAfter.i2cState === 0 }
+					const acked = statusAfter.i2cState === 0
+					return { addr, acked }
 				}
 			})
 
@@ -534,6 +596,9 @@ export class MCP2221UIBuilder {
 
 			const scanResults = await serializeScan
 
+			// clear after scan
+			const status = await this.#device.common.status({ cancelI2c: true })
+			console.log('state after scan', status)
 
 			const ackedList = scanResults.filter(({ _addr, acked }) => acked)
 			// console.log(ackedList)
@@ -606,7 +671,7 @@ export class MCP2221UIBuilder {
 			statusButton.disabled = false
 		}))
 
-		cancelI2CButton.addEventListener('click', asyncEvent(async event => {
+		cancelI2CButton?.addEventListener('click', asyncEvent(async event => {
 			cancelI2CButton.disabled = true
 
 			await refreshStatus({ opaque: 'user cancel', cancelI2c: true })

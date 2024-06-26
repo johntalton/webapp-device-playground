@@ -189,6 +189,7 @@ export class HT16K33Builder {
 			event.preventDefault()
 
 			await this.#device.setMemory(Segment.clearMemory())
+			await refreshDirect()
 
 		}))
 
