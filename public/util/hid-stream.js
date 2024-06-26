@@ -1,75 +1,158 @@
+import { delayMs } from "./delay.js"
+
 export const REPORT_ID = 0
 
-function getReadStream(hid) {
-	return new ReadableStream({
-		type: 'bytes',
-		start(controller) {
-			hid.addEventListener('inputreport', event => {
-				const { reportId, data, device } = event
+function makeHandler(controller, supportBYOB = false) {
+	return event => {
+		const { reportId, data, device } = event
 
-				// for now only report zero, until we return in buffer
-				if(reportId !== REPORT_ID) { controller.error('report id miss-match') }
+		// for now only report zero, until we return in buffer
+		if(reportId !== REPORT_ID) { controller.error('report id miss-match') }
 
-				if (controller.byobRequest !== null) {
-					const { view } = controller.byobRequest
-					const bytesRead = data.byteLength
+		if (supportBYOB && controller.byobRequest !== null) {
+			const { view } = controller.byobRequest
+			const bytesRead = data.byteLength
 
-					// normalize data from a DataView to Uint8Array
-					const input = ArrayBuffer.isView(data) ?
-						new Uint8Array(data.buffer, data.byteOffset, data.byteLength) :
-						new Uint8Array(data)
+			// normalize data from a DataView to Uint8Array
+			const input = ArrayBuffer.isView(data) ?
+				new Uint8Array(data.buffer, data.byteOffset, data.byteLength) :
+				new Uint8Array(data)
 
-					// copy-into
-					view.set(input)
+			// copy-into
+			// console.log('hidStream: copy into byob request buffer')
+			view.set(input)
 
-					controller.byobRequest.respond(bytesRead)
-				}
-				else {
-					controller.enqueue(data)
-				}
-			})
-		},
-		cancel() {
-
+			controller.byobRequest.respond(bytesRead)
 		}
-	}, {})
+		else {
+			// console.log('hidStream: queuing data in readable hid stream', data)
+			controller.enqueue(data)
+		}
+	}
 }
 
-function getWriteStream(hid) {
-	return new WritableStream({
-		start(controller) {},
-    write(chunk, controller) {
-			// console.log('send report')
-			return hid.sendReport(REPORT_ID, chunk)
-		},
-    close(controller) {},
-    abort(reason) {}
-	}, {
-		// highWaterMark: 1,
-		// size: () => 1
-	})
+/**
+ * @implements UnderlyingSource
+ */
+export class ReadableStreamUnderlyingSourceWebHID {
+	type = 'bytes'
+	autoAllocateChunkSize = undefined
+
+	#hid
+	#handler
+	#closed = false
+
+	get closed() { return this.#closed }
+
+	constructor(hid) {
+		this.#hid = hid
+	}
+
+	async start(controller) {
+		if(this.#handler === undefined) {
+			this.#handler = makeHandler(controller, true)
+			this.#hid.addEventListener('inputreport', this.#handler)
+		}
+	}
+
+	// async pull(controller) {
+	// 	console.log(Date.now(), 'no pull', controller.desiredSize)
+	// }
+
+	async cancel(reason) {
+		console.log('hid stream canceled', reason)
+		this.#hid.removeEventListener('inputreport', this.#handler)
+		this.#closed = true
+	}
+}
+
+/**
+ * @implements UnderlyingSink
+ */
+export class WritableStreamUnderlyingSourceWebHID {
+	// type = 'bytes'
+
+	#hid
+	#closed = false
+
+	get closed() { return this.#closed }
+
+	constructor(hid) {
+		this.#hid = hid
+	}
+
+	start(controller) {}
+
+	write(chunk, controller) { return this.#hid.sendReport(REPORT_ID, chunk) }
+
+	async close(controller) {
+		console.log('hid stream writer close')
+		this.#closed = true
+	}
+
+	async abort(reason) {
+		console.log('hid stream writer abort', reason)
+		this.#closed = true
+	}
 }
 
 
-export class HIDStreamSource {
-	#r
-	#w
+/**
+ * @implements ReadableWritablePair
+ */
+export class WebHIDStreamSource {
+	#r = null
+	#ur = null
+	#w = null
+	#uw = null
 	#hid
 
-	constructor(hid) { this.#hid = hid }
+	constructor(hid) {
+		this.#hid = hid
+
+		// allocate and thus start reader
+		if(this.readable === null) {}
+	}
+
 
 	get readable() {
-		if(this.#r === undefined) {
-			this.#r = getReadStream(this.#hid)
+		if(this.#ur !== null && this.#ur.closed) {
+			this.#ur = null
+			this.#r = null
 		}
+
+		if(this.#r !== null) {
+			return this.#r
+		}
+
+		// because this is a 'bytes' stream, this queuing strategy
+		// is always ByteLengthQueuingStrategy (https://streams.spec.whatwg.org/#blqs-class)
+		const queuingStrategy = {
+			highWaterMark: 1
+		}
+
+		this.#ur = new ReadableStreamUnderlyingSourceWebHID(this.#hid)
+		this.#r = new ReadableStream(this.#ur, queuingStrategy)
 
 		return this.#r
 	}
 
 	get writable() {
-		if(this.#w === undefined) {
-			this.#w = getWriteStream(this.#hid)
+		if(this.#uw !== null && this.#uw.closed) {
+			this.#uw = null
+			this.#w = null
 		}
+
+		if(this.#w !== null) {
+			return this.#w
+		}
+
+		const queuingStrategy = new ByteLengthQueuingStrategy({
+			highWaterMark: 1
+		})
+
+		this.#uw = new WritableStreamUnderlyingSourceWebHID(this.#hid)
+		this.#w = new WritableStream(this.#uw, queuingStrategy)
 
 		return this.#w
 	}

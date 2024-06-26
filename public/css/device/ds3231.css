@@ -13,38 +13,14 @@ ds3231-config {
   }
 
   & > form {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 1em;
-    align-items: center;
 
     padding-block: 1.5em;
     padding-inline: 1.5em;
   }
 
-  & > form select {
-    background-color: var(--color-accent--lighter, red);
-  }
-
   & > form > fieldset {
-    grid-column: 1 / span 2;
     justify-self: normal;
 
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 1em;
-    align-items: center;
-
-    padding-block: 1em;
-    padding-inline: 1em;
-
-    border-radius: 1em;
-    border-color: var(--color-accent--darker, red);
-
-    & > legend {
-      font-weight: bold;
-      padding-inline: 1ch;
-    }
   }
 
 

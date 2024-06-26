@@ -24,7 +24,9 @@
 					"@johntalton/excamera-i2cdriver/capture": "/node_modules/@johntalton/excamera-i2cdriver/src/capture-generator/index.js",
 					"@johntalton/i2c-bus-excamera-i2cdriver": "/node_modules/@johntalton/i2c-bus-excamera-i2cdriver/src/index.js",
 					"@johntalton/mcp2221": "/node_modules/@johntalton/mcp2221/lib/index.js",
+					"@johntalton/mcp2221/coders": "/node_modules/@johntalton/mcp2221/lib/converter/index.js",
 					"@johntalton/i2c-bus-mcp2221": "/node_modules/@johntalton/i2c-bus-mcp2221/lib/index.js",
+
 
 					"@johntalton/tca9548a": "/node_modules/@johntalton/tca9548a/src/index.js",
 					"@johntalton/boschieu": "/node_modules/@johntalton/boschieu/src/boschieu.js",
@@ -64,6 +66,7 @@
 		<nav>
 			<button data-aside-toggle>🔖 Menu</button>
 			<button data-theme-roller>♲</button>
+			<button disabled id="requestWeb">🔌 Web</button>
 			<button disabled id="requestSerial">🔌 Serial</button>
 			<button disabled id="requestUSB">🔌 USB</button>
 			<button disabled id="requestHID">🔌 HID</button>
@@ -84,6 +87,14 @@
 			<!--  -->
 			<template>
 				<section data-loading>
+					<p data-loading>
+						Loading...
+					</p>
+					<p data-error>
+						<b>Error!</b>
+						<output name="errorMessage"></output>
+						<button name="retryOpen">Retry</button>
+					</p>
 				</section>
 			</template>
 		</main>

@@ -1,14 +1,32 @@
 <!DOCTYPE html>
 <html>
 	<body>
-		<mcp2221-config>
+		<mcp2221-config data-password data-status="success">
 			<div class="tabs">
 				<button data-tab="common" data-active>Common</button>
-				<button data-tab="config">Config</button>
+				<button data-tab="flash">Flash</button>
+				<button data-tab="descriptor">USB Descriptors</button>
 				<button data-tab="gpio">Gpio</button>
 				<button data-tab="i2c">I²C Host</button>
-				<button data-tab="password">Password</button>
 			</div>
+
+			<form data-descriptors data-status="success" data-for-tab="descriptor" class="tabsContent">
+				<p data-status="not-allowed">
+					Flash writes are not allowed.
+				</p>
+
+				<label>Manufacturer</label>
+				<input name="usbManufacturer" type="text" />
+
+				<label>Product</label>
+				<input name="usbProduct" type="text" />
+
+				<label>Serial Number</label>
+				<input name="usbSN" type="text" />
+
+				<label>Factory Serial Number</label>
+				<input name="factorySN" type="text" readonly />
+			</form>
 
 			<form data-common data-active data-for-tab="common" class="tabsContent">
 				<button data-status>Status</button>
@@ -68,7 +86,7 @@
 					<label>State</label>
 					<output name="i2cState"></output>
 
-					<label>address</label>
+					<label>Address</label>
 					<output name="address"></output>
 
 					<label>Requested Transfer Length</label>
@@ -95,32 +113,104 @@
 					<label>ACKed</label>
 					<output name="ACKed"></output>
 
-					<label>pendingValue</label>
+					<label>Pending Value</label>
 					<output name="pendingValue"></output>
 				</fieldset>
 
 				<fieldset>
-					<legend></legend>
+					<legend>Revision</legend>
 
-					<label>Hardware Revision</label>
+					<label>Hardware</label>
 					<output name="hardwareRevision"></output>
 
-					<label>Firmware Revision</label>
+					<label>Firmware</label>
 					<output name="firmwareRevision"></output>
 				</fieldset>
 			</form>
 
-			<form data-flash data-for-tab="config" class="tabsContent">
-				<!-- <label>Write Mode</label>
-				<select name="writeMode">
-					<option value="flash">FLASH</option>
-					<option value="sram">SRAM</option>
-				</select> -->
+			<form data-flash data-status="success" data-for-tab="flash" class="tabsContent">
+				<p data-status="not-allowed">
+					The Flash write was Not Allowed.  This Is likely do to a bad password
+				</p>
 
-				<fieldset data-change-group="interrupt">
+				<fieldset>
+					<label>Current Active Password</label>
+					<output name="currentAccessPassword"></output>
+
+					<label>Access Password</label>
+					<input name="accessPassword" type="text" />
+
+					<button data-send-access-password>Send</button>
+				</fieldset>
+
+				<button data-flash-flash>Write to FLASH</button>
+
+
+				<fieldset data-change-group="chip">
+					<label>Security</label>
+					<select name="security">
+						<option value="permanently-locked" disabled>Permanently Locked</option>
+						<option value="password-protected">Password Protected</option>
+						<option value="unsecured">Unsecured</option>
+					</select>
+				</fieldset>
+
+				<fieldset>
+					<label>Password</label>
+					<select name="passwordMethod">
+						<option value="current">Current Access</option>
+						<option value="new">New</option>
+					</select>
+
+					<label>New Password</label>
+					<input name="newPassword" type="text" />
+				</fieldset>
+
+				<fieldset data-change-group="chip">
 					<legend></legend>
 
-					<label>Interrupt Edge</label>
+					<label>CDC Serial Emulation</label>
+					<input name="cdcSerialEmulation" type="checkbox" />
+
+					<label>UART LED Rx</label>
+					<input name="uartLEDRx" type="checkbox" />
+
+					<label>UART LED Tx</label>
+					<input name="uartLEDTx" type="checkbox" />
+
+					<label>I²C LED</label>
+					<input name="i2cLED" type="checkbox" />
+
+					<label>Suspend</label>
+					<input name="SSPND" type="checkbox" />
+
+					<label>USB Config</label>
+					<input name="USBCFG" type="checkbox" />
+				</fieldset>
+
+				<fieldset data-change-group="usb">
+					<legend>USB</legend>
+
+					<label>Vendor Id</label>
+					<input name="vendorId" type="text" />
+
+					<label>Product Id</label>
+					<input name="productId" type="text"  />
+
+					<label>Self Power</label>
+					<input name="selfPower" type="checkbox"  />
+
+					<label>Remote Wake</label>
+					<input name="remoteWake" type="checkbox"  />
+
+					<label>mA Requested</label>
+					<input name="mARequested" type="number" />
+				</fieldset>
+
+				<fieldset data-change-group="interrupt">
+					<legend>Interrupt On Change</legend>
+
+					<label>Edge</label>
 					<select name="interruptEdge">
 						<option value="positive">Positive</option>
 						<option value="negative">Negative</option>
@@ -171,7 +261,7 @@
 					</select>
 
 					<label>Initial Value</label>
-					<input name="dacInitialValue" type="number" />
+					<input name="dacInitialValue" type="number" min="0" max="31" />
 				</fieldset>
 
 				<fieldset data-change-group="adc">
@@ -191,95 +281,21 @@
 						<option value="Vrm">Vrm</option>
 					</select>
 				</fieldset>
-
-				<fieldset>
-					<label>Security</label>
-					<select name="security" disabled>
-						<option value="permanently-locked">Permanently Locked</option>
-						<option value="password-protected">Password Protected</option>
-						<option value="unsecured">Unsecured</option>
-					</select>
-
-					<label>CDC Serial Emulation</label>
-					<input name="cdcSerialEmulation" type="checkbox" />
-
-				</fieldset>
-
-				<fieldset>
-					<legend></legend>
-
-					<label>UART LED Rx</label>
-					<input name="uartLEDRx" type="checkbox" />
-
-					<label>UART LED Tx</label>
-					<input name="uartLEDTx" type="checkbox" />
-
-					<label>I²C LED</label>
-					<input name="i2cLED" type="checkbox" />
-
-					<label>Suspend</label>
-					<input name="SSPND" type="checkbox" />
-
-					<label>USB Config</label>
-					<input name="USBCFG" type="checkbox" />
-				</fieldset>
-
-				<fieldset>
-					<legend>USB</legend>
-
-					<label>USB Manufacturer</label>
-					<input name="usbManufacturer" type="text" />
-
-					<label>USB Product</label>
-					<input name="usbProduct" type="text" />
-
-					<label>USB Serial Number</label>
-					<input name="usbSN" type="text" />
-
-					<label>FactorySerialNumber</label>
-					<input name="factorySN" type="text" />
-				</fieldset>
-
-				<fieldset>
-					<legend>USB</legend>
-
-					<label>Vendor Id</label>
-					<input name="vendorId" type="text" />
-
-					<label>Product Id</label>
-					<input name="productId" type="text"  />
-
-					<label>Power Attribute</label>
-					<input name="powerAttribute" type="text"  />
-
-					<label>mA Requested</label>
-					<input name="mARequested" type="text"  />
-				</fieldset>
 			</form>
 
-			<div data-for-tab="password" class="tabsContent">
-				<form data-password>
-					<label>Current Active Password</label>
-					<output name="currentAccessPassword"></output>
-
-					<label>Access Password</label>
-					<input name="accessPassword" type="text" />
-
-					<button data-send-access-password>Send</button>
-				</form>
-			</div>
-
 			<div data-gpios data-for-tab="gpio" class="tabsContent">
-				<form data-gpio="0">
-					<fieldset>
-						<legend>Gpio 0</legend>
 
-						<label>Designation</label>
-						<select name="designation">
-							<option value="LED UART RX">LED UART RX</option>
-							<option value="SSPND">USB Host Suspend</option>
-							<option value="Gpio">Gpio</option>
-						</select>
+
+				<form data-gpio="0">
+					<label>GP 0 Designation</label>
+					<select name="designation">
+						<option value="LED UART RX">LED UART RX</option>
+						<option value="SSPND">USB Host Suspend</option>
+						<option value="Gpio">Gpio</option>
+					</select>
+
+					<fieldset>
+						<legend>I/O</legend>
 
 						<label>Direction</label>
 						<select name="direction">
@@ -296,17 +312,17 @@
 				</form>
 
 				<form data-gpio="1">
-					<fieldset>
-						<legend>Gpio 1</legend>
+					<label>GP 1 Designation</label>
+					<select name="designation">
+						<option value="Clock Output">Clock Output</option>
+						<option value="Interrupt Detection">Interrupt Detection</option>
+						<option value="LED UART TX">LED UART TX </option>
+						<option value="ADC1">ADC 1</option>
+						<option value="Gpio">Gpio</option>
+					</select>
 
-						<label>Designation</label>
-						<select name="designation">
-							<option value="Clock Output">Clock Output</option>
-							<option value="Interrupt Detection">Interrupt Detection</option>
-							<option value="LED UART TX">LED UART TX </option>
-							<option value="ADC1">ADC 1</option>
-							<option value="Gpio">Gpio</option>
-						</select>
+					<fieldset>
+						<legend>I/0</legend>
 
 						<label>Direction</label>
 						<select name="direction">
@@ -323,16 +339,16 @@
 				</form>
 
 				<form data-gpio="2">
+					<label>GP 2 Designation</label>
+					<select name="designation">
+						<option value="DAC1">DAC 1</option>
+						<option value="ADC2">ADC 2</option>
+						<option value="USB">USB Configured</option>
+						<option value="Gpio">Gpio</option>
+					</select>
+
 					<fieldset>
 						<legend>Gpio 2</legend>
-
-						<label>Designation</label>
-						<select name="designation">
-							<option value="DAC1">DAC 1</option>
-							<option value="ADC2">ADC 2</option>
-							<option value="USB">USB Configured</option>
-							<option value="Gpio">Gpio</option>
-						</select>
 
 						<label>Direction</label>
 						<select name="direction">
@@ -349,16 +365,16 @@
 				</form>
 
 				<form data-gpio="3">
+					<label>GP 3 Designation</label>
+					<select name="designation">
+						<option value="DAC2">DAC 2</option>
+						<option value="ADC3">ADC 3</option>
+						<option value="LED I2C">LED I²C</option>
+						<option value="Gpio">Gpio</option>
+					</select>
+
 					<fieldset>
 						<legend>Gpio 3</legend>
-
-						<label>Designation</label>
-						<select name="designation">
-							<option value="DAC2">DAC 2</option>
-							<option value="ADC3">ADC 3</option>
-							<option value="LED I2C">LED I²C</option>
-							<option value="Gpio">Gpio</option>
-						</select>
 
 						<label>Direction</label>
 						<select name="direction">
@@ -373,6 +389,121 @@
 						</select>
 					</fieldset>
 				</form>
+
+				<form data-sram-gp>
+					<fieldset data-change-group="interrupt">
+						<legend>Interrupt On Change</legend>
+
+						<label>Edge</label>
+						<select name="interruptEdge">
+							<option value="positive">Positive</option>
+							<option value="negative">Negative</option>
+							<option value="both">Both</option>
+							<option value="off">Off</option>
+						</select>
+					</fieldset>
+
+					<fieldset data-change-group="clock">
+						<legend>Clock</legend>
+
+						<label>Clock Duty Cycle</label>
+						<select name="clockDutyCycle">
+							<option value="0%">0%</option>
+							<option value="25%">25%</option>
+							<option value="50%">50%</option>
+							<option value="75%">75%</option>
+						</select>
+
+						<label>Clock Rate</label>
+						<select name="clockDivider">
+							<option value="375 kHz">   375 kHz</option>
+							<option value="750 kHz">   750 kHz</option>
+							<option value="1.5 MHz"> 1.5 MHz</option>
+							<option value="3 MHz"> 3 MHz</option>
+							<option value="6 MHz"> 6 MHz</option>
+							<option value="12 MHz">12 MHz</option>
+							<option value="24 MHz">24 MHz</option>
+						</select>
+					</fieldset>
+
+					<fieldset data-change-group="dac">
+						<legend>DAC</legend>
+
+						<label>Reference Voltage</label>
+						<select name="dacReferenceVoltage">
+							<option value="4.096V">4.096 V</option>
+							<option value="2.048V">2.048 V</option>
+							<option value="1.024V">1.024 V</option>
+							<option value="Off">Off</option>
+						</select>
+
+						<label>Options</label>
+						<select name="dacReferenceOptions">
+							<option value="Vdd">Vdd</option>
+							<option value="Vrm">Vrm</option>
+						</select>
+
+						<label>Initial Value</label>
+						<input name="dacInitialValue" type="number" min="0" max="31" />
+					</fieldset>
+
+					<fieldset data-change-group="adc">
+						<legend>ADC</legend>
+
+						<label>Reference Voltage</label>
+						<select name="adcReferenceVoltage">
+							<option value="4.096V">4.096 V</option>
+							<option value="2.048V">2.048 V</option>
+							<option value="1.024V">1.024 V</option>
+							<option value="Off">Off</option>
+						</select>
+
+						<label>Options</label>
+						<select name="adcReferenceOptions">
+							<option value="Vdd">Vdd</option>
+							<option value="Vrm">Vrm</option>
+						</select>
+					</fieldset>
+
+					<fieldset data-sram-output>
+						<label>CDC Serial Enumeration</label>
+						<output name="enabledCDCSerialEnumeration"></output>
+
+						<label>Security</label>
+						<output name="security"></output>
+
+						<label>UART LED Rx</label>
+						<output name="uartLEDRx"></output>
+
+						<label>UART LED Tx</label>
+						<output name="uartLEDTx"></output>
+
+						<label>I²C LED</label>
+						<output name="i2cLED"></output>
+
+						<label>SSPND</label>
+						<output name="SSPND"></output>
+
+						<label>USBCFG</label>
+						<output name="USBCFG"></output>
+
+						<label>PendorId</label>
+						<output name="vendorId"></output>
+
+						<label>ProductId</label>
+						<output name="productId"></output>
+
+						<label>Self Power</label>
+						<output name="selfPower"></output>
+
+						<label>Remote Wake</label>
+						<output name="remoteWake"></output>
+
+						<label>mA Requested</label>
+						<output name="mARequested"></output>
+
+					</fieldset>
+				</form>
 			</div>
 
 			<div data-for-tab="i2c" class="tabsContent">
@@ -380,9 +511,9 @@
 					<fieldset>
 						<label>Speed</label>
 						<select name="busSpeed">
-							<option value="50">50 MHz</option>
-							<option value="100">100 MHz</option>
-							<option value="400">400 MHz</option>
+							<option value="50">50 kHz</option>
+							<option value="100">100 kHz</option>
+							<option value="400">400 kHz</option>
 							<option value="custom" data-custom disabled>-</option>
 						</select>
 

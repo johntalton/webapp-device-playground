@@ -46,22 +46,44 @@ export function buildDeviceSection(builder) {
 	const clone = content.cloneNode(true)
 	const sectionElem = clone.querySelector('section')
 
+	const loadView = async () => {
+		sectionElem.toggleAttribute('data-error', false)
+
+		const controller = new AbortController()
+		const signal = controller.signal
+
+		const customElem = await builder.buildCustomView({ signal })
+		sectionElem.appendChild(customElem)
+		sectionElem.toggleAttribute('data-loading', false)
+	}
+
+	const retryButton = sectionElem.querySelector('button[name="retryOpen"]')
+	retryButton.addEventListener('click', asyncEvent(async event => {
+		retryButton.disabled = true
+		event.preventDefault()
+
+		try {
+			await builder.close()
+
+			await builder.open()
+			await loadView()
+		}
+		catch(e) {
+			console.log('error re-opening view', e)
+			sectionElem.toggleAttribute('data-loading', false)
+			sectionElem.toggleAttribute('data-error', true)
+		}
+
+		retryButton.disabled = false
+	}))
 
 	Promise.resolve()
 		.then(async () => builder.open())
-		.then(async () => {
-			sectionElem.toggleAttribute('data-error', false)
-
-			const controller = new AbortController()
-			const signal = controller.signal
-
-			const customElem = await builder.buildCustomView({ signal })
-			sectionElem.appendChild(customElem)
-			sectionElem.toggleAttribute('data-loading', false)
-		})
+		.then(loadView)
 		.catch(e => {
+			console.log('error opening view', e)
+			sectionElem.toggleAttribute('data-loading', false)
 			sectionElem.toggleAttribute('data-error', true)
-			console.error('error building view', e)
 		})
 
 	return sectionElem
@@ -184,18 +206,22 @@ export async function addUSBDevice(device) {
 	console.log('UI:addUSB', device)
 }
 
-export async function addHIDDevice(hid) {
+export async function addHIDDevice(hid, signal) {
 	const deviceListElem = document.getElementById('deviceList')
-	console.log('UI:addHID', hid)
+	// console.log('UI:addHID', hid)
 
 	if(hid.vendorId === MCP2221_USB_FILTER.vendorId) {
-		if(hid.productId == MCP2221_USB_FILTER.productId) {
+		if(hid.productId === MCP2221_USB_FILTER.productId || hid.productId === 220) {
 			//console.log('adding mcp2221', hid)
 
 			const builder = await MCP2221UIBuilder.builder(hid, UI_HOOKS)
 			const demolisher = buildDeviceListItem(deviceListElem, builder)
 
-
+			signal.addEventListener('abort', event => {
+				const { reason } = signal
+				console.log(`signal abort on hid mcp2221 (${reason}) - run ui demolisher`)
+				demolisher()
+			})
 
 
 			return
@@ -211,10 +237,90 @@ export async function addI2CDevice(definition) {
 	const demolisher = buildDeviceListItem(deviceListElem, builder)
 
 	definition.port?.addEventListener('disconnect', event => {
-		console.log('I²C device disconnect - demo time', this)
+		console.log('I²C device disconnect - run ui demolisher', this)
+		demolisher()
+	})
+
+	definition.signal?.addEventListener('abort', event => {
+		const { reason } = definition.signal
+		console.log(`I²C device signaled disconnect (${reason}) - run ui demolisher`)
 		demolisher()
 	})
 
 	return
 }
 
+
+
+export class I2CBusWeb {
+	#url
+
+	constructor(url = 'http://localhost:3000/mcp') {
+		this.#url = url
+	}
+
+	async postCommand(command, options) {
+		try {
+			const result = await fetch(this.#url, {
+				method: 'POST',
+				headers: {
+					'Content-Type': 'application/json',
+				},
+				body: JSON.stringify({
+					type: command,
+					...options
+				})
+			})
+
+			if(!result.ok) { throw new Error('result not ok') }
+
+			return result.json()
+		}
+		catch(e) {
+			console.warn('fetch exception', e)
+			throw e
+		}
+	}
+
+	async scan() {
+		return this.postCommand('scan', {})
+	}
+
+	async readI2cBlock(address, cmd, length, target) {
+		return this.postCommand('readI2cBlock', {
+			address,
+			cmd,
+			length
+		})
+	}
+
+	async writeI2cBlock(address, cmd, length, buffer) {
+		return this.postCommand('writeI2cBlock', {
+			address,
+			cmd,
+			length,
+      buffer: [ ...buffer ]
+		})
+	}
+
+	async i2cRead(address, length, target) {
+		return this.postCommand('i2cRead', {
+			address,
+			length
+		})
+  }
+
+  async i2cWrite(address, length, buffer) {
+    return this.postCommand('i2cWrite', {
+			address,
+			length,
+      buffer: [ ...buffer ]
+		})
+  }
+}
+
+// addI2CDevice({
+// 	type: 'ht16k33',
+// 	address: 0x71,
+// 	bus: new I2CBusWeb()
+// })

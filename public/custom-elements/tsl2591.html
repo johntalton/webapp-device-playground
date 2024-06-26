@@ -25,37 +25,7 @@
 
 				margin-inline-end: 2em;
 
-				& select {
-					background-color: var(--color-accent--lighter, red);
-				}
-
-				& input[type="number"]:not(:where(:focus-visible, :focus)) {
-					background-color: var(--color-accent--lighter, red);
-				}
-
-				& input[type="checkbox"] {
-					accent-color: var(--color-accent--darker, red);
-					width: 1.25em;
-					height: 1.25em;
-				}
-
 				& > fieldset {
-					display: grid;
-					grid-template-columns: 1fr 1fr;
-					gap: 1em;
-					align-items: center;
-					align-content: baseline;
-
-					padding-block: 1em;
-					padding-inline: 1em;
-
-					border-radius: 1em;
-					border-color: var(--color-accent--darker, red);
-
-					& > legend {
-						font-weight: bold;
-						padding-inline: 1ch;
-					}
 
 					&[data-actions] {
 						grid-column: 1 / -1;

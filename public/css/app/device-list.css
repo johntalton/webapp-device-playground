@@ -21,6 +21,8 @@ aside ul {
 	margin-block-start: 0;
 	margin-inline-start: 0.5em;
 
+	overflow-x: scroll;
+
   background-color: var(--selected-background, red);
 	color: var(--color, red);
 }

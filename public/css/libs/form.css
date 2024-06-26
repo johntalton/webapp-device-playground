@@ -23,6 +23,7 @@ form {
     justify-self: stretch;
     justify-items: start;
     align-items: center;
+    align-content: baseline;
 
     & legend:not(:empty) {
       font-weight: bold;
@@ -88,31 +89,33 @@ form {
 
 
   & input[type="number"] {
-    min-width: 7ch;
-    font-size: 1.5em;
+    /* min-width: 7ch; */
+    /* font-size: 1.5em; */
+    height: 2em;
 
     padding-inline-start: 1ch;
 
-    border-radius: .25em;
-    border-style: dashed;
+    border-radius: .5em;
     border-style: solid;
-    border-color: transparent;
+    border-color: var(--color-accent--dark, red);
 
     background-color: var(--color-accent--lightest, red);
     color: var(--color-accent--lightest-text, red);
+
+    &:not(:where(:focus-visible, :focus)) {
+      background-color: var(--color-accent--lighter, red);
+    }
+
+    &:where(:focus-visible, :focus) {
+      background-color: var(--color-white, red);
+      color: var(--color-black, red);
+
+      outline-color: var(--color-accent, red);
+      outline-width: 5px;
+    }
   }
 
-  & input[type="number"]:not(:where(:focus-visible, :focus)) {
-    background-color: var(--color-accent--lighter, red);
-  }
 
-  & input[type="number"]:where(:focus-visible, :focus) {
-    background-color: var(--color-white, red);
-    color: var(--color-black, red);
-
-    outline-color: var(--color-accent, red);
-    outline-width: 5px;
-  }
 
 
 
@@ -139,6 +142,10 @@ form {
     &:disabled {
       border: 0;
       background-color: #00000014;
+    }
+
+    &:not([disabled]):not([readonly]):not(:valid) {
+      background-color:pink;
     }
   }
 

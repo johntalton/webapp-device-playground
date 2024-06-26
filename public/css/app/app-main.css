@@ -32,12 +32,30 @@ main > section {
   & > :not(button) {
     align-self: stretch;
   }
-
-  &[data-loading] {
-    display: none;
-  }
 }
 
 main > section:not([data-active]) {
   display: none;
+}
+
+main > section {
+  & p[data-loading] {
+    display: flex;
+  }
+
+  & p[data-error] {
+    display: flex;
+
+    margin-inline: 0 2em;
+    padding: 1em;
+    border-radius: 1em;
+    padding-block: 2em;
+
+    border: 7px groove var(--color-accent--darker-error, red);
+    background-color: var(--color-accent--lightest-error, red);
+    color: var(--color-accent--lightest-error-text, red);
+  }
+
+  &:not([data-loading]) { & p[data-loading] { display: none; }}
+  &:not([data-error]) { & p[data-error] { display: none; }}
 }

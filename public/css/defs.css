@@ -49,6 +49,7 @@
 		var(--color-accent--l));
 	--color-accent-text: var(--color-white, red);
 
+
 	/*  */
 
 	/* --color-accent--lighter: hsl(from var(--color-accent, red) h s var(--lighter-percentage, 1)); */
@@ -66,10 +67,6 @@
 	--color-accent--darker-text: var(--color-white, red);
 
 
-
-
-
-
 	--color-accent--light: hsl(
 		var(--color-accent--h),
 		var(--color-accent--s),
@@ -85,19 +82,20 @@
 		var(--color-accent--s),
 		calc(var(--color-accent--l) + var(--lightest-percentage)));
 
-		--color-accent--dark: hsl(
-			var(--color-accent--h),
-			var(--color-accent--s),
-			calc(var(--color-accent--l) - var(--dark-percentage)));
+	--color-accent--dark: hsl(
+		var(--color-accent--h),
+		var(--color-accent--s),
+		calc(var(--color-accent--l) - var(--dark-percentage)));
 
-		--color-accent--darker: hsl(
-			var(--color-accent--h),
-			var(--color-accent--s),
-			calc(var(--color-accent--l) - var(--darker-percentage)));
-
-
+	--color-accent--darker: hsl(
+		var(--color-accent--h),
+		var(--color-accent--s),
+		calc(var(--color-accent--l) - var(--darker-percentage)));
 
 
 
+	--color-accent--darker-error: rgb(255 0 0 / 75%);
 
+	--color-accent--lightest-error: oklab(0.65 0.26 0.15 / 0.2);
+	--color-accent--lightest-error-text: var(--color-accent--lightest-text, red);
 }

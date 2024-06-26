@@ -15,13 +15,109 @@ mcp2221-config {
 		align-items: center;
 	} */
 
+	& [data-descriptors] {
+		& > [data-status] {
+			grid-column: 1 / -1;
+
+			display: none;
+
+			padding: 1em;
+			border-radius: 1em;
+			padding-block: 2em;
+
+			border: 7px groove var(--color-accent--darker-error, red);
+			background-color: var(--color-accent--lightest-error, red);
+			color: var(--color-accent--lightest-error-text, red);
+		}
+
+		/* &[data-status="success"] {
+			& > [data-status]:not([data-status="success"]) {
+				display: none;
+			}
+		}
+
+		&[data-status="not-allowed"] {
+			& > [data-status]:not([data-status="not-allowed"]) {
+				display: none;
+			}
+		} */
+
+		&[data-status="success"] {
+			& > [data-status="success"] {
+				display: initial;
+			}
+		}
+
+		&[data-status="not-allowed"] {
+			& > [data-status="not-allowed"] {
+				display: initial;
+			}
+		}
+	}
+
+	& [data-flash] {
+
+		& > [data-status] {
+			display: flex;
+
+			&:not([data-status="success"]) {
+				display: none;
+			}
+		}
+
+		&[data-status="not-allowed"] > [data-status="not-allowed"] {
+			display: initial;
+
+			grid-column: 1 / -1;
+			padding: 1em;
+			border-radius: 1em;
+			padding-block: 2em;
+
+			border: 7px groove var(--color-accent--darker-error, red);
+			background-color: var(--color-accent--lightest-error, red);
+			color: var(--color-accent--lightest-error-text, red);
+		}
+	}
+
+	& [data-sram-output] {
+		font-size: 0.5
+	}
+
 
 	& [data-gpios] {
+		display:flex;
+		flex-wrap: wrap;
+		gap: 2em;
+		row-gap: 1em;
+		justify-content: space-between;
+
+		padding-block-start: 3em;
+	}
+
+	& form[data-gpio] {
+		flex-grow: 1;
 		display: flex;
-    flex-wrap: wrap;
-    justify-content: center;
-    align-items: flex-start;
-		gap: 1em;
+		flex-direction: column;
+
+		align-items: stretch;
+
+		/* max-width: min-content; */
+
+		& fieldset {
+			display: flex;
+			flex-direction: column;
+			align-items: start;
+		}
+	}
+
+	& form[data-sram-gp] {
+		flex-grow: 1;
+		width: 100%;
+
+		& fieldset {
+			/* background: var(--color-accent--lighter, red);
+			color: var(--color-accent--lighter-text, red); */
+		}
 	}
 
 	& select[name="busSpeed"] > option[data-custom]:disabled {

@@ -2,18 +2,25 @@
 export const MCP2111_HID_FILTER = { vendorId: 1240, productId: 221 }
 
 export const SUPPORTED_HID_FILTER = [
-	MCP2111_HID_FILTER
+	MCP2111_HID_FILTER,
+	{ vendorId: 1240, productId: 220 } // for testing productId change feature
 ]
 
+/**
+ * @param {Map} knownDevices
+ */
 async function addHIDDevice(ui, device, knownDevices) {
-	if(knownDevices.includes(device)) {
+	if(knownDevices.has(device)) {
 		console.log('HID:addHIDDevice: re-adding existing paired device ... ')
 		return
 	}
 
-	knownDevices.push(device)
+	const controller = new AbortController()
+	const { signal } = controller
 
-	return ui.addHIDDevice(device)
+	knownDevices.set(device, { controller })
+
+	return ui.addHIDDevice(device, signal)
 }
 
 async function hydrateHIDBackgroundDevices(addDevice) {
@@ -22,7 +29,7 @@ async function hydrateHIDBackgroundDevices(addDevice) {
 }
 
 
-async function hydrateHIDEvents(addDevice) {
+async function hydrateHIDEvents(addDevice, knownDevices) {
 	navigator.hid.addEventListener('connect', event => {
 		const { device } = event
 
@@ -33,8 +40,15 @@ async function hydrateHIDEvents(addDevice) {
 
   navigator.hid.addEventListener('disconnect', event => {
 		const { device } = event
-		// hid devices are responsible for their own cleanup
-		console.log('hid device disconnected')
+
+		if(!knownDevices.has(device)) {
+			console.log('hid unknown device disconnect')
+			return
+		}
+
+		const { controller } = knownDevices.get(device)
+		controller.abort('hid disconnect')
+
 	})
 }
 
@@ -59,12 +73,12 @@ async function hydrateHIDRequestButton(requestHIDButton, addDevice) {
 }
 
 export async function hydrateHID(requestHIDButton, ui) {
-	const knownDevices = []
+	const knownDevices = new Map()
 	const add = device => addHIDDevice(ui, device, knownDevices)
 
 	return Promise.all([
 		hydrateHIDBackgroundDevices(add),
-		hydrateHIDEvents(add),
+		hydrateHIDEvents(add, knownDevices),
 		hydrateHIDRequestButton(requestHIDButton, add)
 	])
 }
