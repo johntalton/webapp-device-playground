@@ -14,8 +14,13 @@ export async function hydrateTheme() {
 
 		themRollerButton.setAttribute('title', theme)
 
-		const transition = document.startViewTransition(() => {
+		if (!document.startViewTransition) {
 			document.body.setAttribute('data-theme', theme)
-		})
+		}
+		else {
+			const transition = document.startViewTransition(() => {
+				document.body.setAttribute('data-theme', theme)
+			})
+		}
 	})
 }

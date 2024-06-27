@@ -84,6 +84,7 @@ export class TSL2591Builder {
 			check('enabled', enabled)
 			check('powerOn', powerOn)
 
+			console.log({ gain, time })
 			const gainSelect = root?.querySelector('select[name="gain"]')
 			gainSelect.value = gain
 
@@ -278,7 +279,9 @@ export class TSL2591Builder {
 							yield device.getColor()
 						}
 						catch(e) {
-							// console.log('again?', e)
+							console.log('break', e)
+							break
+							console.log('again?', e)
 							await delayMs(1000 / 10)
 						}
 					}

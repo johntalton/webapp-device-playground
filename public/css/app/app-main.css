@@ -38,6 +38,26 @@ main > section:not([data-active]) {
   display: none;
 }
 
+[data-no-support] {
+  margin-inline: 0 2em;
+  margin-block-end: 1em;
+  padding: 1em;
+  border-radius: 1em;
+  padding-block: 2em;
+
+  border: 7px groove var(--color-accent--darker-error, red);
+  background-color: var(--color-accent--lightest-error, red);
+  color: var(--color-accent--lightest-error-text, red);
+}
+
+[data-no-support][data-dismissed] {
+  display: none;
+}
+
+body:not([data-supports=""]) [data-no-support] {
+  display: none;
+}
+
 main > section {
   & p[data-loading] {
     display: flex;

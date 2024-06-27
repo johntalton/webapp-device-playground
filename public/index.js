@@ -10,6 +10,7 @@ import {
 	hydrateUI
 } from './hydrate/ui.js'
 import { hydrateTheme } from './hydrate/theme.js'
+import { DOMTokenListLike } from './util/dom-token-list.js';
 
 async function onContentLoaded() {
 	if (!HTMLScriptElement.supports && HTMLScriptElement.supports('importmap')) {
@@ -20,13 +21,31 @@ async function onContentLoaded() {
 	const requestUSBButton = document.getElementById('requestUSB')
 	const requestHIDButton = document.getElementById('requestHID')
 
+	const supportSerial = 'serial' in navigator
+	const supportHID = 'hid' in navigator
+	const supportUSB = 'usb' in navigator
+
+	const supportAttr = document.body.getAttributeNode('data-supports')
+	supportAttr.value = ''
+	const dtl = new DOMTokenListLike(supportAttr)
+	dtl.toggle('serial', supportSerial)
+	dtl.toggle('hid', supportHID)
+	dtl.toggle('usb', supportUSB)
+
+	const dismissNoSupportButton = document.querySelector('button[name="dismissNoSupport"]')
+	dismissNoSupportButton?.addEventListener('click', event => {
+		event.preventDefault()
+		const noSupportDialog = event.target.closest('[data-no-support]')
+		noSupportDialog.toggleAttribute('data-dismissed')
+	})
+
 	await Promise.all([
 		hydrateCustomElements(),
 		hydrateUI(),
 
-		hydrateSerial(requestSerialButton, UI_HOOKS),
-		hydrateUSB(requestUSBButton, UI_HOOKS),
-		hydrateHID(requestHIDButton, UI_HOOKS),
+		supportSerial ? hydrateSerial(requestSerialButton, UI_HOOKS) : null,
+		supportUSB ? hydrateUSB(requestUSBButton, UI_HOOKS) : null,
+		supportHID ? hydrateHID(requestHIDButton, UI_HOOKS) : null,
 
 		hydrateTheme(),
 		hydrateEffects()

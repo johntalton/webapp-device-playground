@@ -14,6 +14,8 @@ import {
 	EXCAMERA_LABS_MINI_PRODUCT_ID
 } from '@johntalton/excamera-i2cdriver'
 import { asyncEvent } from '../util/async-event.js'
+import { deviceGuessByAddress } from '../devices-i2c/guesses.js'
+import { appendDeviceListItem } from '../util/device-list.js'
 
 
 const MCP2221_USB_FILTER = {
@@ -113,7 +115,7 @@ export function buildDeviceListItem(deviceListElem, builder) {
 			return
 		}
 
-		const transition = document.startViewTransition(() => {
+		const transitionView = () => {
 			deviceListElem.querySelectorAll(':scope > li').forEach(li => {
 				li.removeAttribute('data-active')
 				const bElem = li.querySelector('button')
@@ -126,7 +128,15 @@ export function buildDeviceListItem(deviceListElem, builder) {
 			mainElem.querySelectorAll(':scope > section').forEach(s => s.removeAttribute('data-active'))
 
 			sectionElem.toggleAttribute('data-active', true)
-		})
+		}
+
+		if(!document.startViewTransition) {
+			transitionView()
+		} else {
+			const transition = document.startViewTransition(transitionView)
+		}
+
+
 	}), { once: false })
 
 	// demolisher
@@ -255,29 +265,42 @@ export async function addI2CDevice(definition) {
 export class I2CBusWeb {
 	#url
 
-	constructor(url = 'http://localhost:3000/mcp') {
+	constructor(url = 'http://localhost:3000/port') {
 		this.#url = url
 	}
 
+	get name() { return `WebI²C(${this.#url})`}
+
 	async postCommand(command, options) {
 		try {
-			const result = await fetch(this.#url, {
+			const response = await fetch(this.#url, {
 				method: 'POST',
 				headers: {
 					'Content-Type': 'application/json',
 				},
 				body: JSON.stringify({
+					namespace: window.origin,
+					opaque: '🤷🏻‍♂️',
 					type: command,
 					...options
 				})
 			})
 
-			if(!result.ok) { throw new Error('result not ok') }
+			if(!response.ok) { throw new Error(`response not ok ${response.status}`) }
 
-			return result.json()
+			const result = await response.json()
+
+			if(result.type === 'error') {
+				throw new Error('WebI²C Remote Error: ' + result.why)
+			}
+
+			return {
+				...result,
+				buffer: (result.buffer !== undefined) ? Uint8Array.from(result.buffer) : undefined
+			}
 		}
 		catch(e) {
-			console.warn('fetch exception', e)
+			// console.warn('fetch exception', e)
 			throw e
 		}
 	}
@@ -319,8 +342,105 @@ export class I2CBusWeb {
   }
 }
 
-// addI2CDevice({
-// 	type: 'ht16k33',
-// 	address: 0x71,
-// 	bus: new I2CBusWeb()
-// })
+addI2CDevice({
+	type: 'ht16k33',
+	address: 0x71,
+	bus: new I2CBusWeb()
+})
+
+const deviceListElem = document.getElementById('deviceList')
+const builder = {
+	title: '☠️',
+	open() {
+
+	},
+	async buildCustomView() {
+		const response = await fetch('./custom-elements/web.html')
+		if (!response.ok) { throw new Error('no html for view') }
+		const view = await response.text()
+		const doc = (new DOMParser()).parseFromString(view, 'text/html')
+
+		const root = doc?.querySelector('web-config')
+		if (root === null) { throw new Error('no root for template') }
+
+		const urlText = root.querySelector('input[name="url"]')
+		const scanButton = root.querySelector('button[data-scan]')
+		const deviceList = root.querySelector('[data-device-list]')
+		const addressElem = root.querySelector('addr-display[name="scanResults"]')
+
+		scanButton?.addEventListener('click', asyncEvent(async event => {
+			scanButton.disabled = true
+
+			const bus = new I2CBusWeb(urlText.value)
+
+			const existingHexs = addressElem.querySelectorAll('hex-display')
+			existingHexs.forEach(eh => eh.remove())
+
+			const existingLis = root.querySelectorAll('li')
+			existingLis.forEach(el => el.remove())
+
+
+			try {
+				const { addresses: ackedList } = await bus.scan()
+
+				ackedList.forEach(addr => {
+					const acked = true
+
+
+					const hexElem = document.createElement('hex-display')
+
+					hexElem.setAttribute('slot', addr)
+
+					hexElem.toggleAttribute('acked', true)
+					// hexElem.toggleAttribute('arbitration', arbitration)
+					// hexElem.toggleAttribute('timedout', timedout)
+
+					hexElem.textContent = addr.toString(16).padStart(2, '0')
+
+					addressElem.append(hexElem)
+
+					//
+					const listElem = document.createElement('li')
+					listElem.textContent = addr
+
+					listElem.setAttribute('slot', 'vdevice-guess-list')
+					listElem.toggleAttribute('data-acked', true)
+
+					const guesses = deviceGuessByAddress(addr)
+					const item = appendDeviceListItem(deviceList, addr, { acked, guesses })
+
+					item.button.addEventListener('click', e => {
+						e.preventDefault()
+
+						//
+						item.button.disabled = true
+						const deviceGuess = item.select.value
+
+						const controller = new AbortController()
+						const { signal } = controller
+
+						UI_HOOKS.addI2CDevice({
+							type: deviceGuess,
+							bus,
+							address: addr,
+
+							port: undefined,
+							signal
+						})
+
+
+					}, { once: true })
+
+				})
+			}
+			catch(e) {
+				console.log(e)
+			}
+
+			scanButton.disabled = false
+		}))
+
+		return root
+	}
+}
+const demolisher = buildDeviceListItem(deviceListElem, builder)

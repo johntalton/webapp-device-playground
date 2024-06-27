@@ -326,6 +326,13 @@ export class ExcameraI2CDriverUIBuilder {
 			// bufferSize: 1
 		})
 
+		const signals = await this.#port.getSignals()
+		console.log(`Clear To Send:       ${signals.clearToSend}`)
+		console.log(`Data Carrier Detect: ${signals.dataCarrierDetect}`)
+		console.log(`Data Set Ready:      ${signals.dataSetReady}`)
+		console.log(`Ring Indicator:      ${signals.ringIndicator}`)
+
+
 		// device author provided init script
 		await initScript(this.#port)
 

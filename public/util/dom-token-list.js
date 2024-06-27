@@ -4,13 +4,23 @@ const EMPTY_SPACE = ''
 export class DOMTokenListLike {
 	#set
 	#attr
+	// #observer
+
+	static fromValue(value) {
+		return new Set(value.split(SINGLE_SPACE).filter(v => v !== EMPTY_SPACE))
+	}
 
 	/**
 	 * @param {Attr} attr
 	 */
 	constructor(attr) {
-		this.#set = new Set(attr.value.split(SINGLE_SPACE).filter(v => v !== EMPTY_SPACE))
+		this.#set = DOMTokenListLike.fromValue(attr.value)
 		this.#attr = attr
+
+		// this.#observer = new MutationObserver(mutations => {
+		// 	console.log('ATTR', mutations)
+		// })
+		// this.#observer.observe(attr.ownerElement, { attributeFilter: [ attr.name ], attributes: true })
 	}
 
 	_update() {
@@ -22,6 +32,7 @@ export class DOMTokenListLike {
 	}
 
 	get value() { return this.toString() }
+	set value(value) { this.#set = DOMTokenListLike.fromValue(value) }
 
 	/**
 	 * @param {String} token

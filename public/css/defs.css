@@ -28,6 +28,10 @@
 
 
 [data-theme] {
+	--color-white: white;
+	--color-black: black;
+	--color-gray: gray;
+
 	/*  */
 	--color-disabled: var(--color-gray);
 	--color-opaque-black: rgba(50 50 50 / 0.25);

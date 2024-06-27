@@ -1,0 +1,56 @@
+<!DOCTYPE>
+<html>
+	<body>
+		<web-config>
+			<style>
+				web-config {
+					margin-block-start: 1em;
+					margin-inline-end: 2em;
+
+					display: flex;
+					flex-wrap: wrap;
+					gap: 1em;
+
+					& > form {
+						flex-grow: 1;
+						min-width: 100%;
+
+						& > fieldset {
+							border-width: 0;
+							background-color: var(--color-accent--lightest, red);
+							color: var(--color-accent--lightest-text, red);
+						}
+					}
+				}
+			</style>
+
+			<form>
+				<fieldset>
+					<label>Web Address</label>
+					<input name="url" type="text" value="http://localhost:3000/mcp" />
+				</fieldset>
+			</form>
+
+			<div data-scan-group>
+				<button data-scan>Scan 🔎</button>
+
+				<addr-display name="scanResults">
+				</addr-display>
+
+				<ul data-device-list>
+					<!-- dynamic content -->
+					<template>
+						<li>
+							<form>
+								<hex-display></hex-display>
+								<select></select>
+								<button>Create Device 🕹️</button>
+							</form>
+						</li>
+					</template>
+				</ul>
+
+			</div>
+		</web-config>
+	</body>
+</html>

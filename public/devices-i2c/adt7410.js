@@ -74,7 +74,9 @@ export class ADT7410Builder {
 
 		//
 		const refreshId = async () => {
+			// console.log('refresh id')
 			this.#id = await this.#device.getId()
+				.then(id => { console.log(id); return id })
 				.catch(e => ({ manufactureId: NaN, revisionId: NaN, matchedVendor: false }))
 
 			idOutput.value = `Manufacture: 0x${this.#id.manufactureId.toString(16).padStart(2, '0')}, Revision ${this.#id.revisionId} ${this.#id.matchedVendor ? '' : '🛑'}`

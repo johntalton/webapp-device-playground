@@ -128,19 +128,27 @@ form {
 
   & input[type="text"] {
     accent-color: var(--color-accent--darker, red);
-    border: 0;
+    /* background-color: var(--color-accent--lightest, red);
+    color: var(--color-accent--lightest-text, red); */
+     background-color: var(--color-accent--lighter, red);
+    color: var(--color-accent--lighter-text, red);
 
-    border-radius: 2em;
+    border-width: 2px;
+    border-style: solid;
+    border-color: var(--color-accent--darker, red);
+
+    border-radius: 1em;
     padding-inline-start: 1em;
-    padding-block: .5em;
+    padding-block: .75em;
 
-    &:not(:focus-visible) {
-      background-color: var(--color-accent--lighter, red);
-      color: var(--color-accent--lighter-text, red);
+    width: 100%;
+
+    &:focus-visible {
+      background-color: var(--color-white, white);
+      color: var(--color-black, black);
     }
 
     &:disabled {
-      border: 0;
       background-color: #00000014;
     }
 

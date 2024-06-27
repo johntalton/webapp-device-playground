@@ -59,7 +59,7 @@
 		<script src="./index.js" type="module" async defer></script>
 		<link rel="stylesheet" type="text/css" href="./index.css"></link>
 	</head>
-	<body data-theme="Corp" data-view="aside">
+	<body data-theme="Corp" data-view="aside" data-supports="initial">
 		<html-import id="addr-display" src="./custom-elements/address-display.html"></html-import>
 		<h1>⚙️ Web I²C Playground</h1>
 
@@ -84,6 +84,11 @@
 		</aside>
 
 		<main>
+			<div data-no-support>
+				<b>😢</b>
+				No supported bus types
+				<button name="dismissNoSupport">Dismiss</button>
+			</div>
 			<!--  -->
 			<template>
 				<section data-loading>
