@@ -1,4 +1,20 @@
 form {
+	--form-border-radius: 0.5em;
+	--form-border-width: 2px;
+	--form-border-color: red;
+
+	--form-color-background: var(--color-accent--lighter, red);
+	--form-color-text: var(--color-accent--lighter-text, red);
+
+	--form-color-accent: var(--color-accent--darker, red);
+	--form-color-accent-text: var(--color-accent--darker-text, red);
+
+	--form-color-active-background: var(--color-white, white);
+	--form-color-active-text: var(--color-black, black);
+}
+
+
+form {
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: 1em;
@@ -36,21 +52,29 @@ form {
     justify-self: start;
     align-self: flex-start;
     min-width: 15ch;
+
+		/* outline-color: var(--form-color-accent, red); */
   }
 
   & progress {
-    accent-color: var(--color-accent--darker, red);
+    accent-color: var(--form-color-accent, red);
   }
+
+
+
+  & input[type="range"] {
+    min-height: 3em;
+    accent-color: var(--form-color-accent, red);
+  }
+
 
 
 
   & select {
-    appearance: none;
+    /* appearance: none; */
 
-    /* background-color: var(--color-accent--lighter, red);
-    color: var(--color-accent--lighter-text, red); */
-    background-color: var(--color-accent--darker, red);
-    color: var(--color-accent--darker-text);
+    background-color: var(--form-color-accent, red);
+    color: var(--form-color-accent-text, red);
 
     min-width: 20ch;
 
@@ -60,92 +84,82 @@ form {
     padding-block: 0.5em;
 
     border-radius: 1em;
-    border-style: dashed;
-    border-style: solid;
     border-color: transparent;
+
+		/* outline-color: var(--form-color-accent, red); */
+
+		&:disabled {
+      background-color: #00000014;
+    }
   }
-
-  & select:where(:active, :hover) {
-    box-shadow: 0 0 5px var(--color-opaque-black, red);
-  }
-
-  & select:where(:focus-visible, :focus) {
-    outline-color: var(--color-accent, red);
-    outline-width: 5px;
-  }
-
-
-
 
   & input[type="checkbox"] {
-    accent-color: var(--color-accent--darker, red);
+    accent-color: var(--form-color-accent, red);
     width: 1.25em;
     height: 1.25em;
     margin: 0.5em;
     aspect-ratio: 1 / 1;
+
+		/* outline-color: var(--form-color-accent, red); */
+
+		&:where(:focus-within, :focus-visible, :focus) {
+      background-color: var(--form-color-active-background, white);
+      color: var(--form-color-active-text, black);
+    }
+
+		&:disabled {
+      background-color: #00000014;
+    }
   }
-
-
-
 
   & input[type="number"] {
-    /* min-width: 7ch; */
-    /* font-size: 1.5em; */
-    height: 2em;
+    padding-block: 0.75em;
+    padding-inline: 1em;
 
-    padding-inline-start: 1ch;
+		accent-color: var(--form-color-accent, red);
+    background-color: var(--form-color-background, red);
+    color: var(--form-color-text, red);
 
-    border-radius: .5em;
+		border-radius: var(--form-border-radius, 0);
+		border-width: var(--form-border-width, 0);
     border-style: solid;
-    border-color: var(--color-accent--dark, red);
+    border-color: var(--form-color-accent, red);
 
-    background-color: var(--color-accent--lightest, red);
-    color: var(--color-accent--lightest-text, red);
+		/* outline-color: var(--form-color-accent, red); */
 
-    &:not(:where(:focus-visible, :focus)) {
-      background-color: var(--color-accent--lighter, red);
+    &:where(:focus-within, :focus-visible, :focus) {
+      background-color: var(--form-color-active-background, white);
+      color: var(--form-color-active-text, black);
     }
 
-    &:where(:focus-visible, :focus) {
-      background-color: var(--color-white, red);
-      color: var(--color-black, red);
+		&:disabled {
+      background-color: #00000014;
+    }
 
-      outline-color: var(--color-accent, red);
-      outline-width: 5px;
+    &:not([disabled]):not([readonly]):not(:valid) {
+      background-color:pink;
     }
   }
-
-
-
-
-
-  & input[type="range"] {
-    min-height: 3em;
-    accent-color: var(--color-accent--darker, red);
-  }
-
-
 
   & input[type="text"] {
-    accent-color: var(--color-accent--darker, red);
-    /* background-color: var(--color-accent--lightest, red);
-    color: var(--color-accent--lightest-text, red); */
-     background-color: var(--color-accent--lighter, red);
-    color: var(--color-accent--lighter-text, red);
+    accent-color: var(--form-color-accent, red);
+    background-color: var(--form-color-background, red);
+    color: var(--form-color-text, red);
 
-    border-width: 2px;
+    border-width: var(--form-border-width, 0);
     border-style: solid;
-    border-color: var(--color-accent--darker, red);
+    border-color: var(--form-color-accent, red);
+    border-radius: var(--form-border-radius, 0);
 
-    border-radius: 1em;
     padding-inline-start: 1em;
     padding-block: .75em;
-
     width: 100%;
 
-    &:focus-visible {
-      background-color: var(--color-white, white);
-      color: var(--color-black, black);
+		/* outline-color: var(--form-color-accent, red); */
+
+    &:where(:focus-within, :focus-visible, :focus) {
+      background-color: var(--form-color-active-background, white);
+      color: var(--form-color-active-text, black);
     }
 
     &:disabled {

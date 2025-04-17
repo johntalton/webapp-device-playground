@@ -2,7 +2,13 @@
 <html>
 	<body>
 		<tca9548-config>
-			<form>
+			<div class="tabs">
+				<button data-tab="tune" data-active>Tune</button>
+				<button data-tab="scan">Scan</button>
+			</div>
+
+
+			<form data-active data-for-tab="tune" class="tabsContent">
 				<fieldset>
 					<legend>Channels</legend>
 
@@ -46,6 +52,44 @@
 						<input type="checkbox" name="ch7" value="7">
 					</label>
 				</fieldset>
+			</form>
+
+			<form data-for-tab="scan" class="tabsContent">
+
+				<fieldset>
+					<legend>Device Strategy</legend>
+
+					<select>
+						<option>Exclusive</option>
+						<option></option>
+					</select>
+
+					<output name="exclusiveChannels"></output>
+				</fieldset>
+
+
+				<div data-scan-group>
+					<button data-scan>Scan 🔎</button>
+
+					<addr-display name="scanResults">
+					</addr-display>
+
+					<ul data-device-list>
+						<!-- dynamic content -->
+						<template>
+							<li>
+								<form>
+									<!-- <output></output> -->
+									<hex-display></hex-display>
+									<select></select>
+									<button>Create Device 🕹️</button>
+								</form>
+							</li>
+						</template>
+					</ul>
+				</div>
+
+
 			</form>
 		</tca9548-config>
 	</body>

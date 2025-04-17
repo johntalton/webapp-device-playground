@@ -1,10 +1,17 @@
 
 import { Tca9548a } from '@johntalton/tca9548a'
 import { I2CAddressedBus } from '@johntalton/and-other-delights'
+import { I2CBusTCA9538A } from '@johntalton/i2c-bus-tca9548a'
+
 import { asyncEvent } from '../util/async-event.js'
 import { range } from '../util/range.js'
+import { bindTabRoot } from '../util/tabs.js'
+import { deviceGuessByAddress } from './guesses.js'
+import { appendDeviceListItem } from '../util/device-list.js'
 
 export class TCA9548Builder {
+	#ui
+	#bus
 	#abus
 	#device
 
@@ -15,6 +22,8 @@ export class TCA9548Builder {
 	constructor(definition, ui) {
 		const { bus, address } = definition
 
+		this.#ui = ui
+		this.#bus = bus
 		this.#abus = new I2CAddressedBus(bus, address)
 	}
 
@@ -64,6 +73,88 @@ export class TCA9548Builder {
 			await refresh()
 		}))
 
+		const scanButton = root.querySelector('button[data-scan]')
+		const deviceList = root.querySelector('[data-device-list]')
+		const addressElem = root.querySelector('addr-display[name="scanResults"]')
+
+		scanButton?.addEventListener('click', asyncEvent(async event => {
+			event.preventDefault()
+
+			scanButton.disabled = true
+
+			const existingHexs = addressElem.querySelectorAll('hex-display')
+			existingHexs.forEach(eh => eh.remove())
+
+			const existingLis = root.querySelectorAll('li')
+			existingLis.forEach(el => el.remove())
+
+
+			try {
+				const ackedList = await this.#bus.scan()
+
+				ackedList.forEach(addr => {
+					const acked = true
+
+
+					const hexElem = document.createElement('hex-display')
+
+					hexElem.setAttribute('slot', addr)
+
+					hexElem.toggleAttribute('acked', true)
+					// hexElem.toggleAttribute('arbitration', arbitration)
+					// hexElem.toggleAttribute('timedout', timedout)
+
+					hexElem.textContent = addr.toString(16).padStart(2, '0')
+
+					addressElem.append(hexElem)
+
+					//
+					const listElem = document.createElement('li')
+					listElem.textContent = addr
+
+					listElem.setAttribute('slot', 'vdevice-guess-list')
+					listElem.toggleAttribute('data-acked', true)
+
+					const guesses = deviceGuessByAddress(addr)
+					const item = appendDeviceListItem(deviceList, addr, { acked, guesses })
+
+					item.button.addEventListener('click', e => {
+						e.preventDefault()
+
+						const strategy = {
+							exclusive: 3
+						}
+
+						//
+						item.button.disabled = true
+						const deviceGuess = item.select.value
+
+						const controller = new AbortController()
+						const { signal } = controller
+
+						this.#ui.addI2CDevice({
+							type: deviceGuess,
+							bus: I2CBusTCA9538A.from(this.#bus, this.#device, strategy),
+							address: addr,
+
+							port: undefined,
+							signal
+						})
+
+
+					}, { once: true })
+
+				})
+			}
+			catch(e) {
+				console.log(e)
+			}
+
+			scanButton.disabled = false
+		}))
+
+
+		bindTabRoot(root)
 
 		await refresh()
 

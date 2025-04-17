@@ -1,5 +1,3 @@
-"use strict";
-
 import { hydrateSerial } from './hydrate/serial.js'
 import { hydrateUSB } from './hydrate/usb.js'
 import { hydrateHID } from './hydrate/hid.js'

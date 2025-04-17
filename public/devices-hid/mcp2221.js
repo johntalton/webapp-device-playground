@@ -3,7 +3,7 @@ import { I2CBusMCP2221 } from '@johntalton/i2c-bus-mcp2221'
 import { dumpHIDDevice } from '../util/hid-info.js'
 import { range } from '../util/range.js'
 import { deviceGuessByAddress } from '../devices-i2c/guesses.js'
-import { delayMs} from '../util/delay.js'
+import { delayMs } from '../util/delay.js'
 import { WebHIDStreamSource } from '../util/hid-stream.js'
 import { bindTabRoot } from '../util/tabs.js'
 import { appendDeviceListItem } from '../util/device-list.js'
@@ -20,28 +20,36 @@ import { I2CTransactionBus } from '@johntalton/and-other-delights'
 
 
 export class MCP2221UIBuilder {
+	#source
 	#hidDevice
 	#device
 	#ui
 	#vbus
 	#closeController
 
-	static async builder(hidDevice, ui) {
-		return new MCP2221UIBuilder(hidDevice, ui)
+	static async builder(hidDevice, ui, source = undefined) {
+		return new MCP2221UIBuilder(hidDevice, ui, source)
 	}
 
-	constructor(hidDevice, ui) {
+	constructor(hidDevice, ui, source) {
 		this.#hidDevice = hidDevice
+		this.#source = source
 		this.#ui = ui
 		this.#closeController = new AbortController()
 	}
 
-	get title() { return this.#hidDevice.productName }
+	get title() { return (this.#hidDevice !== undefined) ? this.#hidDevice.productName : 'MCP2221 WebTransport' }
 
 	async open() {
-		await this.#hidDevice.open()
-		const source = new WebHIDStreamSource(this.#hidDevice)
-		this.#device = MCP2221A.from(source)
+		if(this.#hidDevice !== undefined) {
+			await this.#hidDevice.open()
+			const source = new WebHIDStreamSource(this.#hidDevice)
+			this.#device = MCP2221A.from(source)
+		}
+		else {
+			this.#device = MCP2221A.from(this.#source)
+		}
+
 		const mbus = I2CBusMCP2221.from(this.#device, { opaquePrefix: 'MBus' })
 		this.#vbus = I2CTransactionBus.from(mbus)
 	}

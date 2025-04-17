@@ -217,6 +217,9 @@ export async function addUSBDevice(device) {
 }
 
 export async function addHIDDevice(hid, signal) {
+	////////
+	// return
+
 	const deviceListElem = document.getElementById('deviceList')
 	// console.log('UI:addHID', hid)
 
@@ -262,91 +265,92 @@ export async function addI2CDevice(definition) {
 
 
 
-export class I2CBusWeb {
-	#url
+// export class I2CBusWeb {
+// 	#url
 
-	constructor(url = 'http://localhost:3000/port') {
-		this.#url = url
-	}
+// 	constructor(url = 'http://localhost:3000/port') {
+// 		this.#url = url
+// 	}
 
-	get name() { return `WebI²C(${this.#url})`}
+// 	get name() { return `WebI²C(${this.#url})`}
 
-	async postCommand(command, options) {
-		try {
-			const response = await fetch(this.#url, {
-				method: 'POST',
-				headers: {
-					'Content-Type': 'application/json',
-				},
-				body: JSON.stringify({
-					namespace: window.origin,
-					opaque: '🤷🏻‍♂️',
-					type: command,
-					...options
-				})
-			})
+// 	async postCommand(command, options) {
+// 		try {
+// 			const response = await fetch(this.#url, {
+// 				method: 'POST',
+// 				headers: {
+// 					'Content-Type': 'application/json',
+// 				},
+// 				body: JSON.stringify({
+// 					namespace: window.origin,
+// 					opaque: '🤷🏻‍♂️',
+// 					type: command,
+// 					...options
+// 				})
+// 			})
 
-			if(!response.ok) { throw new Error(`response not ok ${response.status}`) }
+// 			if(!response.ok) { throw new Error(`response not ok ${response.status}`) }
 
-			const result = await response.json()
+// 			const result = await response.json()
 
-			if(result.type === 'error') {
-				throw new Error('WebI²C Remote Error: ' + result.why)
-			}
+// 			if(result.type === 'error') {
+// 				throw new Error('WebI²C Remote Error: ' + result.why)
+// 			}
 
-			return {
-				...result,
-				buffer: (result.buffer !== undefined) ? Uint8Array.from(result.buffer) : undefined
-			}
-		}
-		catch(e) {
-			// console.warn('fetch exception', e)
-			throw e
-		}
-	}
+// 			return {
+// 				...result,
+// 				buffer: (result.buffer !== undefined) ? Uint8Array.from(result.buffer) : undefined
+// 			}
+// 		}
+// 		catch(e) {
+// 			// console.warn('fetch exception', e)
+// 			throw e
+// 		}
+// 	}
 
-	async scan() {
-		return this.postCommand('scan', {})
-	}
+// 	async scan() {
+// 		const { ackedList } = await this.postCommand('scan', {})
+// 		return ackedList
+// 	}
 
-	async readI2cBlock(address, cmd, length, target) {
-		return this.postCommand('readI2cBlock', {
-			address,
-			cmd,
-			length
-		})
-	}
+// 	async readI2cBlock(address, cmd, length, target) {
+// 		return this.postCommand('readI2cBlock', {
+// 			address,
+// 			cmd,
+// 			length
+// 		})
+// 	}
 
-	async writeI2cBlock(address, cmd, length, buffer) {
-		return this.postCommand('writeI2cBlock', {
-			address,
-			cmd,
-			length,
-      buffer: [ ...buffer ]
-		})
-	}
+// 	async writeI2cBlock(address, cmd, length, buffer) {
+// 		return this.postCommand('writeI2cBlock', {
+// 			address,
+// 			cmd,
+// 			length,
+//       buffer: [ ...buffer ]
+// 		})
+// 	}
 
-	async i2cRead(address, length, target) {
-		return this.postCommand('i2cRead', {
-			address,
-			length
-		})
-  }
+// 	async i2cRead(address, length, target) {
+// 		return this.postCommand('i2cRead', {
+// 			address,
+// 			length
+// 		})
+//   }
 
-  async i2cWrite(address, length, buffer) {
-    return this.postCommand('i2cWrite', {
-			address,
-			length,
-      buffer: [ ...buffer ]
-		})
-  }
-}
+//   async i2cWrite(address, length, buffer) {
+//     return this.postCommand('i2cWrite', {
+// 			address,
+// 			length,
+//       buffer: [ ...buffer ]
+// 		})
+//   }
+// }
 
-addI2CDevice({
-	type: 'ht16k33',
-	address: 0x71,
-	bus: new I2CBusWeb()
-})
+// addI2CDevice({
+// 	type: 'ht16k33',
+// 	address: 0x71,
+// 	bus: new I2CBusWeb()
+// })
 
 const deviceListElem = document.getElementById('deviceList')
 const builder = {
@@ -381,7 +385,7 @@ const builder = {
 
 
 			try {
-				const { addresses: ackedList } = await bus.scan()
+				const ackedList = await bus.scan()
 
 				ackedList.forEach(addr => {
 					const acked = true
@@ -443,4 +447,24 @@ const builder = {
 		return root
 	}
 }
-const demolisher = buildDeviceListItem(deviceListElem, builder)
+// const demolisher = buildDeviceListItem(deviceListElem, builder)
+
+
+
+
+
+
+// const transport = new WebTransport('https://localhost:4433/hid0')
+// transport.ready.catch(e => console.warn('failed to establish connection', e))
+
+// await transport.ready
+
+// transport.closed
+// 	.then(info => console.log('transport closed', info))
+// 	.catch(e => console.warn('transport closed oddly', e))
+
+// const source = await transport.createBidirectionalStream()
+
+// const builder2 = await MCP2221UIBuilder.builder(undefined, UI_HOOKS, source)
+// const demolisher = buildDeviceListItem(deviceListElem, builder2)
+

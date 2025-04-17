@@ -1,6 +1,10 @@
 tca9548-config {
 	margin-inline-end: 2em;
 
+	& [data-scan-group] {
+		grid-column: 1 / -1;
+	}
+
   & form {
 
 		& fieldset {

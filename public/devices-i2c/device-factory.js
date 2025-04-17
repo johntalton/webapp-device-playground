@@ -4,7 +4,7 @@ import { DS3502Builder } from './ds3502.js'
 import { DS1841Builder } from './ds1841.js'
 // import { BoschIEUBuilder } from './boschieu.js'
 // import { BNO08XBuilder } from './bno08x.js'
-// import { SSD1306Builder } from './ssd1306.js'
+import { SSD1306Builder } from './ssd1306.js'
 import { PCA9536Builder} from './pca9536.js'
 import { PCF8574Builder } from './pcf8574.js'
 import { PCF8523Builder } from './pcf8523.js'
@@ -52,7 +52,7 @@ const BY_NAME = {
 	[DS3502_INFO.name]: (definition, ui) => DS3502Builder.builder(definition, ui),
 	// [BOSCH_IEU_INFO.name]: (definition, ui) => BoschIEUBuilder.builder(definition, ui),
 	// [BNO_08X_INFO.name]: (definition, ui) => BNO08XBuilder.builder(definition, ui),
-	// [SSD1306_INFO.name]: (definition, ui) => SSD1306Builder.builder(definition, ui),
+	[SSD1306_INFO.name]: (definition, ui) => SSD1306Builder.builder(definition, ui),
 	[PCF_8574_INFO.name]: (definition, ui) => PCF8574Builder.builder(definition, ui),
 	[PCF_8523_INFO.name]: (definition, ui) => PCF8523Builder.builder(definition, ui),
 	[HT16K33_INFO.name]: (definition, ui) => HT16K33Builder.builder(definition, ui),

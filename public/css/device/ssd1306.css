@@ -1,0 +1,36 @@
+@import url("../fonts.css");
+
+ssd1306-config {
+	/* display: flex;
+	flex-direction: column;
+	flex-wrap: wrap;
+	align-content: center;
+	justify-content: flex-start;
+	align-items: baseline; */
+
+	& canvas {
+		border: 1px solid pink;
+	}
+
+	& [data-scrolling-controls] {
+		display: flex;
+		flex-direction: row;
+		gap: 1em;
+
+		margin-block-end: 2em;
+	}
+
+	& .logo {
+		text-transform: capitalize;
+		font-family: "Roboto-Black", sans-serif;
+		font-weight: bold;
+	}
+
+	& form {
+		margin-inline: 1em;
+	}
+
+	& sup, sub {
+		font-size: smaller;
+	}
+}

@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html>
+	<body>
+		<ssd1306-config>
+			<div class="tabs">
+				<button data-tab="upload" data-active>Upload</button>
+				<button data-tab="fundamental">Fundamental</button>
+				<button data-tab="scrolling">Scrolling</button>
+				<button data-tab="addressing">Addressing</button>
+				<button data-tab="hardware">Hardware</button>
+				<button data-tab="timing">Timing</button>
+			</div>
+			<section data-for-tab="fundamental" class="tabsContent">
+				<form method="dialog">
+					<label>Enable Display</label>
+					<input name="displayEnable" type="checkbox" />
+
+					<label>Invert Display</label>
+					<select name="displayInvert">
+						<option disabled selected value></option>
+						<option value="true">Invert</option>
+						<option value="false">Normal</option>
+					</select>
+
+					<label>All On</label>
+					<select name="displayAllOn">
+						<option disabled selected value></option>
+						<option value="true">All On</option>
+						<option value="false">From RAM</option>
+					</select>
+
+					<label>Contrast</label>
+					<input name="contrast" type="range" min="0" max="255" />
+
+				</form>
+			</section>
+
+			<section data-for-tab="scrolling" class="tabsContent">
+				<div data-scrolling-controls>
+					<button command="--scrolling-start">Start Scrolling</button>
+					<button command="--scrolling-stop">Stop Scrolling</button>
+				</div>
+				<form method="dialog" data-form="scrolling">
+					<label>Horizontal Direction</label>
+					<select name="scrollDirection">
+						<option value="left">Left</option>
+						<option value="right">Right</option>
+					</select>
+
+					<label>Start Page</label>
+					<input name="scrollPageStart" type="number" min="0" max="7" />
+
+					<label>End Page</label>
+					<input  name="scrollPageEnd" type="number" min="0" max="7" />
+
+					<label>Interval</label>
+					<select name="scrollInterval">
+						<option value="2">2 Frames (fast)</option>
+						<option value="3">3 Frames</option>
+						<option value="4">4 Frames</option>
+						<option value="5">5 Frames</option>
+						<option value="25">25 Frames</option>
+						<option value="64">64 Frames</option>
+						<option value="128">128 Frames</option>
+						<option value="256">256 Frames (slow)</option>
+					</select>
+
+					<fieldset>
+						<legend>Vertical Scrolling</legend>
+						<label>Enable</label>
+						<input name="enableVertical"  type="checkbox" />
+
+						<label>Vertical Offset (per frame)</label>
+						<input name="verticalOffset" type="number" min="0" max="63" />
+
+						<label>Vertical Area Top</label>
+						<input name="verticalAreaTop" type="number" min="0" max="63" />
+
+						<label>Vertical Area Row Count</label>
+						<input name="verticalAreaRows" type="number" min="0" max="63" />
+					</fieldset>
+				</form>
+			</section>
+
+			<section data-for-tab="addressing" class="tabsContent">
+				<form method="dialog">
+					<label>Address Mode <sup>*</sup></label>
+					<select name="addressMode">
+						<option disabled selected value></option>
+						<option value="horizontal">Horizontal</option>
+						<option value="vertical">Vertical</option>
+						<option value="page">Page</option>
+					</select>
+
+					<fieldset>
+						<legend>Horizontal / Vertical</legend>
+
+						<label>Start Page</label>
+						<input name="pageStart" type="number" min="0" max="7" />
+
+						<label>End Page</label>
+						<input name="pageEnd" type="number" min="0" max="7" />
+
+						<label>Start Column</label>
+						<input name="columnStart" type="number" min="0" max="63" />
+
+						<label>End Column</label>
+						<input name="columnEnd" type="number" min="0" max="63" />
+					</fieldset>
+
+					<fieldset>
+						<legend>Page</legend>
+
+						<label>Page</label>
+						<input name="pagingPage" type="number" min="0" max="7" />
+					</fieldset>
+				</form>
+			</section>
+
+			<section data-for-tab="hardware" class="tabsContent">
+				<form method="dialog">
+
+					<label>Scan Direction (Horizontal)</label>
+					<select name="flipHorizontal">
+						<option disabled selected value></option>
+						<option value="normal">Normal</option>
+						<option value="remap">Remap</option>
+					</select>
+
+					<label>Segment Remap (Vertical) <sup>*</sup></label>
+					<select name="flipVertical">
+						<option disabled selected value></option>
+						<option value="normal">Normal</option>
+						<option value="remap">Remap</option>
+					</select>
+
+					<label >Display Start Line (RAM)</label>
+					<input name="displayStartLine" type="range" min="0" max="63" />
+
+				</form>
+			</section>
+
+			<section data-for-tab="timing" class="tabsContent">
+				<form method="dialog">
+
+					<label>Clock Divider</label>
+					<input name="divider" type="number" min="0" max="15" />
+
+					<label>Oscillator Frequency</label>
+					<input name="oscillator" type="number" min="0" max="15" />
+
+					<label>V<sub>COM</sub> Deselect Level</label>
+					<input name="vcomlevel" type="number" min="0" max="7" />
+				</form>
+			</section>
+
+			<section data-for-tab="upload" data-active class="tabsContent">
+				<canvas data-preview height="64" width="128"></canvas>
+				<input name="sourcePicker" type="file" accept="image/*" />
+			</section>
+
+    </ssd1306-config>
+	</body>
+</html>
