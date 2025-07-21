@@ -89,7 +89,9 @@ form {
 		/* outline-color: var(--form-color-accent, red); */
 
 		&:disabled {
+      /* background-color: var(--color-accent--lightest, red); */
       background-color: #00000014;
+      color: var(--color-disabled, red);
     }
   }
 

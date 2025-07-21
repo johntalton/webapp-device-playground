@@ -340,7 +340,7 @@ export class ExcameraI2CDriverUIBuilder {
 		this.#i2cDriver = ExcameraLabsI2CDriverI2C.from({ port: this.#port })
 		const exbus = I2CBusExcameraI2CDriver.from(this.#i2cDriver)
 		this.#tbus = I2CTransactionBus.from(exbus)
-		this.#vbus = RestrictiveBus.from(RateLimitBus.from(this.#tbus))
+		this.#vbus = this.#tbus //  RestrictiveBus.from(RateLimitBus.from(this.#tbus))
 
 		const { crc } = await ExcameraLabsI2CDriver.transmitStatusInfo(this.#port)
 		this.#i2cDriver.crc = crc

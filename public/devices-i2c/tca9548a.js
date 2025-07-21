@@ -1,7 +1,7 @@
 
 import { Tca9548a } from '@johntalton/tca9548a'
 import { I2CAddressedBus } from '@johntalton/and-other-delights'
-import { I2CBusTCA9538A } from '@johntalton/i2c-bus-tca9548a'
+import { I2CBusTCA9548A, DefaultChannelManager } from '@johntalton/i2c-bus-tca9548a'
 
 import { asyncEvent } from '../util/async-event.js'
 import { range } from '../util/range.js'
@@ -9,11 +9,30 @@ import { bindTabRoot } from '../util/tabs.js'
 import { deviceGuessByAddress } from './guesses.js'
 import { appendDeviceListItem } from '../util/device-list.js'
 
+
+class EmittingChannelManager extends EventTarget {
+	#default
+
+	constructor(strategy) {
+		super()
+		this.#default = new DefaultChannelManager(strategy)
+	}
+
+	async before(device) {
+		return this.#default.before(device)
+	}
+
+	async after(device) {
+		return this.#default.after(device).then(() => this.dispatchEvent(new Event('after')))
+	}
+}
+
 export class TCA9548Builder {
 	#ui
 	#bus
 	#abus
 	#device
+	#currentStrategy
 
 	static async builder(definition, ui) {
 		return new TCA9548Builder(definition, ui)
@@ -25,6 +44,8 @@ export class TCA9548Builder {
 		this.#ui = ui
 		this.#bus = bus
 		this.#abus = new I2CAddressedBus(bus, address)
+
+		this.#currentStrategy = {}
 	}
 
 	get title() { return 'TCA9548A Multiplexer' }
@@ -48,11 +69,23 @@ export class TCA9548Builder {
 
 		const allChannelInputs = root.querySelectorAll('input[name ^= "ch"]')
 
+		const exclusiveChannelList = root.querySelector('output[name="exclusiveChannels"]')
+
 		const refresh = async () => {
 			// allChannelInputs.forEach(i => i.disabled = true)
 
 			const channels = await this.#device.getChannels()
 
+			// scan display
+			exclusiveChannelList.value = channels.join(' ')
+			this.#currentStrategy = {
+				exclusive: channels,
+				pedantic: false,
+				allow: [ ],
+				restore: false
+			}
+
+			// tune display
 			allChannelInputs.forEach(i => i.checked = false)
 			channels.forEach(ch => {
 				const chElem = root.querySelector(`input[name="ch${ch}"]`)
@@ -121,20 +154,24 @@ export class TCA9548Builder {
 					item.button.addEventListener('click', e => {
 						e.preventDefault()
 
-						const strategy = {
-							exclusive: 3
-						}
-
 						//
 						item.button.disabled = true
+						item.select.disabled = true
 						const deviceGuess = item.select.value
 
 						const controller = new AbortController()
 						const { signal } = controller
 
+
+						const cm = new EmittingChannelManager(this.#currentStrategy)
+						cm.addEventListener('after', () => {
+							refresh()
+								.catch(e => console.warn(e))
+						})
+
 						this.#ui.addI2CDevice({
 							type: deviceGuess,
-							bus: I2CBusTCA9538A.from(this.#bus, this.#device, strategy),
+							bus: I2CBusTCA9548A.from(this.#bus, this.#device, cm),
 							address: addr,
 
 							port: undefined,
