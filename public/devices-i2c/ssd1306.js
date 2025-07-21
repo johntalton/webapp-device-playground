@@ -1,4 +1,4 @@
-import { I2CAddressedBus } from '@johntalton/and-other-delights'
+import { I2CAddressedBus, I2CAddressedTransactionBus } from '@johntalton/and-other-delights'
 import {
 	SSD1306,
 	ADDRESS_MODE,
@@ -8,7 +8,7 @@ import {
 } from '@johntalton/ssd1306'
 import { bindTabRoot } from '../util/tabs.js'
 
-function imageDataAlphaToRAM(imageData) {
+function imageDataAlphaToRAM(imageData, horizontal = true) {
 	const result = new Array(128 * 8)
 
 	for(let page = 0; page < 8; page += 1) {
@@ -30,11 +30,21 @@ function imageDataAlphaToRAM(imageData) {
 				}
 			}
 
-			result[(page * 128) + x] = current
+			const resultIdx = horizontal ? ((page * 128) + x ): ((x * 8) + page)
+			result[resultIdx] = current
 		}
 	}
 
 	return result
+}
+
+const DEFAULT_CHUNK_SIZE = 32
+
+/** @param {Array<number>} data  */
+function* chunksOf(data, size) {
+	for(let i = 0; i < data.length; i += size) {
+		yield data.slice(i, i + size)
+	}
 }
 
 
@@ -42,6 +52,8 @@ export class SSD1306Builder {
 	#definition
 	/** @type {SSD1306} */
 	#device
+	/** @type {I2CAddressedTransactionBus} */
+	#tbus
 
 	static async builder(definition, ui) {
 		return new SSD1306Builder(definition, ui)
@@ -57,8 +69,8 @@ export class SSD1306Builder {
 
 	async open() {
 		const { bus, address } = this.#definition
-		const abus = new I2CAddressedBus(bus, address)
-		this.#device = SSD1306.from(abus)
+		this.#tbus = new I2CAddressedTransactionBus(bus, address)
+		this.#device = SSD1306.from(this.#tbus)
 
 
 		await this.#device.setAddressMode(ADDRESS_MODE.HORIZONTAL)
@@ -86,8 +98,18 @@ export class SSD1306Builder {
 
 
 		const canvas = root.querySelector('canvas[data-preview]')
-		const context = canvas?.getContext('2d')
+		const context = canvas?.getContext('2d', {
+			willReadFrequently: true,
+			imageSmoothingQuality: 'low'
+		})
+
+		const font = new FontFace('canvas-roboto-black', 'url(fonts/Roboto/static/Roboto-Black.ttf)', {})
+		await font.load()
+		document.fonts.add(font)
+
 		const inputSourcePicker = root.querySelector('input[name="sourcePicker"]')
+		const textAreaText = root.querySelector('textarea[name="text"]')
+		const inputFontSize = root.querySelector('input[name="fontSize"]')
 
 		const checkboxEnable = root.querySelector('input[name="displayEnable"]')
 		const selectInvert = root.querySelector('select[name="displayInvert"]')
@@ -273,12 +295,52 @@ export class SSD1306Builder {
 					offscreenContext.drawImage(imageBitmap, 0, 0, width, height)
 					const imageData = offscreenContext.getImageData(0, 0, width, height)
 
-					const ramContent = imageDataAlphaToRAM(imageData)
+					const ramContent = imageDataAlphaToRAM(imageData, true)
 
-					return this.#device.writeData(ramContent)
+					return this.#tbus.transaction(async abus => {
+						const device = SSD1306.from(abus)
+						for(const chunk of chunksOf(ramContent, DEFAULT_CHUNK_SIZE)) {
+							await device.writeData(chunk)
+						}
+					})
+
 				})
 				.catch(e => console.warn(e))
 		})
+
+
+		textAreaText?.addEventListener('change', async event => {
+			const fontSize = parseInt(inputFontSize.value)
+
+			const lines = textAreaText.value?.split('\n') ?? ''
+
+			await font.loaded
+
+			context.fillStyle = 'white'
+			context.clearRect(0, 0, 128, 64)
+			context.font = `${fontSize}px canvas-roboto-black`
+			context.fillStyle = 'black'
+
+			lines.forEach((line, idx) => {
+				context.fillText(line, 0, (idx + 1) * fontSize)
+			})
+
+
+			const imageData = context.getImageData(0, 0, 128, 64)
+			const ramContent = imageDataAlphaToRAM(imageData, true)
+
+
+			return this.#tbus.transaction(async abus => {
+				const device = SSD1306.from(abus)
+				for(const chunk of chunksOf(ramContent, DEFAULT_CHUNK_SIZE)) {
+					await device.writeData(chunk)
+				}
+			})
+		})
+
+
+
+
 
 		bindTabRoot(root)
 

@@ -9,6 +9,7 @@ ssd1306-config {
 	align-items: baseline; */
 
 	& canvas {
+		font-family: "Roboto Black";
 		border: 1px solid pink;
 	}
 

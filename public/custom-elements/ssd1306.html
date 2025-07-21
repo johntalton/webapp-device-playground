@@ -156,7 +156,22 @@
 
 			<section data-for-tab="upload" data-active class="tabsContent">
 				<canvas data-preview height="64" width="128"></canvas>
-				<input name="sourcePicker" type="file" accept="image/*" />
+
+				<section>
+					<input name="sourcePicker" type="file" accept="image/*" />
+				</section>
+
+				<section>
+					<label>Font Size</label>
+					<input name="fontSize" type="number" />
+
+					<textarea name="text"></textarea>
+				</section>
+
+				<section>
+					<button command="--animate">Animation</button>
+				</section>
+
 			</section>
 
     </ssd1306-config>
