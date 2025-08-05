@@ -53,244 +53,256 @@
 		</fieldset>
 	</form>
 
-	<form method="dialog" data-for-tab="controls">
-		<fieldset>
-			<legend>Feedback Control</legend>
+	<div data-for-tab="controls">
+		<form data-form="feedback" method="dialog">
+			<fieldset>
+				<legend>Feedback Control</legend>
 
-			<label data-otp>Device Mode</label>
-			<select  data-otp name="deviceMode">
-				<option value="0">ERM (default)</option>
-				<option value="1">LRA</option>
-			</select>
+				<label data-otp>Device Mode</label>
+				<select  data-otp name="deviceMode">
+					<option value="0">ERM (default)</option>
+					<option value="1">LRA</option>
+				</select>
 
-			<label data-otp>Brake Factor</label>
-			<select data-otp name="brakeFactor">
-				<option value="0">1x</option>
-				<option value="1">2x</option>
-				<option value="2">3x</option>
-				<option value="3">4x (default)</option>
-				<option value="4">6x</option>
-				<option value="5">8x</option>
-				<option value="6">16x</option>
-				<option value="7">Braking disabled</option>
-			</select>
+				<label data-otp>Brake Factor</label>
+				<select data-otp name="brakeFactor">
+					<option value="0">1x</option>
+					<option value="1">2x</option>
+					<option value="2">3x</option>
+					<option value="3">4x (default)</option>
+					<option value="4">6x</option>
+					<option value="5">8x</option>
+					<option value="6">16x</option>
+					<option value="7">Braking disabled</option>
+				</select>
 
-			<label data-otp>Loop Gain</label>
-			<select  data-otp name="loopGain">
-				<option value="0">Low</option>
-				<option value="1">Medium (default)</option>
-				<option value="2">High</option>
-				<option value="3">Very High</option>
-			</select>
+				<label data-otp>Loop Gain</label>
+				<select  data-otp name="loopGain">
+					<option value="0">Low</option>
+					<option value="1">Medium (default)</option>
+					<option value="2">High</option>
+					<option value="3">Very High</option>
+				</select>
 
-			<label data-otp>Analog Gain</label>
-			<select data-otp name="analogGain">
-				<optgroup label="ERM Mode">
-					<option value="0">0.255x</option>
-					<option value="1">0.7875x</option>
-					<option value="2">1.365x (default)</option>
-					<option value="3">3.0x</option>
-				</optgroup>
-				<optgroup label="LAR Mode">
-					<option value="0">3.75x</option>
-					<option value="1">7.5x</option>
-					<option value="2">15x (default)</option>
-					<option value="3">22.5x</option>
-				</optgroup>
-			</select>
-		</fieldset>
+				<label data-otp>Analog Gain</label>
+				<select data-otp name="analogGain">
+					<optgroup label="ERM Mode">
+						<option value="0">0.255x</option>
+						<option value="1">0.7875x</option>
+						<option value="2">1.365x (default)</option>
+						<option value="3">3.0x</option>
+					</optgroup>
+					<optgroup label="LAR Mode">
+						<option value="0">3.75x</option>
+						<option value="1">7.5x</option>
+						<option value="2">15x (default)</option>
+						<option value="3">22.5x</option>
+					</optgroup>
+				</select>
+			</fieldset>
+		</form>
 
-		<fieldset>
-			<legend>Control 1</legend>
+		<form data-form="control1" method="dialog">
+			<fieldset>
+				<legend>Control 1</legend>
 
-			<label>Startup Boost</label>
-			<input name="startupBoost" type="checkbox" />
+				<label>Startup Boost</label>
+				<input name="startupBoost" type="checkbox" />
 
-			<label>AC coupling</label>
-			<input name="acCouple" type="checkbox" />
+				<label>AC coupling</label>
+				<input name="acCouple" type="checkbox" />
 
-			<label>Drive Time (ms)</label>
-			<input name="driveTime" type="range" min="0" max="31" />
-		</fieldset>
+				<label>Drive Time (ms)</label>
+				<input name="driveTime" type="range" min="0" max="31" />
+			</fieldset>
+		</form>
 
-		<fieldset>
-			<legend>Control 2</legend>
+		<form data-form="control2" method="dialog">
+			<fieldset>
+				<legend>Control 2</legend>
 
-			<label>Input Mode</label>
-			<select name="bidirInput">
-				<option value="0">Unidirectional</option>
-				<option value="1">Bidirectional (default)</option>
-			</select>
+				<label>Input Mode</label>
+				<select name="bidirInput">
+					<option value="0">Unidirectional</option>
+					<option value="1">Bidirectional (default)</option>
+				</select>
 
-			<label>Brake Stabilizer</label>
-			<input name="brakeStabilizer" type="checkbox" />
+				<label>Brake Stabilizer</label>
+				<input name="brakeStabilizer" type="checkbox" />
 
-			<label>Sample Time</label>
-			<select name="sampleTime">
-				<option value="0">150 µs</option>
-				<option value="1">200 µs</option>
-				<option value="2">250 µs</option>
-				<option value="3">300 µs (default)</option>
-			</select>
+				<label>Sample Time</label>
+				<select name="sampleTime">
+					<option value="0">150 µs</option>
+					<option value="1">200 µs</option>
+					<option value="2">250 µs</option>
+					<option value="3">300 µs (default)</option>
+				</select>
 
-			<label>Blanking Time</label>
-			<select name="blankingTime">
-				<optgroup label="ERM Mode">
-					<option value="0">45 µs</option>
-					<option value="1">75 µs (default)</option>
-					<option value="2">150 µs</option>
-					<option value="3">225 µs</option>
-				</optgroup>
-				<optgroup label="LRA Mode" disabled>
-					<option value="0">15 µs</option>
-					<option value="1">25 µs (default)</option>
-					<option value="2">50 µs</option>
-					<option value="3">75 µs</option>
-					<option value="4">90 µs</option>
-					<option value="5">105 µs</option>
-					<option value="6">120 µs</option>
-					<option value="7">135 µs</option>
-					<option value="8">150 µs</option>
-					<option value="9">165 µs</option>
-					<option value="10">180 µs</option>
-					<option value="11">195 µs</option>
-					<option value="12">210 µs</option>
-					<option value="13">235 µs</option>
-					<option value="14">260 µs</option>
-					<option value="15">285 µs</option>
-				</optgroup>
-			</select>
+				<label>Blanking Time</label>
+				<select name="blankingTime">
+					<optgroup label="ERM Mode">
+						<option value="0">45 µs</option>
+						<option value="1">75 µs (default)</option>
+						<option value="2">150 µs</option>
+						<option value="3">225 µs</option>
+					</optgroup>
+					<optgroup label="LRA Mode" disabled>
+						<option value="0">15 µs</option>
+						<option value="1">25 µs (default)</option>
+						<option value="2">50 µs</option>
+						<option value="3">75 µs</option>
+						<option value="4">90 µs</option>
+						<option value="5">105 µs</option>
+						<option value="6">120 µs</option>
+						<option value="7">135 µs</option>
+						<option value="8">150 µs</option>
+						<option value="9">165 µs</option>
+						<option value="10">180 µs</option>
+						<option value="11">195 µs</option>
+						<option value="12">210 µs</option>
+						<option value="13">235 µs</option>
+						<option value="14">260 µs</option>
+						<option value="15">285 µs</option>
+					</optgroup>
+				</select>
 
-			<label>Current dissipation time</label>
-			<select name="currentDissipationTime">
-				<optgroup label="ERM Mode">
-					<option value="0">45 µs</option>
-					<option value="1">75 µs (default)</option>
-					<option value="2">150 µs</option>
-					<option value="3">225 µs</option>
-				</optgroup>
-				<optgroup label="LRA Mode" disabled>
-					<option value="0">15 µs</option>
-					<option value="1">25 µs (default)</option>
-					<option value="2">50 µs</option>
-					<option value="3">75 µs</option>
-					<option value="4">90 µs</option>
-					<option value="5">105 µs</option>
-					<option value="6">120 µs</option>
-					<option value="7">135 µs</option>
-					<option value="8">150 µs</option>
-					<option value="9">165 µs</option>
-					<option value="10">180 µs</option>
-					<option value="11">195 µs</option>
-					<option value="12">210 µs</option>
-					<option value="13">235 µs</option>
-					<option value="14">260 µs</option>
-					<option value="15">285 µs</option>
-				</optgroup>
-			</select>
-		</fieldset>
+				<label>Current dissipation time</label>
+				<select name="currentDissipationTime">
+					<optgroup label="ERM Mode">
+						<option value="0">45 µs</option>
+						<option value="1">75 µs (default)</option>
+						<option value="2">150 µs</option>
+						<option value="3">225 µs</option>
+					</optgroup>
+					<optgroup label="LRA Mode" disabled>
+						<option value="0">15 µs</option>
+						<option value="1">25 µs (default)</option>
+						<option value="2">50 µs</option>
+						<option value="3">75 µs</option>
+						<option value="4">90 µs</option>
+						<option value="5">105 µs</option>
+						<option value="6">120 µs</option>
+						<option value="7">135 µs</option>
+						<option value="8">150 µs</option>
+						<option value="9">165 µs</option>
+						<option value="10">180 µs</option>
+						<option value="11">195 µs</option>
+						<option value="12">210 µs</option>
+						<option value="13">235 µs</option>
+						<option value="14">260 µs</option>
+						<option value="15">285 µs</option>
+					</optgroup>
+				</select>
+			</fieldset>
+		</form>
 
-		<fieldset>
-			<legend>Control 3</legend>
+		<form data-form="control3" method="dialog">
+			<fieldset>
+				<legend>Control 3</legend>
 
-			<label>Noise Gate Threshold</label>
-			<select name="noiseGateThreshold">
-				<option value="0">Disabled</option>
-				<option value="1">2%</option>
-				<option value="2">4% (default)</option>
-				<option value="3">8%</option>
-			</select>
+				<label>Noise Gate Threshold</label>
+				<select name="noiseGateThreshold">
+					<option value="0">Disabled</option>
+					<option value="1">2%</option>
+					<option value="2">4% (default)</option>
+					<option value="3">8%</option>
+				</select>
 
-			<label>ERM Mode</label>
-			<select name="ermMode">
-				<option value="0">Closed Loop</option>
-				<option value="1">Open Loop (default)</option>
-			</select>
+				<label>ERM Mode</label>
+				<select name="ermMode">
+					<option value="0">Closed Loop</option>
+					<option value="1">Open Loop (default)</option>
+				</select>
 
-			<label>Supply Compensation</label>
-			<select name="supplyCompensation">
-				<option value="0">Enabled (default)</option>
-				<option value="1">Disabled</option>
-			</select>
+				<label>Supply Compensation</label>
+				<select name="supplyCompensation">
+					<option value="0">Enabled (default)</option>
+					<option value="1">Disabled</option>
+				</select>
 
-			<label>Data Format (Realtime Playback)</label>
-			<select name="dataFormat">
-				<option value="0">Signed (default)</option>
-				<option value="1">Unsigned</option>
-			</select>
+				<label>Data Format (Realtime Playback)</label>
+				<select name="dataFormat">
+					<option value="0">Signed (default)</option>
+					<option value="1">Unsigned</option>
+				</select>
 
-			<label>LRA Drive Mode</label>
-			<select name="lraDriveMode">
-				<option value="0">Once Per Cycle (default)</option>
-				<option value="1">Twice Per Cycle</option>
-			</select>
+				<label>LRA Drive Mode</label>
+				<select name="lraDriveMode">
+					<option value="0">Once Per Cycle (default)</option>
+					<option value="1">Twice Per Cycle</option>
+				</select>
 
-			<label>Input Mode Trigger</label>
-			<select name="inputModeTrigger">
-				<option value="0">PWM Input (default)</option>
-				<option value="1">Analog Input</option>
-			</select>
+				<label>Input Mode Trigger</label>
+				<select name="inputModeTrigger">
+					<option value="0">PWM Input (default)</option>
+					<option value="1">Analog Input</option>
+				</select>
 
-			<label>LRA Open Loop Mode</label>
-			<select name="lraOpenLoopMode">
-				<option value="0">Auto-resonance mode (default)</option>
-				<option value="1">LRA open-loop mode</option>
-			</select>
-		</fieldset>
+				<label>LRA Open Loop Mode</label>
+				<select name="lraOpenLoopMode">
+					<option value="0">Auto-resonance mode (default)</option>
+					<option value="1">LRA open-loop mode</option>
+				</select>
+			</fieldset>
+		</form>
 
-		<fieldset>
-			<legend>Control 4</legend>
+		<form data-form="control4" method="dialog">
+			<fieldset>
+				<legend>Control 4</legend>
 
-			<label>Zero Crossing Detect Time</label>
-			<select name="zeroCrossingDetect">
-				<option value="0">100 µs (default)</option>
-				<option value="1">200 µs</option>
-				<option value="2">300 µs</option>
-				<option value="3">390 µs</option>
-			</select>
+				<label>Zero Crossing Detect Time</label>
+				<select name="zeroCrossingDetect">
+					<option value="0">100 µs (default)</option>
+					<option value="1">200 µs</option>
+					<option value="2">300 µs</option>
+					<option value="3">390 µs</option>
+				</select>
 
-			<label>Auto Calibration Time (ms)</label>
-			<select name="autoCalibrationTime">
-				<option value="0">150 to 350</option>
-				<option value="1">250 to 450</option>
-				<option value="2">500 to 700 (default)</option>
-				<option value="3">1000 to 1200</option>
-			</select>
+				<label>Auto Calibration Time (ms)</label>
+				<select name="autoCalibrationTime">
+					<option value="0">150 to 350</option>
+					<option value="1">250 to 450</option>
+					<option value="2">500 to 700 (default)</option>
+					<option value="3">1000 to 1200</option>
+				</select>
 
-			<label>Memory Status</label>
-			<output name="memoryStatus"></output>
-		</fieldset>
+				<label>Memory Status</label>
+				<output name="memoryStatus"></output>
+			</fieldset>
+		</form>
 
-		<fieldset>
-			<legend>Control 5</legend>
+		<form data-form="control5" method="dialog">
+			<fieldset>
+				<legend>Control 5</legend>
 
-			<label>Cycles required to attempt synchronization</label>
-			<select name="cycleAttempts">
-				<option value="0">3 attempts</option>
-				<option value="1">4 attempts</option>
-				<option value="2">5 attempts (default)</option>
-				<option value="3">6 attempts</option>
-			</select>
+				<label>Cycles required to attempt synchronization</label>
+				<select name="cycleAttempts">
+					<option value="0">3 attempts</option>
+					<option value="1">4 attempts</option>
+					<option value="2">5 attempts (default)</option>
+					<option value="3">6 attempts</option>
+				</select>
 
-			<label>Open-Loop Transition</label>
-			<select name="openLoopTransition">
-				<option value="0">Never (default)</option>
-				<option value="1">Automatically</option>
-			</select>
+				<label>Open-Loop Transition</label>
+				<select name="openLoopTransition">
+					<option value="0">Never (default)</option>
+					<option value="1">Automatically</option>
+				</select>
 
-			<label>Playback Interval</label>
-			<select name="playbackInterval">
-					<option value="0">5 ms (default)</option>
-					<option value="1">1 ms</option>
-			</select>
+				<label>Playback Interval</label>
+				<select name="playbackInterval">
+						<option value="0">5 ms (default)</option>
+						<option value="1">1 ms</option>
+				</select>
 
-			<label>Blanking Time MSB</label>
-			<input name="blankingTimeMSB" type="number" />
+				<label>Blanking Time MSB</label>
+				<input name="blankingTimeMSB" type="number" />
 
-			<label>Current Dissipation Time MSB</label>
-			<input name="currentDissipationTimeMSB" type="number" />
-		</fieldset>
-	</form>
+				<label>Current Dissipation Time MSB</label>
+				<input name="currentDissipationTimeMSB" type="number" />
+			</fieldset>
+		</form>
+	</div>
 
 	<form method="dialog" data-for-tab="parameters">
 		<fieldset>
@@ -368,7 +380,7 @@
 	</form>
 
 	<div data-for-tab="waveform">
-		<form method="dialog">
+		<form data-form="library" method="dialog">
 			<fieldset>
 				<legend>Library Selection</legend>
 				<label>High-Impedance</label>

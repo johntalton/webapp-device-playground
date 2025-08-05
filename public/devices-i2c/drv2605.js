@@ -3,12 +3,18 @@ import {
 	DRV2605,
 	DEVICE_ID_MAP,
 	WAVEFORM_SEQUENCER_END_ID,
-	WAVEFORM_SEQUENCER_MAX_ITEMS
+	WAVEFORM_SEQUENCER_MAX_ITEMS,
+	ERM_MODE_DRIVE_TIME_FACTOR_MS,
+	ERM_MODE_DRIVE_TIME_OFFSET_MS,
+	LRA_MODE_DRIVE_TIME_FACTOR_MS,
+	LRA_MODE_DRIVE_TIME_OFFSET_MS
 } from '@johntalton/drv2605'
 
 import { asyncEvent } from '../util/async-event.js'
 import { bindTabRoot } from '../util/tabs.js'
 import { range } from '../util/range.js'
+
+const BASE_10 = 10
 
 const WAVEFORM_SEQUENCER_CORE_LOOKUP = [
 	{ name: 'stop', base: 0 },
@@ -217,21 +223,25 @@ export class DRV2605Builder {
 		const modeSelect = root.querySelector('select[name="mode"]')
 
 		// feedback control
+		const formFeedback = root.querySelector('form[data-form="feedback"]')
 		const deviceModeSelect = root.querySelector('select[name="deviceMode"]')
 		const brakeFactorSelect = root.querySelector('select[name="brakeFactor"]')
 		const loopGainSelect = root.querySelector('select[name="loopGain"]')
 		const analogGainSelect = root.querySelector('select[name="analogGain"]')
 		// control 1
+		const formControl1 = root.querySelector('form[data-form="control1"]')
 		const startupBoostCheckbox = root.querySelector('input[name="startupBoost"]')
 		const acCoupleCheckbox = root.querySelector('input[name="acCouple"]')
 		const driveTimeRange = root.querySelector('input[name="driveTime"]')
 		// control 2
+		const formControl2 = root.querySelector('form[data-form="control2"]')
 		const bidirInputSelect = root.querySelector('select[name="bidirInput"]')
 		const brakeStabilizerCheckbox = root.querySelector('input[name="brakeStabilizer"]')
 		const sampleTimeSelect = root.querySelector('select[name="sampleTime"]')
 		const blankingTimeSelect = root.querySelector('select[name="blankingTime"]')
 		const currentDissipationTimeSelect = root.querySelector('select[name="currentDissipationTime"]')
 		// control 3
+		const formControl3 = root.querySelector('form[data-form="control3"]')
 		const noiseGateThresholdSelect = root.querySelector('select[name="noiseGateThreshold"]')
 		const ermModeSelect = root.querySelector('select[name="ermMode"]')
 		const supplyCompensationSelect = root.querySelector('select[name="supplyCompensation"]')
@@ -240,10 +250,12 @@ export class DRV2605Builder {
 		const inputModeTriggerSelect = root.querySelector('select[name="inputModeTrigger"]')
 		const lraOpenLoopModeSelect = root.querySelector('select[name="lraOpenLoopMode"]')
 		// control 4
+		const formControl4 = root.querySelector('form[data-form="control4"]')
 		const zeroCrossingDetectSelect = root.querySelector('select[name="zeroCrossingDetect"]')
 		const autoCalibrationTimeSelect = root.querySelector('select[name="autoCalibrationTime"]')
 		const memoryStatusOutput = root.querySelector('output[name="memoryStatus"]')
 		// control 5
+		const formControl5 = root.querySelector('form[data-form="control5"]')
 		const cycleAttemptsSelect = root.querySelector('select[name="cycleAttempts"]')
 		const openLoopTransitionSelect = root.querySelector('select[name="openLoopTransition"]')
 		const playbackIntervalSelect = root.querySelector('select[name="playbackInterval"]')
@@ -278,6 +290,7 @@ export class DRV2605Builder {
 
 
 		// waveform listing
+		const formLibrary = root.querySelector('form[data-form="library"]')
 		const highImpedanceCheckbox = root.querySelector('input[name="highImpedance"]')
 		const waveformLibrarySelect = root.querySelector('select[name="waveformLibrary"]')
 		const waveformListing = root.querySelector('[data-waveform-listing]')
@@ -295,6 +308,14 @@ export class DRV2605Builder {
 		}))
 		const waveformListingLIForms = waveformListing.querySelectorAll('li > form')
 
+
+		if(!(formFeedback instanceof HTMLFormElement)) { throw new Error('missing formFeedback') }
+		if(!(formControl1 instanceof HTMLFormElement)) { throw new Error('missing formControl1') }
+		if(!(formControl2 instanceof HTMLFormElement)) { throw new Error('missing formControl2') }
+		if(!(formControl3 instanceof HTMLFormElement)) { throw new Error('missing formControl3') }
+		if(!(formControl4 instanceof HTMLFormElement)) { throw new Error('missing formControl4') }
+		if(!(formControl5 instanceof HTMLFormElement)) { throw new Error('missing formControl5') }
+		if(!(formLibrary instanceof HTMLFormElement)) { throw new Error('missing formLibrary') }
 
 		if(!(deviceIDElem instanceof HTMLOutputElement)) { throw new Error('missing deviceIDElem') }
 		if(!(diagnosticResultCheckbox instanceof HTMLInputElement)) { throw new Error('missing diagnosticResultCheckbox') }
@@ -404,10 +425,6 @@ export class DRV2605Builder {
 				AC_COUPLE
 			} = await this.#device.getControl1()
 
-			const LRA_MODE_DRIVE_TIME_FACTOR_MS = 0.1
-			const ERM_MODE_DRIVE_TIME_FACTOR_MS = 0.2
-			const LRA_MODE_DRIVE_TIME_OFFSET_MS = 0.5
-			const ERM_MODE_DRIVE_TIME_OFFSET_MS = 1
 
 			const lraMode = false // todo
 			const factor = lraMode ? LRA_MODE_DRIVE_TIME_FACTOR_MS : ERM_MODE_DRIVE_TIME_FACTOR_MS
@@ -531,7 +548,7 @@ export class DRV2605Builder {
 
 			if(valid && !wait && hasPercents) {
 				percentOptions?.forEach(option => {
-					const enable = definition.percents.includes(parseInt(option.value))
+					const enable = definition.percents.includes(parseInt(option.value, BASE_10))
 					option.disabled = !enable
 				})
 			}
@@ -659,9 +676,12 @@ export class DRV2605Builder {
 
 
 
+
+
+
 		const updateMode = async () => {
 			const standby = standbySelect.value === 'true'
-			const mode = parseInt(modeSelect.value, 10)
+			const mode = parseInt(modeSelect.value, BASE_10)
 
 			await this.#device.setMode({
 				DEV_RESET: false,
@@ -673,14 +693,124 @@ export class DRV2605Builder {
 			await refreshStatus()
 		}
 
-		const updateControls = async () => {
+		const updateFeedbackControl = async () => {
+			const N_ERM_LRA = deviceModeSelect.value
+			const FB_BRAKE_FACTOR = brakeFactorSelect.value
+			const LOOP_GAIN = loopGainSelect.value
+			const BEMF_GAIN = analogGainSelect.value
 
+			await this.#device.setFeedbackControl({
+				N_ERM_LRA,
+				FB_BRAKE_FACTOR,
+				LOOP_GAIN,
+				BEMF_GAIN
+			})
+
+			await refreshFeedbackControl()
+		}
+
+		const updateControl1 = async () => {
+			const STARTUP_BOOST = startupBoostCheckbox.checked
+			const AC_COUPLE = acCoupleCheckbox.checked
+			const DRIVE_TIME = parseInt(driveTimeRange.value, BASE_10) // todo: convert from ms into value
+
+			await this.#device.setControl1({
+				STARTUP_BOOST,
+				AC_COUPLE,
+				DRIVE_TIME
+			})
+
+			await refreshControl1()
+		}
+
+		const updateControl2 = async () => {
+			const BIDIR_INPUT = bidirInputSelect.value
+			const BRAKE_STABILIZER = brakeStabilizerCheckbox.checked
+			const SAMPLE_TIME = sampleTimeSelect.value
+			const BLANKING_TIME = blankingTimeSelect.value
+			const IDISS_TIME = currentDissipationTimeSelect.value
+
+			await this.#device.setControl2({
+				BIDIR_INPUT,
+				BRAKE_STABILIZER,
+				SAMPLE_TIME,
+				BLANKING_TIME,
+				IDISS_TIME
+			})
+
+			await refreshControl2()
+		}
+
+		const updateControl3 = async () => {
+			const NG_THRESH = noiseGateThresholdSelect.value
+			const ERM_OPEN_LOOP = ermModeSelect.value
+			const SUPPLY_COMP_DIS = supplyCompensationSelect.value
+			const DATA_FORMAT_RTP = dataFormatSelect.value
+			const LRA_DRIVE_MODE = lraDriveModeSelect.value
+			const N_PWM_ANALOG = inputModeTriggerSelect.value
+			const LRA_OPEN_LOOP = lraOpenLoopModeSelect.value
+
+			await this.#device.setControl3({
+				NG_THRESH,
+				ERM_OPEN_LOOP,
+				SUPPLY_COMP_DIS,
+				DATA_FORMAT_RTP,
+				LRA_DRIVE_MODE,
+				N_PWM_ANALOG,
+				LRA_OPEN_LOOP
+			})
+
+			await refreshControl3()
+		}
+
+		const updateControl4 = async () => {
+			const ZC_DET_TIME = zeroCrossingDetectSelect.value
+			const AUTO_CAL_TIME = autoCalibrationTimeSelect.value
+			// OTP_PROGRAM
+
+			await this.#device.setControl4({
+				ZC_DET_TIME,
+				AUTO_CAL_TIME,
+				OTP_PROGRAM: false // warning: true values will write to rom
+			})
+
+			await refreshControl4()
+		}
+
+		const updateControl5 = async () => {
+			const AUTO_OL_CNT = cycleAttemptsSelect.value
+			const LRA_AUTO_OPEN_LOOP = openLoopTransitionSelect.value
+			const PLAYBACK_INTERVAL = playbackIntervalSelect.value
+			const BLANKING_TIME = parseInt(blankingTimeMSBNumber.value, BASE_10)
+			const IDISS_TIME = parseInt(currentDissipationTimeMSBNumber.value, BASE_10)
+
+			await this.#device.setControl5({
+				AUTO_OL_CNT,
+				LRA_AUTO_OPEN_LOOP,
+				PLAYBACK_INTERVAL,
+				BLANKING_TIME,
+				IDISS_TIME
+			})
+
+			await refreshControl5()
+		}
+
+		const updateLibrary = async () => {
+			const hiZ = highImpedanceCheckbox.checked
+			const library = parseInt(waveformLibrarySelect.value, BASE_10)
+
+			await this.#device.setLibrarySelection({
+				HI_Z: hiZ,
+				LIBRARY_SEL: library
+			})
+
+			await refreshLibrary()
 		}
 
 		const updateWaveform = async item => {
 
 			const li = item.closest('li')
-			const sequence = parseInt(li.getAttribute('data-sequence'), 10)
+			const sequence = parseInt(li.getAttribute('data-sequence'), BASE_10)
 
 			const fd = new FormData(item.form)
 			const wait = fd.get('wait') === 'on'
@@ -691,8 +821,8 @@ export class DRV2605Builder {
 			const ramp = fd.get('transitionRamp')
 			const strength = fd.get('transitionStrength')
 
-			const percent = ((_percent instanceof File) || (_percent === null)) ? 0 : parseInt(_percent, 10)
-			const waitTime = ((_waitTime instanceof File) || (_waitTime === null)) ? 0 : parseInt(_waitTime, 10)
+			const percent = ((_percent instanceof File) || (_percent === null)) ? 0 : parseInt(_percent, BASE_10)
+			const waitTime = ((_waitTime instanceof File) || (_waitTime === null)) ? 0 : parseInt(_waitTime, BASE_10)
 
 			const id = wait ? waitTime : waveformIDByName(effect, { percent, alt, ramp, strength })
 
@@ -711,7 +841,8 @@ export class DRV2605Builder {
 		}
 
 		const updateRealtime = async () => {
-			const rtp = parseInt(rtpInputRange.value, 10)
+			const rtp = parseInt(rtpInputRange.value, BASE_10)
+			// console.log(rtp)
 			await this.#device.setRealTimePlaybackInput(rtp)
 		}
 
@@ -754,6 +885,35 @@ export class DRV2605Builder {
 
 		modeSelect?.addEventListener('change', asyncEvent(async event => {
 			await updateMode()
+		}))
+
+		formFeedback.addEventListener('change', asyncEvent(async event => {
+			await updateFeedbackControl()
+		}))
+
+		formControl1.addEventListener('change', asyncEvent(async event => {
+			await updateControl1()
+		}))
+
+		formControl2.addEventListener('change', asyncEvent(async event => {
+			await updateControl2()
+		}))
+
+		formControl3.addEventListener('change', asyncEvent(async event => {
+			await updateControl3()
+		}))
+
+		formControl4.addEventListener('change', asyncEvent(async event => {
+			await updateControl4()
+		}))
+
+		formControl5.addEventListener('change', asyncEvent(async event => {
+			await updateControl5()
+		}))
+
+
+		formLibrary.addEventListener('change', asyncEvent(async event => {
+			await updateLibrary()
 		}))
 
 		waveformListingLIForms.forEach(form => form.addEventListener('change', asyncEvent(async event => {
