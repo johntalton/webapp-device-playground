@@ -1,0 +1,71 @@
+drv2605-config {
+
+  &[data-otp] label[data-otp]:after {
+    position: relative;
+    left: calc(1em);
+    content: '🔒'
+  }
+
+
+  & [data-controls] {
+    display: flex;
+    gap: 1em;
+  }
+
+  & input[type="checkbox"][data-warn] {
+    &::after {
+      position: relative;
+      left: calc(100% + 1em);
+      content: "👍";
+    }
+
+    &:checked::after {
+      content: "👎";
+    }
+  }
+
+
+
+  & [data-for-tab="waveform"] {
+    display: flex;
+    flex-direction: column;
+  }
+
+  & [data-waveform-listing] {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+
+    & li {
+      display: flex;
+      padding-inline: 1em;
+      padding-block: 1em;
+      gap: 2em;
+      border-radius: 1em;
+
+      & > form {
+        display: contents;
+      }
+
+      &[data-inactive] {
+        opacity: 0.45;
+      }
+
+      &:nth-child(odd) {
+        background-color: lch(from var(--color-accent--lightest) calc(l - 5) c h);
+      }
+
+      & section {
+        display: flex;
+        flex-direction: column;
+        row-gap: 0.5em;
+      }
+
+      &[data-visible=""] section { display: none; }
+      &[data-visible="wait"] section:not([data-visible-when *= "wait"]) { display: none }
+      &[data-visible="waveform"] section:not([data-visible-when *= "waveform"]) { display: none }
+      &[data-visible="percent"] section:not([data-visible-when *= "percent"]) { display: none }
+      &[data-visible="transition"] section:not([data-visible-when *= "transition"]) { display: none }
+    }
+  }
+}

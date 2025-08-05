@@ -16,7 +16,7 @@ import { MCP23Builder } from './mcp23.js'
 import { EEPROMBuilder } from './eeprom.js'
 import { ADXL375Builder } from './adxl375.js'
 import { AHT20Builder } from './aht20.js'
-// import { DRV2605Builder } from './drv2605.js'
+import { DRV2605Builder } from './drv2605.js'
 import { DS3231Builder } from './ds3231.js'
 import { TSL2591Builder } from './tsl2591.js'
 import { AW9523Builder } from './aw9523.js'
@@ -64,7 +64,7 @@ const BY_NAME = {
 	[EEPROM_INFO.name]: (definition, ui) => EEPROMBuilder.builder(definition, ui),
 	[ADXL375_INFO.name]: (definition, ui) => ADXL375Builder.builder(definition, ui),
 	[AHT20_INFO.name]: (definition, ui) => AHT20Builder.builder(definition, ui),
-	// [DRV2605_INFO.name]: (definition, ui) => DRV2605Builder.builder(definition, ui),
+	[DRV2605_INFO.name]: (definition, ui) => DRV2605Builder.builder(definition, ui),
 	[DS3231_INFO.name]: (definition, ui) => DS3231Builder.builder(definition, ui),
 	[TSL2591_INFO.name]: (definition, ui) => TSL2591Builder.builder(definition, ui),
 	[AW9523_INFO.name]: (definition, ui) => AW9523Builder.builder(definition, ui),

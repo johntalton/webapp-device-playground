@@ -20,7 +20,7 @@
 		transition: background-color 3s, color 3s;
 	} */
 
-	*:not(:where(html, body)) {
+	*:not(:where(html, body, small)) {
 		font-family: inherit;
 		font-size: inherit;
 	}

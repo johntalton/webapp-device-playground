@@ -65,7 +65,7 @@
 
 
 
-.tabsContent {
+:where(.tabsContent, [data-for-tab]) {
 	margin-block-start: 0;
 	flex-grow: 1;
 	background-color: var(--color-accent--lightest, red);
@@ -80,6 +80,6 @@
 	/* display: block; */
 }
 
-.tabsContent:not([data-active]) {
+:where(.tabsContent, [data-for-tab]):not([data-active]) {
 	display: none !important;
 }

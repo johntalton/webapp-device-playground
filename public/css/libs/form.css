@@ -22,6 +22,7 @@ form {
   align-items: center;
   align-self: stretch;
 
+  justify-items: start;
 
 
   & fieldset {

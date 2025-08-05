@@ -1,0 +1,494 @@
+<drv2605-config data-otp>
+	<div class="tabs">
+		<button data-tab="general" data-active>General</button>
+		<button data-tab="controls">Controls</button>
+		<button data-tab="parameters">Parameters</button>
+		<button data-tab="waveform">Waveform</button>
+		<button data-tab="realtime">Real-Time</button>
+	</div>
+
+	<form method="dialog" data-for-tab="general" data-active>
+		<section data-controls>
+			<button name="reset" type="button" command="--reset">Reset</button>
+			<button name="go" type="button" command="--go">Go</button>
+			<button name="stop" type="button" command="--stop">Stop</button>
+		</section>
+
+		<fieldset>
+			<legend>Status</legend>
+
+			<label>Device ID</label>
+			<output name="deviceId" value="-"></output>
+
+			<label>Diagnostic Result</label>
+			<input name="diagnosticResult" type="checkbox" data-warn readonly disabled />
+
+			<label>Over Temperature</label>
+			<input name="overTemperature" type="checkbox" data-warn readonly disabled />
+
+			<label>Over Current</label>
+			<input name="overCurrent" type="checkbox" data-warn readonly disabled />
+		</fieldset>
+
+		<fieldset>
+			<legend>Mode</legend>
+
+			<label>Standby</label>
+			<select name="standby">
+				<option value="true">Standby</option>
+				<option value="false">Ready</option>
+			</select>
+
+			<label>Mode</label>
+			<select name="mode">
+				<option value="0">Internal Trigger</option>
+				<option value="1">External Trigger (edge mode)</option>
+				<option value="2">External Trigger (level mode)</option>
+				<option value="3">PWM input and analog input</option>
+				<option value="4">Audio-to-vibe</option>
+				<option value="5">Real-time playback (RTP mode)</option>
+				<option value="6">Diagnostics</option>
+				<option value="7">Auto calibration</option>
+			</select>
+		</fieldset>
+	</form>
+
+	<form method="dialog" data-for-tab="controls">
+		<fieldset>
+			<legend>Feedback Control</legend>
+
+			<label data-otp>Device Mode</label>
+			<select  data-otp name="deviceMode">
+				<option value="0">ERM (default)</option>
+				<option value="1">LRA</option>
+			</select>
+
+			<label data-otp>Brake Factor</label>
+			<select data-otp name="brakeFactor">
+				<option value="0">1x</option>
+				<option value="1">2x</option>
+				<option value="2">3x</option>
+				<option value="3">4x (default)</option>
+				<option value="4">6x</option>
+				<option value="5">8x</option>
+				<option value="6">16x</option>
+				<option value="7">Braking disabled</option>
+			</select>
+
+			<label data-otp>Loop Gain</label>
+			<select  data-otp name="loopGain">
+				<option value="0">Low</option>
+				<option value="1">Medium (default)</option>
+				<option value="2">High</option>
+				<option value="3">Very High</option>
+			</select>
+
+			<label data-otp>Analog Gain</label>
+			<select data-otp name="analogGain">
+				<optgroup label="ERM Mode">
+					<option value="0">0.255x</option>
+					<option value="1">0.7875x</option>
+					<option value="2">1.365x (default)</option>
+					<option value="3">3.0x</option>
+				</optgroup>
+				<optgroup label="LAR Mode">
+					<option value="0">3.75x</option>
+					<option value="1">7.5x</option>
+					<option value="2">15x (default)</option>
+					<option value="3">22.5x</option>
+				</optgroup>
+			</select>
+		</fieldset>
+
+		<fieldset>
+			<legend>Control 1</legend>
+
+			<label>Startup Boost</label>
+			<input name="startupBoost" type="checkbox" />
+
+			<label>AC coupling</label>
+			<input name="acCouple" type="checkbox" />
+
+			<label>Drive Time (ms)</label>
+			<input name="driveTime" type="range" min="0" max="31" />
+		</fieldset>
+
+		<fieldset>
+			<legend>Control 2</legend>
+
+			<label>Input Mode</label>
+			<select name="bidirInput">
+				<option value="0">Unidirectional</option>
+				<option value="1">Bidirectional (default)</option>
+			</select>
+
+			<label>Brake Stabilizer</label>
+			<input name="brakeStabilizer" type="checkbox" />
+
+			<label>Sample Time</label>
+			<select name="sampleTime">
+				<option value="0">150 µs</option>
+				<option value="1">200 µs</option>
+				<option value="2">250 µs</option>
+				<option value="3">300 µs (default)</option>
+			</select>
+
+			<label>Blanking Time</label>
+			<select name="blankingTime">
+				<optgroup label="ERM Mode">
+					<option value="0">45 µs</option>
+					<option value="1">75 µs (default)</option>
+					<option value="2">150 µs</option>
+					<option value="3">225 µs</option>
+				</optgroup>
+				<optgroup label="LRA Mode" disabled>
+					<option value="0">15 µs</option>
+					<option value="1">25 µs (default)</option>
+					<option value="2">50 µs</option>
+					<option value="3">75 µs</option>
+					<option value="4">90 µs</option>
+					<option value="5">105 µs</option>
+					<option value="6">120 µs</option>
+					<option value="7">135 µs</option>
+					<option value="8">150 µs</option>
+					<option value="9">165 µs</option>
+					<option value="10">180 µs</option>
+					<option value="11">195 µs</option>
+					<option value="12">210 µs</option>
+					<option value="13">235 µs</option>
+					<option value="14">260 µs</option>
+					<option value="15">285 µs</option>
+				</optgroup>
+			</select>
+
+			<label>Current dissipation time</label>
+			<select name="currentDissipationTime">
+				<optgroup label="ERM Mode">
+					<option value="0">45 µs</option>
+					<option value="1">75 µs (default)</option>
+					<option value="2">150 µs</option>
+					<option value="3">225 µs</option>
+				</optgroup>
+				<optgroup label="LRA Mode" disabled>
+					<option value="0">15 µs</option>
+					<option value="1">25 µs (default)</option>
+					<option value="2">50 µs</option>
+					<option value="3">75 µs</option>
+					<option value="4">90 µs</option>
+					<option value="5">105 µs</option>
+					<option value="6">120 µs</option>
+					<option value="7">135 µs</option>
+					<option value="8">150 µs</option>
+					<option value="9">165 µs</option>
+					<option value="10">180 µs</option>
+					<option value="11">195 µs</option>
+					<option value="12">210 µs</option>
+					<option value="13">235 µs</option>
+					<option value="14">260 µs</option>
+					<option value="15">285 µs</option>
+				</optgroup>
+			</select>
+		</fieldset>
+
+		<fieldset>
+			<legend>Control 3</legend>
+
+			<label>Noise Gate Threshold</label>
+			<select name="noiseGateThreshold">
+				<option value="0">Disabled</option>
+				<option value="1">2%</option>
+				<option value="2">4% (default)</option>
+				<option value="3">8%</option>
+			</select>
+
+			<label>ERM Mode</label>
+			<select name="ermMode">
+				<option value="0">Closed Loop</option>
+				<option value="1">Open Loop (default)</option>
+			</select>
+
+			<label>Supply Compensation</label>
+			<select name="supplyCompensation">
+				<option value="0">Enabled (default)</option>
+				<option value="1">Disabled</option>
+			</select>
+
+			<label>Data Format (Realtime Playback)</label>
+			<select name="dataFormat">
+				<option value="0">Signed (default)</option>
+				<option value="1">Unsigned</option>
+			</select>
+
+			<label>LRA Drive Mode</label>
+			<select name="lraDriveMode">
+				<option value="0">Once Per Cycle (default)</option>
+				<option value="1">Twice Per Cycle</option>
+			</select>
+
+			<label>Input Mode Trigger</label>
+			<select name="inputModeTrigger">
+				<option value="0">PWM Input (default)</option>
+				<option value="1">Analog Input</option>
+			</select>
+
+			<label>LRA Open Loop Mode</label>
+			<select name="lraOpenLoopMode">
+				<option value="0">Auto-resonance mode (default)</option>
+				<option value="1">LRA open-loop mode</option>
+			</select>
+		</fieldset>
+
+		<fieldset>
+			<legend>Control 4</legend>
+
+			<label>Zero Crossing Detect Time</label>
+			<select name="zeroCrossingDetect">
+				<option value="0">100 µs (default)</option>
+				<option value="1">200 µs</option>
+				<option value="2">300 µs</option>
+				<option value="3">390 µs</option>
+			</select>
+
+			<label>Auto Calibration Time (ms)</label>
+			<select name="autoCalibrationTime">
+				<option value="0">150 to 350</option>
+				<option value="1">250 to 450</option>
+				<option value="2">500 to 700 (default)</option>
+				<option value="3">1000 to 1200</option>
+			</select>
+
+			<label>Memory Status</label>
+			<output name="memoryStatus"></output>
+		</fieldset>
+
+		<fieldset>
+			<legend>Control 5</legend>
+
+			<label>Cycles required to attempt synchronization</label>
+			<select name="cycleAttempts">
+				<option value="0">3 attempts</option>
+				<option value="1">4 attempts</option>
+				<option value="2">5 attempts (default)</option>
+				<option value="3">6 attempts</option>
+			</select>
+
+			<label>Open-Loop Transition</label>
+			<select name="openLoopTransition">
+				<option value="0">Never (default)</option>
+				<option value="1">Automatically</option>
+			</select>
+
+			<label>Playback Interval</label>
+			<select name="playbackInterval">
+					<option value="0">5 ms (default)</option>
+					<option value="1">1 ms</option>
+			</select>
+
+			<label>Blanking Time MSB</label>
+			<input name="blankingTimeMSB" type="number" />
+
+			<label>Current Dissipation Time MSB</label>
+			<input name="currentDissipationTimeMSB" type="number" />
+		</fieldset>
+	</form>
+
+	<form method="dialog" data-for-tab="parameters">
+		<fieldset>
+			<legend>Library Parameterization</legend>
+
+			<label>Overdrive Time Offset (ms)</label>
+			<input name="overdriveTimeOffset" type="number" />
+
+			<label>Sustain Time Offset, Positive</label>
+			<input name="sustainTimeOffsetPositive" type="number" />
+
+			<label>Sustain Time Offset, Negative</label>
+			<input name="sustainTimeOffsetNegative" type="number" />
+
+			<label>Brake Time Offset</label>
+			<input name="breakTimeOffset" type="number" />
+		</fieldset>
+
+		<fieldset>
+			<legend>Audio To Vibe Control</legend>
+
+			<label>Detection Time</label>
+			<select name="a2vDetectionTime">
+				<option value="0">10 ms</option>
+				<option value="1">20 ms (default)</option>
+				<option value="2">30 ms</option>
+				<option value="3">40 ms</option>
+			</select>
+
+			<label>Low-pass filter frequency</label>
+			<select name="a2vLowPassFilterFrequency">
+				<option value="0">100 Hz</option>
+				<option value="1">125 Hz (default)</option>
+				<option value="2">150 Hz</option>
+				<option value="3">200 Hz</option>
+			</select>
+
+			<label>Minimum Input Level (Voltage)</label>
+			<input name="a2vMinimumInputLevel" type="number" />
+
+			<label>Maximum Input Level (Voltage)</label>
+			<input name="a2vMaximumInputLevel" type="number" />
+
+			<label>Minimum Output Drive (%)</label>
+			<input name="a2vMinimumOutputDrive" type="number" />
+
+			<label>Maximum Output Drive (%)</label>
+			<input name="a2vMaximumOutputDrive" type="number" />
+		</fieldset>
+
+		<fieldset>
+			<legend>Auto Calibration</legend>
+
+			<label data-otp>Rated Voltage</label>
+			<input data-otp name="ratedVoltage" type="number" />
+
+			<label data-otp>Overdrive Clamp Voltage</label>
+			<input data-otp name="overdriveClampVoltage" type="number" />
+
+			<label data-otp>Compensation-Result</label>
+			<input data-otp name="autoCalibrationCompensationResult" type="number" />
+
+			<label data-otp>Back-EMF Result (Voltage)</label>
+			<input data-otp name="autoCalibrationBackEMFResult" type="number" />
+		</fieldset>
+
+		<label>LRA open-loop period (µs)</label>
+		<input name="lraOpenLoopPeriod" type="number" />
+
+		<label>V<sub><small>(BAT)</small></sub> Voltage-Monitor</label>
+		<input name="vbatVoltageMonitor" type="number" />
+
+		<label>LRA period (us)</label>
+		<input name="lraPeriod" type="number" />
+	</form>
+
+	<div data-for-tab="waveform">
+		<form method="dialog">
+			<fieldset>
+				<legend>Library Selection</legend>
+				<label>High-Impedance</label>
+				<input name="highImpedance" type="checkbox" />
+
+				<label>Library</label>
+				<select name="waveformLibrary">
+					<option value="0">Empty</option>
+					<option value="1">TS2200 Library A (default)</option>
+					<option value="2">TS2200 Library B</option>
+					<option value="3">TS2200 Library C</option>
+					<option value="4">TS2200 Library D</option>
+					<option value="5">TS2200 Library E</option>
+					<option value="6">LRA Library</option>
+					<option value="7">TS2200 Library F</option>
+				</select>
+			</fieldset>
+		</form>
+
+		<ol data-waveform-listing>
+			<template>
+				<li data-inactive data-sequence="" data-visible="">
+					<form method="dialog">
+						<section data-visible-when="wait waveform percent transition">
+							<label>Wait</label>
+							<input name="wait" type="checkbox" />
+						</section>
+
+						<section data-visible-when="wait">
+							<label>Wait Time (ms)</label>
+							<input name="waitTime" type="number" min="0" max="127"/>
+						</section>
+
+						<section data-visible-when="waveform percent transition">
+							<label>Waveform Effect</label>
+							<select name="waveformSeq">
+								<option value="stop">Stop</option>
+								<option value="strongClick">Strong Click</option>
+								<option value="sharpClick">Sharp Click</option>
+								<option value="softBump">Soft Bump</option>
+								<option value="doubleClick">Double Click</option>
+								<option value="tripleClick">Triple Click</option>
+								<option value="softFuzz">Soft Fuzz</option>
+								<option value="strongBuzz">Strong Buzz</option>
+								<option value="alert750">Alert (750 ms)</option>
+								<option value="alert1000">Alert (1000 ms)</option>
+								<option value="strongClickAlt">Strong Click (Alt)</option>
+								<option value="mediumClick">Medium Click</option>
+								<option value="sharpTick">Sharp Tick</option>
+								<option value="shortDoubleClickStrong">Short Double Click Strong</option>
+								<option value="shortDoubleClickMedium">Short Double Click Medium</option>
+								<option value="shortDoubleSharpTick">Short Double Sharp Tick</option>
+								<option value="longDoubleSharpClickStrong">Long Double Sharp Click Strong</option>
+								<option value="longDoubleSharpClickMedium">Long Double Sharp Click Medium</option>
+								<option value="longDoubleSharpTick">Long Double Sharp Tick</option>
+								<option value="buzz">Buzz</option>
+								<option value="pulsingStrong">Pulsing Strong</option>
+								<option value="pulsingMedium">Pulsing Medium</option>
+								<option value="pulsingSharp">Pulsing Sharp</option>
+
+								<optgroup label="Transition">
+									<option value="transitionClick">Transition Click</option>
+									<option value="transitionHum">Transition Hum</option>
+									<option value="transitionSmooth">Smooth</option>
+									<option value="transitionSharp">Sharp</option>
+								</optgroup>
+
+								<option value="longBuzz">Long buzz for programmatic stopping</option>
+								<option value="smoothHum">Smooth Hum</option>
+							</select>
+						</section>
+
+						<section data-visible-when="percent">
+							<label>Percent</label>
+							<select name="waveformPercent">
+								<option value="100" disabled>100%</option>
+								<option value="80" disabled>80%</option>
+								<option value="60" disabled>60%</option>
+								<option value="50" disabled>50%</option>
+								<option value="40" disabled>40%</option>
+								<option value="30" disabled>30%</option>
+								<option value="20" disabled>20%</option>
+								<option value="10" disabled>10%</option>
+							</select>
+						</section>
+
+						<section data-visible-when="transition">
+							<label>Transition Style</label>
+							<select name="transitionStrength">
+								<option value="long">Long</option>
+								<option value="medium">Medium</option>
+								<option value="short">Short</option>
+							</select>
+						</section>
+
+						<section data-visible-when="transition">
+							<label>Transition Ramp</label>
+							<select name="transitionRamp">
+								<optgroup label="Ramp Down">
+									<option value="100-0">100% to 0</option>
+									<option value="50-0">50% to 0%</option>
+								</optgroup>
+
+								<optgroup label="Ramp Up">
+									<option value="0-100">0% to 100%</option>
+									<option value="0-50">0% to 50%</option>
+								</optgroup>
+
+							</select>
+						</section>
+					</form>
+				</li>
+			</template>
+		</ol>
+	</div>
+
+	<form method="dialog" data-for-tab="realtime">
+		<label>Real-Time Input</label>
+		<input name="rtpInput" type="range" min="0" max="255" />
+
+
+	</form>
+</drv2605-config>
