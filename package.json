@@ -13,7 +13,7 @@
     "@johntalton/aw9523": "^2.0.0",
     "@johntalton/bitsmush": "^1.0.2",
     "@johntalton/boschieu": "^6.0.1",
-    "@johntalton/drv2605": "^2.0.0",
+    "@johntalton/drv2605": "^2.1.0",
     "@johntalton/ds1841": "^2.0.0",
     "@johntalton/ds3231": "^1.1.1",
     "@johntalton/ds3502": "^5.0.0",
