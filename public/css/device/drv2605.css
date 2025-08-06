@@ -8,8 +8,16 @@ drv2605-config {
 
 
   & [data-controls] {
+    grid-column: 1 / -1;
     display: flex;
     gap: 1em;
+
+    width: 100%;
+
+    & > hr {
+      flex-grow: 1;
+      border: none;
+    }
   }
 
   & input[type="checkbox"][data-warn] {
@@ -24,6 +32,11 @@ drv2605-config {
     }
   }
 
+  & [data-input-with-note] {
+    display: flex;
+    align-items: center;
+    gap: 2em;
+  }
 
 
   & [data-for-tab="waveform"] {

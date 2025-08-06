@@ -7,12 +7,25 @@ import {
 	ERM_MODE_DRIVE_TIME_FACTOR_MS,
 	ERM_MODE_DRIVE_TIME_OFFSET_MS,
 	LRA_MODE_DRIVE_TIME_FACTOR_MS,
-	LRA_MODE_DRIVE_TIME_OFFSET_MS
+	LRA_MODE_DRIVE_TIME_OFFSET_MS,
+	UnitConverter,
+	MODE,
+	WAIT_TIME_MULTIPLIER_MS
 } from '@johntalton/drv2605'
 
 import { asyncEvent } from '../util/async-event.js'
 import { bindTabRoot } from '../util/tabs.js'
 import { range } from '../util/range.js'
+
+function round2(f) {
+	return Math.trunc(f * 100) / 100
+}
+
+const UNIT_SUFFIX_MS = 'ms'
+const UNIT_SUFFIX_VOLTAGE = 'V'
+const UNIT_SUFFIX_PERCENT = '%'
+const UNIT_SUFFIX_COEFFICIENT = '(coefficient)'
+const UNIT_SUFFIX_US = 'µs'
 
 const BASE_10 = 10
 
@@ -138,23 +151,23 @@ function waveformIDByName(name, options) {
 }
 
 async function script_basic(device) {
-	await device.setOverdriveTimeOffset(0)
-	await device.setSustainTimeOffsetPositive(0)
-	await device.setSustainTimeOffsetNegative(0)
-	await device.setBrakeTimeOffset(0)
+	// await device.setOverdriveTimeOffset(0)
+	// await device.setSustainTimeOffsetPositive(0)
+	// await device.setSustainTimeOffsetNegative(0)
+	// await device.setBrakeTimeOffset(0)
 
-	await device.setFeedbackControl({
-		N_ERM_LRA: 0, // ERM Mode,
-		FB_BRAKE_FACTOR: 3, // 4x
-		LOOP_GAIN: 1, // Medium
-		BEMF_GAIN: 2
-	})
+	// await device.setFeedbackControl({
+	// 	N_ERM_LRA: 0, // ERM Mode,
+	// 	FB_BRAKE_FACTOR: 3, // 4x
+	// 	LOOP_GAIN: 1, // Medium
+	// 	BEMF_GAIN: 2
+	// })
 
-	const control3 = await device.getControl3()
-	await device.setControl3({
-		...control3,
-		ERM_OPEN_LOOP: 1 // open loop
-	})
+	// const control3 = await device.getControl3()
+	// await device.setControl3({
+	// 	...control3,
+	// 	ERM_OPEN_LOOP: 1 // open loop
+	// })
 
 	// await device.setWaveformSequencer1({
 	// 	WAV_FRM_SEQ: 88
@@ -262,16 +275,23 @@ export class DRV2605Builder {
 		const blankingTimeMSBNumber = root.querySelector('input[name="blankingTimeMSB"]')
 		const currentDissipationTimeMSBNumber = root.querySelector('input[name="currentDissipationTimeMSB"]')
 
-		// parameters
+		// library parameters
 		const overdriveTimeOffsetNumber = root.querySelector('input[name="overdriveTimeOffset"]')
+		const overdriveTimeOffsetMSOutput = root.querySelector('output[name="overdriveTimeOffsetMS"]')
 		const sustainTimeOffsetPositiveNumber = root.querySelector('input[name="sustainTimeOffsetPositive"]')
+		const sustainTimeOffsetPositiveMSOutput = root.querySelector('output[name="sustainTimeOffsetPositiveMS"]')
 		const sustainTimeOffsetNegativeNumber = root.querySelector('input[name="sustainTimeOffsetNegative"]')
-		const breakTimeOffsetNumber = root.querySelector('input[name="breakTimeOffset"]')
-		const ratedVoltageNumber = root.querySelector('input[name="ratedVoltage"]')
-		const overdriveClampVoltageNumber = root.querySelector('input[name="overdriveClampVoltage"]')
+		const sustainTimeOffsetNegativeMSOutput = root.querySelector('output[name="sustainTimeOffsetNegativeMS"]')
+		const brakeTimeOffsetNumber = root.querySelector('input[name="brakeTimeOffset"]')
+		const brakeTimeOffsetMSOutput = root.querySelector('output[name="brakeTimeOffsetMS"]')
+
+		// parameters
 		const lraOpenLoopPeriodNumber = root.querySelector('input[name="lraOpenLoopPeriod"]')
+		const lraOpenLoopPeriodUSOutput = root.querySelector('output[name="lraOpenLoopPeriodUS"]')
 		const vbatVoltageMonitorNumber = root.querySelector('input[name="vbatVoltageMonitor"]')
+		const vbatVoltageMonitorVOutput = root.querySelector('output[name="vbatVoltageMonitorV"]')
 		const lraPeriodNumber = root.querySelector('input[name="lraPeriod"]')
+		const lraPeriodUSOutput = root.querySelector('output[name="lraPeriodUS"]')
 
 		// audio to vibe controls
 		const a2vDetectionTimeSelect = root.querySelector('select[name="a2vDetectionTime"]')
@@ -280,10 +300,20 @@ export class DRV2605Builder {
 		const a2vMaximumInputLevelNumber = root.querySelector('input[name="a2vMaximumInputLevel"]')
 		const a2vMinimumOutputDriveNumber = root.querySelector('input[name="a2vMinimumOutputDrive"]')
 		const a2vMaximumOutputDriveNumber = root.querySelector('input[name="a2vMaximumOutputDrive"]')
+		const a2vMinimumInputLevelVOutput = root.querySelector('output[name="a2vMinimumInputLevelV"]')
+		const a2vMaximumInputLevelVOutput = root.querySelector('output[name="a2vMaximumInputLevelV"]')
+		const a2vMinimumOutputDrivePercentOutput = root.querySelector('output[name="a2vMinimumOutputDrivePercent"]')
+		const a2vMaximumOutputDriverPercentOutput = root.querySelector('output[name="a2vMaximumOutputDriverPercent"]')
 
 		// auto calibration
+		const ratedVoltageNumber = root.querySelector('input[name="ratedVoltage"]')
+		const ratedVoltageVOutput = root.querySelector('output[name="ratedVoltageV"]')
+		const overdriveClampVoltageNumber = root.querySelector('input[name="overdriveClampVoltage"]')
+		const overdriveClampVoltageVOutput = root.querySelector('output[name="overdriveClampVoltageV"]')
 		const autoCalibrationCompensationResultNumber = root.querySelector('input[name="autoCalibrationCompensationResult"]')
+		const autoCalibrationCompensationResultCoefficientOutput = root.querySelector('output[name="autoCalibrationCompensationResultCoefficient"]')
 		const autoCalibrationBackEMFResultNumber = root.querySelector('input[name="autoCalibrationBackEMFResult"]')
+		const autoCalibrationBackEMFResultVOutput = root.querySelector('output[name="autoCalibrationBackEMFResultV"]')
 
 		// Realtime
 		const rtpInputRange = root.querySelector('input[name="rtpInput"]')
@@ -350,33 +380,49 @@ export class DRV2605Builder {
 		if(!(playbackIntervalSelect instanceof HTMLSelectElement)) { throw new Error('missing playbackIntervalSelect') }
 		if(!(blankingTimeMSBNumber instanceof HTMLInputElement)) { throw new Error('missing blankingTimeMSBNumber') }
 		if(!(currentDissipationTimeMSBNumber instanceof HTMLInputElement)) { throw new Error('missing currentDissipationTimeMSBNumber') }
-		if(!(autoCalibrationCompensationResultNumber instanceof HTMLInputElement)) { throw new Error('missing autoCalibrationCompensationResultNumber') }
-		if(!(autoCalibrationBackEMFResultNumber instanceof HTMLInputElement)) { throw new Error('missing autoCalibrationBackEMFResultNumber') }
 		if(!(a2vDetectionTimeSelect instanceof HTMLSelectElement)) { throw new Error('missing a2vDetectionTimeSelect') }
 		if(!(a2vLowPassFilterFrequencySelect instanceof HTMLSelectElement)) { throw new Error('missing a2vLowPassFilterFrequencySelect') }
 		if(!(a2vMinimumInputLevelNumber instanceof HTMLInputElement)) { throw new Error('missing a2vMinimumInputLevelNumber') }
 		if(!(a2vMaximumInputLevelNumber instanceof HTMLInputElement)) { throw new Error('missing a2vMaximumInputLevelNumber') }
 		if(!(a2vMinimumOutputDriveNumber instanceof HTMLInputElement)) { throw new Error('missing a2vMinimumOutputDriveNumber') }
 		if(!(a2vMaximumOutputDriveNumber instanceof HTMLInputElement)) { throw new Error('missing a2vMaximumOutputDriveNumber') }
+		if(!(a2vMinimumInputLevelVOutput instanceof HTMLOutputElement)) { throw new Error('missing a2vMinimumInputLevelVOutput') }
+		if(!(a2vMaximumInputLevelVOutput instanceof HTMLOutputElement)) { throw new Error('missing a2vMaximumInputLevelVOutput') }
+		if(!(a2vMinimumOutputDrivePercentOutput instanceof HTMLOutputElement)) { throw new Error('missing a2vMinimumOutputDrivePercentOutput') }
+		if(!(a2vMaximumOutputDriverPercentOutput instanceof HTMLOutputElement)) { throw new Error('missing a2vMaximumOutputDriverPercentOutput') }
 		if(!(overdriveTimeOffsetNumber instanceof HTMLInputElement)) { throw new Error('missing overdriveTimeOffsetNumber') }
+		if(!(overdriveTimeOffsetMSOutput instanceof HTMLOutputElement)) { throw new Error('missing overdriveTimeOffsetMSOutput') }
 		if(!(sustainTimeOffsetPositiveNumber instanceof HTMLInputElement)) { throw new Error('missing sustainTimeOffsetPositiveNumber') }
+		if(!(sustainTimeOffsetPositiveMSOutput instanceof HTMLOutputElement)) { throw new Error('missing sustainTimeOffsetPositiveMSOutput') }
 		if(!(sustainTimeOffsetNegativeNumber instanceof HTMLInputElement)) { throw new Error('missing sustainTimeOffsetNegativeNumber') }
-		if(!(breakTimeOffsetNumber instanceof HTMLInputElement)) { throw new Error('missing breakTimeOffsetNumber') }
+		if(!(sustainTimeOffsetNegativeMSOutput instanceof HTMLOutputElement)) { throw new Error('missing sustainTimeOffsetNegativeMSOutput') }
+		if(!(brakeTimeOffsetNumber instanceof HTMLInputElement)) { throw new Error('missing brakeTimeOffsetNumber') }
+		if(!(brakeTimeOffsetMSOutput instanceof HTMLOutputElement)) { throw new Error('missing brakeTimeOffsetMSOutput') }
 		if(!(ratedVoltageNumber instanceof HTMLInputElement)) { throw new Error('missing ratedVoltageNumber') }
+		if(!(ratedVoltageVOutput instanceof HTMLOutputElement)) { throw new Error('missing autoCalibrationCompensationResultCoefficientOutput') }
 		if(!(overdriveClampVoltageNumber instanceof HTMLInputElement)) { throw new Error('missing overdriveClampVoltageNumber') }
+		if(!(overdriveClampVoltageVOutput instanceof HTMLOutputElement)) { throw new Error('missing autoCalibrationCompensationResultCoefficientOutput') }
+		if(!(autoCalibrationCompensationResultNumber instanceof HTMLInputElement)) { throw new Error('missing autoCalibrationCompensationResultNumber') }
+		if(!(autoCalibrationCompensationResultCoefficientOutput		 instanceof HTMLOutputElement)) { throw new Error('missing autoCalibrationCompensationResultCoefficientOutput') }
+		if(!(autoCalibrationBackEMFResultNumber instanceof HTMLInputElement)) { throw new Error('missing autoCalibrationBackEMFResultNumber') }
+		if(!(autoCalibrationBackEMFResultVOutput instanceof HTMLOutputElement)) { throw new Error('missing autoCalibrationCompensationResultCoefficientOutput') }
 		if(!(lraOpenLoopPeriodNumber instanceof HTMLInputElement)) { throw new Error('missing lraOpenLoopPeriodNumber') }
+		if(!(lraOpenLoopPeriodUSOutput instanceof HTMLOutputElement)) { throw new Error('missing lraOpenLoopPeriodUSOutput') }
 		if(!(vbatVoltageMonitorNumber instanceof HTMLInputElement)) { throw new Error('missing vbatVoltageMonitorNumber') }
+		if(!(vbatVoltageMonitorVOutput instanceof HTMLOutputElement)) { throw new Error('missing vbatVoltagemonitorVOutput') }
 		if(!(lraPeriodNumber instanceof HTMLInputElement)) { throw new Error('missing lraPeriodNumber') }
+		if(!(lraPeriodUSOutput instanceof HTMLOutputElement)) { throw new Error('missing lraPeriodUSOutput') }
 		if(!(highImpedanceCheckbox instanceof HTMLInputElement)) { throw new Error('missing highImpedanceCheckbox') }
 		if(!(waveformLibrarySelect instanceof HTMLSelectElement)) { throw new Error('missing waveformLibrarySelect') }
 		if(!(rtpInputRange instanceof HTMLInputElement)) { throw new Error('missing rtpInputRange') }
 
 
 		const _refreshOTP = () => {
+			console.log('OTP update')
 			const items = root.querySelectorAll('[data-otp]')
 			items.forEach(item => {
 				const otpLock = root.hasAttribute('data-otp')
-				if([ 'SELECT', 'INPUT' ].includes(item.nodeName)) {
+				if((item instanceof HTMLInputElement) || (item instanceof HTMLSelectElement)) {
 					item.disabled = otpLock
 				}
 			})
@@ -410,7 +456,6 @@ export class DRV2605Builder {
 
 		const refreshFeedbackControl = async () => {
 			const feedbackControl = await this.#device.getFeedbackControl()
-			console.log(feedbackControl)
 
 			deviceModeSelect.value = feedbackControl.N_ERM_LRA
 			brakeFactorSelect.value = feedbackControl.FB_BRAKE_FACTOR
@@ -529,6 +574,7 @@ export class DRV2605Builder {
 			if(!(waitCheckbox instanceof HTMLInputElement)) { throw new Error('missing wait checkbox') }
 
 			const waitTimeNumber = liElem.querySelector('input[name="waitTime"]')
+			const waitTimeMSOutput = liElem.querySelector('output[name="waitTimeMS"]')
 			const waveformSeqSelect = liElem.querySelector('select[name="waveformSeq"]')
 			const waveformPercentSelect  = liElem.querySelector('select[name="waveformPercent"]')
 			const transitionStrengthSelect = liElem.querySelector('select[name="transitionStrength"]')
@@ -553,10 +599,12 @@ export class DRV2605Builder {
 				})
 			}
 
-
 			waitCheckbox.checked = wait
 			if(valid) {
-				waitTimeNumber.value = definition.waitTime
+				const waitTime = definition.waitTime ?? 0
+				waitTimeNumber.value = waitTime
+				waitTimeMSOutput.value = `${waitTime * WAIT_TIME_MULTIPLIER_MS} ${UNIT_SUFFIX_MS}`
+
 				waveformSeqSelect.value = definition.name
 				waveformPercentSelect.value = definition.percent
 				transitionStrengthSelect.value = definition.strength
@@ -601,56 +649,155 @@ export class DRV2605Builder {
 			})
 		}
 
-		const refreshAudioToVibe = async () => {
-			const A_CAL_COMP = await this.#device.getAutoCalibrationCompensationResult()
-			const A_CAL_BEMF = await this.#device.getAutoCalibrationBackEMFResult()
-
-			autoCalibrationCompensationResultNumber.value = A_CAL_COMP
-			autoCalibrationBackEMFResultNumber.value = A_CAL_BEMF
+		const refreshRatedVoltage = async () => {
+			const RATED_VOLTAGE = await this.#device.getRatedVoltage()
+			ratedVoltageNumber.value = RATED_VOLTAGE
+			ratedVoltageVOutput.value = `${round2(UnitConverter.decodeRatedVoltage(RATED_VOLTAGE))} ${UNIT_SUFFIX_VOLTAGE}`
 		}
 
-		const refreshAutoCalibration = async () => {
+		const refreshOverdriveClampVoltage = async () => {
+			const OD_CLAMP = await this.#device.getOverdriveClampVoltage()
+
+			const driveTime = undefined // todo
+			const idissTime = undefined // todo
+			const blankingTime = undefined // todo
+
+			overdriveClampVoltageNumber.value = OD_CLAMP
+			overdriveClampVoltageVOutput.value = `${round2(UnitConverter.decodeOverdriveClampVoltage(OD_CLAMP,  driveTime, idissTime, blankingTime))} ${UNIT_SUFFIX_VOLTAGE}`
+		}
+
+		const refreshAutoCalibrationCompensationResult = async () => {
+			const A_CAL_COMP = await this.#device.getAutoCalibrationCompensationResult()
+			autoCalibrationCompensationResultNumber.value = A_CAL_COMP
+			autoCalibrationCompensationResultCoefficientOutput.value = `${round2(UnitConverter.decodeAutoCalibrationCompensationResult(A_CAL_COMP))} ${UNIT_SUFFIX_COEFFICIENT}`
+		}
+
+		const refreshAutoCalibrationBackEMFResult = async () => {
+			const A_CAL_BEMF = await this.#device.getAutoCalibrationBackEMFResult()
+
+			const deviceMode = parseInt(deviceModeSelect.value, BASE_10)
+			const gain = parseInt(analogGainSelect.value, BASE_10)
+
+			autoCalibrationBackEMFResultNumber.value = A_CAL_BEMF
+			autoCalibrationBackEMFResultVOutput.value = `${round2(UnitConverter.decodeAutoCalibrationBackEMFResult(A_CAL_BEMF, deviceMode, gain))} ${UNIT_SUFFIX_VOLTAGE}`
+		}
+
+		const refreshAutoCalibration  = async () => {
+			await refreshRatedVoltage()
+			await refreshOverdriveClampVoltage()
+			await refreshAutoCalibrationCompensationResult()
+			await refreshAutoCalibrationBackEMFResult()
+		}
+
+		const refreshAudioToVibeControl  = async () => {
 			const {
 				ATH_PEAK_TIME,
 				ATH_FILTER
 			} = await this.#device.getAudioToVibeControl()
-			const ATH_MIN_INPUT = await this.#device.getAudioToVibeMinimumInputLevel()
-			const ATH_MAX_INPUT = await this.#device.getAudioToVibeMaximumInputLevel()
-			const ATH_MIN_DRIVE = await this.#device.getAudioToVibeMinimumOutputDrive()
-			const ATH_MAX_DRIVE = await this.#device.getAudioToVibeMaximumOutputDrive()
 
 			a2vDetectionTimeSelect.value = ATH_PEAK_TIME
 			a2vLowPassFilterFrequencySelect.value = ATH_FILTER
+		}
+
+		const refreshAudioToVibeMinimumInputLevel  = async () => {
+			const ATH_MIN_INPUT = await this.#device.getAudioToVibeMinimumInputLevel()
 			a2vMinimumInputLevelNumber.value = ATH_MIN_INPUT
+			a2vMinimumInputLevelVOutput.value = `${round2(UnitConverter.decodeAudioToVibeMinimumInputLevel(ATH_MIN_INPUT))} ${UNIT_SUFFIX_VOLTAGE}`
+		}
+
+		const refreshAudioToVibeMaximumInputLevel = async () => {
+			const ATH_MAX_INPUT = await this.#device.getAudioToVibeMaximumInputLevel()
 			a2vMaximumInputLevelNumber.value = ATH_MAX_INPUT
+			a2vMaximumInputLevelVOutput.value = `${round2(UnitConverter.decodeAudioToVibeMaximumInputLevel(ATH_MAX_INPUT))} ${UNIT_SUFFIX_VOLTAGE}`
+		}
+
+		const refreshAudioToVibeMinimumOutputDrive  = async () => {
+			const ATH_MIN_DRIVE = await this.#device.getAudioToVibeMinimumOutputDrive()
 			a2vMinimumOutputDriveNumber.value = ATH_MIN_DRIVE
+			a2vMinimumOutputDrivePercentOutput.value = `${round2(UnitConverter.decodeAudioToVibeMinimumOutputDrive(ATH_MIN_DRIVE))} ${UNIT_SUFFIX_PERCENT}`
+		}
+
+		const refreshAudioToVibeMaximumOutputDrive  = async () => {
+			const ATH_MAX_DRIVE = await this.#device.getAudioToVibeMaximumOutputDrive()
 			a2vMaximumOutputDriveNumber.value = ATH_MAX_DRIVE
+			a2vMaximumOutputDriverPercentOutput.value = `${round2(UnitConverter.decodeAudioToVibeMaximumOutputDrive(ATH_MAX_DRIVE))} ${UNIT_SUFFIX_PERCENT}`
+		}
+
+
+		const refreshOverdriveTime = async () => {
+			const ODT = await this.#device.getOverdriveTimeOffset()
+
+			const playbackInterval = parseInt(playbackIntervalSelect.value, BASE_10)
+
+			overdriveTimeOffsetNumber.value = ODT
+			overdriveTimeOffsetMSOutput.value = `${round2(UnitConverter.decodeOverdriveTimeOffset(ODT, playbackInterval))} ${UNIT_SUFFIX_MS}`
 
 		}
 
-		const refreshParameters = async () => {
-			const ODT = await this.#device.getOverdriveTimeOffset()
+		const refreshSustainTimeOffsetPositive = async () => {
 			const SPT = await this.#device.getSustainTimeOffsetPositive()
-			const SNT = await this.#device.getSustainTimeOffsetNegative()
-			const BRT = await this.#device.getBrakeTimeOffset()
-			const RATED_VOLTAGE = await this.#device.getRatedVoltage()
-			const OD_CLAMP = await this.#device.getOverdriveClampVoltage()
-			const OL_LRA_PERIOD = await this.#device.getLRAOpenLoopPeriod()
-			const VBAT = await this.#device.getVBATVoltageMonitor()
-			const LRA_PERIOD = await this.#device.getLRAResonancePeriod()
 
-			overdriveTimeOffsetNumber.value = ODT
+			const playbackInterval = parseInt(playbackIntervalSelect.value, BASE_10)
+
 			sustainTimeOffsetPositiveNumber.value = SPT
-			sustainTimeOffsetNegativeNumber.value = SNT
-			breakTimeOffsetNumber.value = BRT
-			ratedVoltageNumber.value = RATED_VOLTAGE
-			overdriveClampVoltageNumber.value = OD_CLAMP
-			lraOpenLoopPeriodNumber.value = OL_LRA_PERIOD
-			vbatVoltageMonitorNumber.value = VBAT
-			lraPeriodNumber.value = LRA_PERIOD
+			sustainTimeOffsetPositiveMSOutput.value = `${round2(UnitConverter.decodeSustainTimeOffsetPositive(SPT, playbackInterval))} ${UNIT_SUFFIX_MS}`
+		}
 
-			await refreshAudioToVibe()
+		const refreshSustainTimeOffsetNegative = async () => {
+			const SNT = await this.#device.getSustainTimeOffsetNegative()
+
+			const playbackInterval = parseInt(playbackIntervalSelect.value, BASE_10)
+
+			sustainTimeOffsetNegativeNumber.value = SNT
+			sustainTimeOffsetNegativeMSOutput.value = `${round2(UnitConverter.decodeSustainTimeOffsetNegative(SNT, playbackInterval))} ${UNIT_SUFFIX_MS}`
+		}
+
+		const refreshBrakeTimeOffset = async () => {
+			const BRT = await this.#device.getBrakeTimeOffset()
+
+			const playbackInterval = parseInt(playbackIntervalSelect.value, BASE_10)
+
+			brakeTimeOffsetNumber.value = BRT
+			brakeTimeOffsetMSOutput.value = `${round2(UnitConverter.decodeBrakeTimeOffset(BRT, playbackInterval))} ${UNIT_SUFFIX_MS}`
+		}
+
+		const refreshLRAOpenLoopPeriod = async () => {
+			const OL_LRA_PERIOD = await this.#device.getLRAOpenLoopPeriod()
+
+			lraOpenLoopPeriodNumber.value = OL_LRA_PERIOD
+			lraOpenLoopPeriodUSOutput.value = `${round2(UnitConverter.decodeLRAOpenLoopPeriod(OL_LRA_PERIOD))} ${UNIT_SUFFIX_US}`
+		}
+
+		const refreshVBATVoltageMonitor = async () => {
+			const VBAT = await this.#device.getVBATVoltageMonitor()
+
+			vbatVoltageMonitorNumber.value = VBAT
+			vbatVoltageMonitorVOutput.value = `${round2(UnitConverter.decodeVBATVoltageMonitor(VBAT))} ${UNIT_SUFFIX_VOLTAGE}`
+		}
+
+		const refreshLRAResonancePeriod = async () => {
+			const LRA_PERIOD = await this.#device.getLRAResonancePeriod()
+			lraPeriodNumber.value = LRA_PERIOD
+			lraPeriodUSOutput.value = `${round2(UnitConverter.decodeLRAResonancePeriod(LRA_PERIOD))} ${UNIT_SUFFIX_US}`
+		}
+
+		const refreshParameters = async () => {
+			await refreshOverdriveTime()
+			await refreshSustainTimeOffsetPositive()
+			await refreshSustainTimeOffsetNegative()
+			await refreshBrakeTimeOffset()
+
+			await refreshAudioToVibeControl()
+			await refreshAudioToVibeMinimumInputLevel()
+			await refreshAudioToVibeMaximumInputLevel()
+			await refreshAudioToVibeMinimumOutputDrive()
+			await refreshAudioToVibeMaximumOutputDrive()
+
 			await refreshAutoCalibration()
+
+			await refreshLRAOpenLoopPeriod()
+			await refreshVBATVoltageMonitor()
+			await refreshLRAResonancePeriod()
 		}
 
 		const refreshRealtime = async () => {
@@ -771,7 +918,7 @@ export class DRV2605Builder {
 			await this.#device.setControl4({
 				ZC_DET_TIME,
 				AUTO_CAL_TIME,
-				OTP_PROGRAM: false // warning: true values will write to rom
+				// OTP_PROGRAM: false // warning: true values will write to rom
 			})
 
 			await refreshControl4()
@@ -846,6 +993,92 @@ export class DRV2605Builder {
 			await this.#device.setRealTimePlaybackInput(rtp)
 		}
 
+		const updateOverdriveTimeOffset = async () => {
+			const odt = parseInt(overdriveTimeOffsetNumber.value, BASE_10)
+			await this.#device.setOverdriveTimeOffset(odt)
+
+			await refreshOverdriveTime()
+		}
+
+		const updateSustainTimeOffsetPositive = async () => {
+			const spt = parseInt(sustainTimeOffsetPositiveNumber.value, BASE_10)
+			await this.#device.setSustainTimeOffsetPositive(spt)
+
+			await refreshSustainTimeOffsetPositive()
+		}
+
+		const updateSustainTimeOffsetNegative = async () => {
+			const snt = parseInt(sustainTimeOffsetNegativeNumber.value, BASE_10)
+			await this.#device.setSustainTimeOffsetNegative(snt)
+
+			await refreshSustainTimeOffsetNegative()
+		}
+
+		const updateBrakeTimeOffset = async () => {
+			const brt = parseInt(brakeTimeOffsetNumber.value, BASE_10)
+			await this.#device.setBrakeTimeOffset(brt)
+
+			await refreshBrakeTimeOffset()
+		}
+
+		const updateAudioToVibeControl = async () => {
+			const ATH_PEAK_TIME = parseInt(a2vDetectionTimeSelect.value, BASE_10)
+			const ATH_FILTER = parseInt(a2vLowPassFilterFrequencySelect.value, BASE_10)
+
+			await this.#device.setAudioToVibeControl({
+				ATH_PEAK_TIME,
+				ATH_FILTER
+			})
+
+			await refreshAudioToVibeControl()
+		}
+
+		const updateAudioToVibeMinimumInputLevel = async () => {
+			const ATH_MIN_INPUT = parseInt(a2vMinimumInputLevelNumber.value, BASE_10)
+
+			await this.#device.setAudioToVibeMinimumInputLevel(ATH_MIN_INPUT)
+
+			await refreshAudioToVibeMinimumInputLevel()
+		}
+
+		const updateAudioToVibeMaximumInputLevel = async () => {
+			const ATH_MAX_INPUT = parseInt(a2vMaximumInputLevelNumber.value, BASE_10)
+
+			await this.#device.setMaximumInputLevel(ATH_MAX_INPUT)
+
+			await refreshAudioToVibeMaximumInputLevel()
+		}
+
+		const updateAudioToVibeMinimumOutputDrive = async () => {
+			const ATH_MIN_DRIVE = parseInt(a2vMinimumOutputDriveNumber.value, BASE_10)
+
+			await this.#device.setMinimumOutputDrive(ATH_MIN_DRIVE)
+
+			await refreshAudioToVibeMinimumOutputDrive()
+		}
+
+		const updateAudioToVibeMaximumOutputDrive = async () => {
+			const ATH_MAX_DRIVE = parseInt(a2vMaximumOutputDriveNumber.value, BASE_10)
+
+			await this.#device.setMaximumOutputDrive(ATH_MAX_DRIVE)
+
+			await refreshAudioToVibeMaximumOutputDrive()
+		}
+
+		const updateLRAOpenLoopPeriod = async () => {
+
+			await refreshLRAOpenLoopPeriod()
+		}
+
+		const updateVBATVoltageMonitor = async () => {
+
+			await refreshVBATVoltageMonitor()
+		}
+
+		const updateLRAResonancePeriod = async () => {
+
+			await refreshLRAResonancePeriod()
+		}
 
 
 
@@ -866,6 +1099,31 @@ export class DRV2605Builder {
 			await this.#device.go()
 
 			await refreshStatus()
+
+			if(parseInt(modeSelect.value, BASE_10) === MODE.AUTO_CALIBRATION) {
+				console.log('Calibration...')
+
+				setTimeout(async () => {
+					console.log('refresh calibration')
+					await refreshStatus()
+					await refreshFeedbackControl()
+					await refreshAutoCalibration()
+
+					await refreshVBATVoltageMonitor()
+					await refreshLRAResonancePeriod()
+				}, 1000 * 1.5)
+			}
+			else if(parseInt(modeSelect.value, BASE_10) === MODE.DIAGNOSTICS) {
+				console.log('Diagnostics...')
+
+				setTimeout(async () => {
+					console.log('refresh diagnostics')
+					await refreshStatus()
+
+					await refreshVBATVoltageMonitor()
+					await refreshLRAResonancePeriod()
+				}, 1000 * 1.5)
+			}
 		}
 
 		const commandStop = async () => {
@@ -919,6 +1177,60 @@ export class DRV2605Builder {
 		waveformListingLIForms.forEach(form => form.addEventListener('change', asyncEvent(async event => {
 			await updateWaveform(event.target)
 		})))
+
+		overdriveTimeOffsetNumber.addEventListener('change', asyncEvent(async event => {
+			await updateOverdriveTimeOffset()
+		}))
+
+		sustainTimeOffsetPositiveNumber.addEventListener('change', asyncEvent(async event => {
+			await updateSustainTimeOffsetPositive()
+		}))
+
+		sustainTimeOffsetNegativeNumber.addEventListener('change', asyncEvent(async event => {
+			await updateSustainTimeOffsetNegative()
+		}))
+
+		brakeTimeOffsetNumber.addEventListener('change', asyncEvent(async event => {
+			await updateBrakeTimeOffset()
+		}))
+
+		a2vDetectionTimeSelect.addEventListener('change', asyncEvent(async event => {
+			await updateAudioToVibeControl()
+		}))
+
+		a2vLowPassFilterFrequencySelect.addEventListener('change', asyncEvent(async event => {
+			await updateAudioToVibeControl()
+		}))
+
+
+		a2vMinimumInputLevelNumber.addEventListener('change', asyncEvent(async event => {
+			await updateAudioToVibeMinimumInputLevel()
+		}))
+
+		a2vMaximumInputLevelNumber.addEventListener('change', asyncEvent(async event => {
+			await updateAudioToVibeMaximumInputLevel()
+		}))
+
+		a2vMinimumOutputDriveNumber.addEventListener('change', asyncEvent(async event => {
+			await updateAudioToVibeMinimumOutputDrive()
+		}))
+
+		a2vMaximumOutputDriveNumber.addEventListener('change', asyncEvent(async event => {
+			await updateAudioToVibeMaximumOutputDrive()
+		}))
+
+		lraOpenLoopPeriodNumber.addEventListener('change', asyncEvent(async event => {
+			await updateLRAOpenLoopPeriod()
+		}))
+
+		vbatVoltageMonitorNumber.addEventListener('change', asyncEvent(async event => {
+			await updateVBATVoltageMonitor()
+		}))
+
+		lraPeriodNumber.addEventListener('change', asyncEvent(async event => {
+			await updateLRAResonancePeriod()
+		}))
+
 
 		rtpInputRange.addEventListener('input', asyncEvent(async event => {
 			await updateRealtime()

@@ -9,9 +9,10 @@
 
 	<form method="dialog" data-for-tab="general" data-active>
 		<section data-controls>
-			<button name="reset" type="button" command="--reset">Reset</button>
 			<button name="go" type="button" command="--go">Go</button>
 			<button name="stop" type="button" command="--stop">Stop</button>
+			<hr />
+			<button name="reset" type="button" command="--reset">Reset</button>
 		</section>
 
 		<fieldset>
@@ -296,88 +297,141 @@
 				</select>
 
 				<label>Blanking Time MSB</label>
-				<input name="blankingTimeMSB" type="number" />
+				<input name="blankingTimeMSB" type="number" min="0" max="3" />
 
 				<label>Current Dissipation Time MSB</label>
-				<input name="currentDissipationTimeMSB" type="number" />
+				<input name="currentDissipationTimeMSB" type="number" min="0" max="3" />
 			</fieldset>
 		</form>
 	</div>
 
-	<form method="dialog" data-for-tab="parameters">
-		<fieldset>
-			<legend>Library Parameterization</legend>
+	<div data-for-tab="parameters">
+		<form method="dialog">
+			<fieldset>
+				<legend>Library Parameterization</legend>
 
-			<label>Overdrive Time Offset (ms)</label>
-			<input name="overdriveTimeOffset" type="number" />
+				<label>Overdrive Time Offset</label>
+				<div data-input-with-note>
+					<input name="overdriveTimeOffset" type="number" min="0" max="255" />
+					<output name="overdriveTimeOffsetMS"></output>
+				</div>
 
-			<label>Sustain Time Offset, Positive</label>
-			<input name="sustainTimeOffsetPositive" type="number" />
+				<label>Sustain Time Offset, Positive</label>
+				<div data-input-with-note>
+					<input name="sustainTimeOffsetPositive" type="number" min="0" max="255" />
+					<output name="sustainTimeOffsetPositiveMS"></output>
+				</div>
 
-			<label>Sustain Time Offset, Negative</label>
-			<input name="sustainTimeOffsetNegative" type="number" />
+				<label>Sustain Time Offset, Negative</label>
+				<div data-input-with-note>
+					<input name="sustainTimeOffsetNegative" type="number" min="0" max="255" />
+					<output name="sustainTimeOffsetNegativeMS"></output>
+				</div>
 
-			<label>Brake Time Offset</label>
-			<input name="breakTimeOffset" type="number" />
-		</fieldset>
+				<label>Brake Time Offset</label>
+				<div data-input-with-note>
+					<input name="brakeTimeOffset" type="number" min="0" max="255" />
+					<output name="brakeTimeOffsetMS"></output>
+				</div>
+			</fieldset>
+		</form>
 
-		<fieldset>
-			<legend>Audio To Vibe Control</legend>
+		<form method="dialog">
+			<fieldset>
+				<legend>Audio To Vibe</legend>
 
-			<label>Detection Time</label>
-			<select name="a2vDetectionTime">
-				<option value="0">10 ms</option>
-				<option value="1">20 ms (default)</option>
-				<option value="2">30 ms</option>
-				<option value="3">40 ms</option>
-			</select>
+				<label>Detection Time</label>
+				<select name="a2vDetectionTime">
+					<option value="0">10 ms</option>
+					<option value="1">20 ms (default)</option>
+					<option value="2">30 ms</option>
+					<option value="3">40 ms</option>
+				</select>
 
-			<label>Low-pass filter frequency</label>
-			<select name="a2vLowPassFilterFrequency">
-				<option value="0">100 Hz</option>
-				<option value="1">125 Hz (default)</option>
-				<option value="2">150 Hz</option>
-				<option value="3">200 Hz</option>
-			</select>
+				<label>Low-pass filter frequency</label>
+				<select name="a2vLowPassFilterFrequency">
+					<option value="0">100 Hz</option>
+					<option value="1">125 Hz (default)</option>
+					<option value="2">150 Hz</option>
+					<option value="3">200 Hz</option>
+				</select>
 
-			<label>Minimum Input Level (Voltage)</label>
-			<input name="a2vMinimumInputLevel" type="number" />
+				<label>Minimum Input Level</label>
+				<div data-input-with-note>
+					<input name="a2vMinimumInputLevel" type="number" min="0" max="255" />
+					<output name="a2vMinimumInputLevelV"></output>
+				</div>
 
-			<label>Maximum Input Level (Voltage)</label>
-			<input name="a2vMaximumInputLevel" type="number" />
+				<label>Maximum Input Level</label>
+				<div data-input-with-note>
+					<input name="a2vMaximumInputLevel" type="number" min="0" max="255" />
+					<output name="a2vMaximumInputLevelV"></output>
+				</div>
 
-			<label>Minimum Output Drive (%)</label>
-			<input name="a2vMinimumOutputDrive" type="number" />
+				<label>Minimum Output Drive</label>
+				<div data-input-with-note>
+					<input name="a2vMinimumOutputDrive" type="number" min="0" max="255" />
+					<output name="a2vMinimumOutputDrivePercent"></output>
+				</div>
 
-			<label>Maximum Output Drive (%)</label>
-			<input name="a2vMaximumOutputDrive" type="number" />
-		</fieldset>
+				<label>Maximum Output Drive</label>
+				<div data-input-with-note>
+					<input name="a2vMaximumOutputDrive" type="number" min="0" max="255" />
+					<output name="a2vMaximumOutputDriverPercent"></output>
+				</div>
+			</fieldset>
+		</form>
 
-		<fieldset>
-			<legend>Auto Calibration</legend>
+		<form method="dialog">
+			<fieldset>
+				<legend>Auto Calibration</legend>
 
-			<label data-otp>Rated Voltage</label>
-			<input data-otp name="ratedVoltage" type="number" />
+				<label data-otp>Rated Voltage</label>
+				<div data-input-with-note>
+					<input data-otp name="ratedVoltage" type="number" min="0" max="255" />
+					<output name="ratedVoltageV"></output>
+				</div>
 
-			<label data-otp>Overdrive Clamp Voltage</label>
-			<input data-otp name="overdriveClampVoltage" type="number" />
+				<label data-otp>Overdrive Clamp Voltage</label>
+				<div data-input-with-note>
+					<input data-otp name="overdriveClampVoltage" type="number" min="0" max="255" />
+					<output name="overdriveClampVoltageV"></output>
+				</div>
 
-			<label data-otp>Compensation-Result</label>
-			<input data-otp name="autoCalibrationCompensationResult" type="number" />
+				<label data-otp>Compensation-Result</label>
+				<div data-input-with-note>
+					<input data-otp name="autoCalibrationCompensationResult" type="number" min="0" max="255" />
+					<output name="autoCalibrationCompensationResultCoefficient"></output>
+				</div>
 
-			<label data-otp>Back-EMF Result (Voltage)</label>
-			<input data-otp name="autoCalibrationBackEMFResult" type="number" />
-		</fieldset>
+				<label data-otp>Back-EMF Result</label>
+				<div data-input-with-note>
+					<input data-otp name="autoCalibrationBackEMFResult" type="number" min="0" max="255" />
+					<output name="autoCalibrationBackEMFResultV"></output>
+				</div>
+			</fieldset>
+		</form>
 
-		<label>LRA open-loop period (µs)</label>
-		<input name="lraOpenLoopPeriod" type="number" />
+		<form method="dialog">
+			<label>LRA open-loop period</label>
+			<data data-input-with-note>
+				<input name="lraOpenLoopPeriod" type="number" min="0" max="127" />
+				<output name="lraOpenLoopPeriodUS"></output>
+			</data>
 
-		<label>V<sub><small>(BAT)</small></sub> Voltage-Monitor</label>
-		<input name="vbatVoltageMonitor" type="number" />
+			<label>V<sub><small>(BAT)</small></sub> Voltage-Monitor</label>
+			<div data-input-with-note>
+				<input name="vbatVoltageMonitor" type="number" min="0" max="255" />
+				<output name="vbatVoltageMonitorV"></output>
+			</div>
 
-		<label>LRA period (us)</label>
-		<input name="lraPeriod" type="number" />
-	</form>
+			<label>LRA period</label>
+			<div data-input-with-note>
+				<input name="lraPeriod" type="number" min="0" max="255" />
+				<output name="lraPeriodUS"></output>
+			</div>
+		</form>
+	</div>
 
 	<div data-for-tab="waveform">
 		<form data-form="library" method="dialog">
@@ -410,8 +464,11 @@
 						</section>
 
 						<section data-visible-when="wait">
-							<label>Wait Time (ms)</label>
-							<input name="waitTime" type="number" min="0" max="127"/>
+							<label>Wait Time</label>
+							<div data-input-with-note>
+								<input name="waitTime" type="number" min="0" max="127"/>
+								<output name="waitTimeMS"></output>
+							</div>
 						</section>
 
 						<section data-visible-when="waveform percent transition">
