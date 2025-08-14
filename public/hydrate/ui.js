@@ -103,6 +103,14 @@ export function buildDeviceListItem(deviceListElem, builder) {
 
 	const sectionElem = buildDeviceSection(builder)
 
+	const lis = deviceListElem.querySelectorAll('li')
+	const first = lis.length === 0
+
+	if(first) {
+		liElem.toggleAttribute('data-active', true)
+		sectionElem.toggleAttribute('data-active', true)
+	}
+
 	deviceListElem.appendChild(liElem)
 	mainElem.appendChild(sectionElem)
 
