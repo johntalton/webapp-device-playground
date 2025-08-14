@@ -381,19 +381,21 @@ export class ExcameraI2CDriverUIBuilder {
 
 		const PREFERRED_DEVICE = 'pcf8523'
 		const manualOptionsTemplate = manualDeviceSelection?.querySelector('template')
-		manualDeviceSelection?.append(...I2C_GUESSES.map(({ addresses, name }) => {
-			const templateDoc = manualOptionsTemplate?.content.cloneNode(true)
-			const optionElem = templateDoc?.querySelector('option')
-			optionElem.setAttribute('value', name)
-			optionElem.innerText = name
+		manualDeviceSelection?.append(...I2C_GUESSES
+				.sort((a, b) => a.name.localeCompare(b.name))
+				.map(({ addresses, name }) => {
+					const templateDoc = manualOptionsTemplate?.content.cloneNode(true)
+					const optionElem = templateDoc?.querySelector('option')
+					optionElem.setAttribute('value', name)
+					optionElem.innerText = name
 
-			if(name.includes(PREFERRED_DEVICE)) {
-				optionElem.selected = true
-				manualAddressInput.value = addresses[0]
-			}
+					if(name.includes(PREFERRED_DEVICE)) {
+						optionElem.selected = true
+						manualAddressInput.value = addresses[0]
+					}
 
-			return optionElem
-		}))
+					return optionElem
+				}))
 
 
 

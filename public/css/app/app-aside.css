@@ -17,8 +17,17 @@ aside {
   /* overflow-y: scroll; */
 }
 
-/* aside h2 {
+aside [data-no-devices] {
+  display: flex;
+  justify-content: center;
   font-size: 1.125em;
-  margin-inline: auto;
-  padding-block-start: 1em;
-} */
+
+  padding-inline: 4em;
+  margin-block-start: 4em;
+
+	color: var(--color-disabled, red);
+}
+
+aside:has(ul > li) [data-no-devices] {
+  display: none;
+}

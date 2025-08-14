@@ -36,15 +36,12 @@
 					"@johntalton/ht16k33/fonts": "/node_modules/@johntalton/ht16k33/lib/font/index.js",
 					"@johntalton/ht16k33/layouts": "/node_modules/@johntalton/ht16k33/lib/layout/index.js",
 					"@johntalton/adt7410": "/node_modules/@johntalton/adt7410/lib/index.js",
-					"@johntalton/drv2605": "/node_modules/@johntalton/drv2605/index.js",
 					"@johntalton/ds3231": "/node_modules/@johntalton/ds3231/src/index.js",
 					"@johntalton/adxl375": "/node_modules/@johntalton/adxl375/src/index.js",
 					"@johntalton/pcf8574": "/node_modules/@johntalton/pcf8574/src/index.js",
 					"@johntalton/ds3502": "/node_modules/@johntalton/ds3502/src/index.js",
 					"@johntalton/tsl2591": "/node_modules/@johntalton/tsl2591/src/index.js",
 					"@johntalton/aw9523": "/node_modules/@johntalton/aw9523/src/index.js",
-
-
 					"@johntalton/bno08x": "/node_modules/@johntalton/bno08x/lib/index.js",
 					"@johntalton/ds1841": "/node_modules/@johntalton/ds1841/lib/index.js",
 					"@johntalton/ft232h": "/node_modules/@johntalton/ft232h/lib/index.js",
@@ -54,14 +51,16 @@
 					"@johntalton/tcs34725": "/node_modules/@johntalton/tcs34725/lib/tcs34725.js",
 					"@johntalton/mcp23": "/node_modules/@johntalton/mcp23/lib/index.js",
 					"@johntalton/aht20": "/node_modules/@johntalton/aht20/src/index.js",
-					"@johntalton/drv2605": "/node_modules/@johntalton/drv2605/src/index.js"
+					"@johntalton/drv2605": "/node_modules/@johntalton/drv2605/src/index.js",
+					"@johntalton/st25dv": "/node_modules/@johntalton/st25dv/src/index.js",
+					"@johntalton/st25dv/ndef": "/node_modules/@johntalton/st25dv/src/ndef/index.js"
 				}
 			}
 		</script>
 		<script src="./index.js" type="module" async defer crossorigin="anonymous"></script>
 		<link rel="stylesheet" type="text/css" href="./index.css"></link>
 	</head>
-	<body data-theme="Corp" data-view="aside" data-supports="initial">
+	<body data-theme="Air" data-view="aside" data-supports="initial">
 		<html-import id="addr-display" src="./custom-elements/address-display.html"></html-import>
 		<h1>⚙️ Web I²C Playground</h1>
 
@@ -75,6 +74,10 @@
 		</nav>
 
 		<aside>
+			<p data-no-devices>
+				<span>No Devices Attached</span>
+				<span></span>
+			</p>
 			<ul id="deviceList">
 				<!--  -->
 				<template>
