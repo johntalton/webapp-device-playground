@@ -19,8 +19,8 @@
     "@johntalton/ds3502": "^5.0.0",
     "@johntalton/excamera-i2cdriver": "^3.0.2",
     "@johntalton/ht16k33": "^1.1.1",
-    "@johntalton/i2c-bus-excamera-i2cdriver": "^3.0.3",
-    "@johntalton/i2c-bus-mcp2221": "^4.0.1",
+    "@johntalton/i2c-bus-excamera-i2cdriver": "^3.0.1",
+    "@johntalton/i2c-bus-mcp2221": "^4.1.2",
     "@johntalton/i2c-bus-tca9548a": "^3.0.0",
     "@johntalton/i2c-port": "^4.0.0",
     "@johntalton/mcp2221": "^4.0.2",
@@ -30,6 +30,7 @@
     "@johntalton/pcf8574": "^2.1.0",
     "@johntalton/ssd1306": "^2.0.1",
     "@johntalton/tca9548a": "^5.1.1",
-    "@johntalton/tsl2591": "^1.0.0"
+    "@johntalton/tsl2591": "^1.0.0",
+    "@johntalton/st25dv": "^1.1.0"
   }
 }
