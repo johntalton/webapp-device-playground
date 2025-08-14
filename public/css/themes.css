@@ -262,3 +262,149 @@
 
 }
 
+html {
+	height: initial;
+}
+
+[data-theme ~= "Air"] {
+	--color-accent: orange;
+	--color-glass: rgb(from black r g b / 0.05);
+
+	background: linear-gradient(358deg, #fff6bb, #d3f4ff);
+	background-color: inherit;
+
+	& form {
+		--form-color-background: white;
+		--form-color-accent: var(--color-accent);
+	}
+
+
+	& main {
+		background-color: inherit;
+	}
+
+	& nav {
+		background: none;
+		background-color: inherit;
+
+		& > button {
+			background-color: transparent;
+		}
+	}
+
+	& h1 {
+		background-color: inherit;
+		color: black;
+	}
+
+	& aside {
+		background-color: inherit;
+
+		& ul {
+			background-color: inherit;
+
+			& > li {
+
+				& > button {
+					background-color: unset;
+				}
+			}
+
+			& > li:has(+ li[data-active]) {
+				background-color: inherit;
+				border-radius: 0;
+
+				& > button {
+					background-color: unset;
+					border-radius: 0;
+				}
+			}
+
+
+			& > li[data-active] {
+				background-color: inherit;
+
+				& > button {
+					background-color: unset;
+					border-radius: 0;
+
+					font-weight: bold;
+					border-inline-start: 9px solid var(--color-accent);
+				}
+			}
+
+			& > li[data-active] + li {
+				background-color: inherit;
+
+				& > button {
+					background-color: unset;
+					border-radius: 0;
+				}
+			}
+
+		}
+
+		& > ul::before, > ul::after {
+			background-color: inherit;
+		}
+	}
+
+	fieldset {
+		background-color: var(--color-glass);
+		border: none;
+	}
+
+	button {
+		background-color: var(--color-glass);
+		color: black;
+	}
+
+	& .tabs {
+
+		& > button {
+			background-color: inherit;
+			border: none;
+
+			&[data-active] {
+				border-block-end: 4px solid var(--color-accent);
+				box-shadow: none;
+				text-decoration: none;
+
+			}
+
+			&:hover {
+				background-color: inherit;
+			}
+		}
+	}
+
+	& :where(.tabsContent, [data-for-tab]) {
+		background-color: inherit;
+	}
+
+
+	& ul[data-device-list] > li[data-acked] {
+		background-color: var(--color-glass);
+	}
+
+	excamera-i2cdriver {
+
+		& form[data-info] {
+			border: none;
+			background-color: var(--color-glass);
+		}
+
+    & form[data-config] {
+			background-color: var(--color-glass);
+		}
+
+		& form[data-manual-add-form] > fieldset {
+			background-color: var(--color-glass);
+		}
+
+		& fieldset[data-action] {
+			border: none;
+		}
+	}
+}
+
