@@ -78,6 +78,12 @@ export const DRV2605_INFO = { addresses: [ 0x5a ], name: 'DRV2605' }
 
 export const AW9523_INFO = { addresses: [ 0x58 ], name: 'AW9523 (LED/GPIO)' }
 
+
+export const ST25DV_USER_INFO = { addresses: [ 0x53 ], name: 'st25dv16k-user' }
+export const ST25DV_SYSTEM_INFO = { addresses: [ 0x57 ], name: 'st25dv16k-system' }
+
+
+
 export const I2C_GUESSES = [
 	// 0x00
 	// 0x10
@@ -87,7 +93,8 @@ export const I2C_GUESSES = [
 	MCP23_INFO,
 	DS1841_INFO,
 	DS3502_INFO,
-	{ addresses: [ 0x2d, 0x53, 0x57 ], name: 'st25dv16k' },
+	ST25DV_USER_INFO,
+	ST25DV_SYSTEM_INFO,
 	TCS_34725_INFO,
 	// 0x30
 	{ addresses: [ 0x30 ], name: 'Trust M' },

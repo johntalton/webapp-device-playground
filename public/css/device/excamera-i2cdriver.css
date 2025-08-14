@@ -60,6 +60,8 @@ excamera-i2cdriver {
 		flex-wrap: wrap;
 		gap: 1em;
 
+		align-self: start;
+
 		padding-inline: 1em;
 		padding-block: 1em;
 		border-radius: 1em;

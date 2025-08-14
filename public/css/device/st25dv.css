@@ -1,0 +1,100 @@
+st25dv-user-config {
+
+	& [data-controls] {
+		padding-block: 1em;
+	}
+
+	& [command="--refresh-status"] {
+		justify-self: end;
+	}
+}
+
+st25dv-system-config {
+
+	& [data-for-tab="config"] {
+		display: flex;
+    flex-direction: column;
+    gap: 1em;
+	}
+
+	& [data-for-tab="password"] {
+		display: flex;
+    flex-direction: column;
+    gap: 1em;
+	}
+
+	& [data-password-bytes] {
+		display: flex;
+    flex-wrap: nowrap;
+	}
+
+	& [data-controls] {
+		padding-block: 1em;
+		display: flex;
+		background-color: var(--color-glass);
+		border-radius: 2em;
+		padding-inline: 2em;
+		margin-block-end: 3em;
+		gap: 2em;
+	}
+
+	& [command="--write-area-layout"] {
+		justify-self: end;
+	}
+
+
+	& area-display {
+		width: 100%;
+		display: flex;
+		height: 4em;
+    margin-block: 2em;
+
+		& [active] {
+			outline: 2px solid white;
+    	box-shadow: 0px 0px 18px 3px #fefefe;
+    	z-index: 1;
+			border-radius: 1em;
+			transform: scaleY(1.25);
+		}
+
+		& > area-1 {
+			background-color: cadetblue;
+			width: 10%;
+
+			border-radius: 1em 0 0 1em;
+		}
+
+		& > area-2 {
+			background-color:cornflowerblue;
+			width: 20%
+		}
+
+		& > area-3 {
+			background-color: lightskyblue;
+			width: 20%
+		}
+
+		& > area-4 {
+			background-color: lightsteelblue;
+			width: 50%;
+
+			border-radius: 0 1em 1em 0;
+		}
+	}
+
+
+	& details {
+
+
+		& > summary {
+			padding-block: 0.75em;
+		}
+
+		& > :not(summary) {
+			border: 2px solid var(--color-accent--darker, red);
+			border-style: groove;
+			border-radius: 1em;
+			padding: 2em;
+		}
+	}
+}

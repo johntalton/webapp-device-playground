@@ -1,0 +1,216 @@
+<st25dv-system-config>
+	<div class="tabs">
+		<button data-tab="info" data-active>Info</button>
+		<button data-tab="area">Areas</button>
+		<button data-tab="config">Configuration</button>
+		<button data-tab="interrupt">Interrupt</button>
+		<button data-tab="password">I²C Password</button>
+	</div>
+
+	<form data-for-tab="info" data-active>
+		<label>UID</label>
+		<output name="UID"></output>
+
+		<label>UID Manufacture</label>
+		<output name="UIDManufacture"></output>
+
+		<label>UID Product</label>
+		<output name="UIDProduct"></output>
+
+		<label>DSFID</label>
+		<output name="DSFID"></output>
+
+		<label>AFI</label>
+		<output name="AFI"></output>
+
+		<label>Memory Size</label>
+		<output name="MemorySize"></output>
+
+		<label>Block Size</label>
+		<output name="BlockSize"></output>
+
+		<label>IC Reference</label>
+		<output name="ICReference"></output>
+
+		<label>IC Revision</label>
+		<output name="Revision"></output>
+	</form>
+
+	<div data-for-tab="area">
+		<button command="--write-area-layout">Write Layout</button>
+
+		<area-display size="04">
+			<area-1 end=""></area-1>
+			<area-2 end="" active></area-2>
+			<area-3 end=""></area-3>
+			<area-4></area-4>
+		</area-display>
+
+
+		<details name="AreaConfiguration">
+			<summary>Area 1</summary>
+			<form method="dialog">
+				<label>RF Password</label>
+				<select name="RFPassword">
+					<option value="0">Locked</option>
+					<option value="1">Password 1</option>
+					<option value="2">Password 2</option>
+					<option value="3">Password 3</option>
+				</select>
+
+				<label>RF Protection</label>
+				<select name="RFProtection">
+					<option value="0"></option>
+					<option value="1"></option>
+					<option value="2"></option>
+					<option value="3"></option>
+				</select>
+
+				<label>I²C Protection</label>
+				<select name="I2CProtection">
+					<option value="0"></option>
+					<option value="1"></option>
+					<option value="2"></option>
+					<option value="3"></option>
+				</select>
+			</form>
+		</details>
+
+		<details name="AreaConfiguration">
+			<summary>Area 2</summary>
+
+		</details>
+	</div>
+
+	<div data-for-tab="config">
+		<form method="dialog">
+			<label>Energy Harvesting</label>
+			<select name="EnergyHarvesting">
+				<option value="0">Force After Boot</option>
+				<option value="1">On Demand</option>
+			</select>
+		</form>
+
+		<form method="dialog">
+			<fieldset>
+				<legend>RF Management</legend>
+
+				<label>RF Disabled</label>
+				<input name="RFDisabled" type="checkbox" />
+
+				<label>RF Sleep</label>
+				<input name="RFSleep" type="checkbox" />
+			</fieldset>
+		</form>
+
+		<form method="dialog">
+			<fieldset>
+				<legend>Mailbox</legend>
+
+				<label>Mode</label>
+				<select name="MailboxMode">
+					<option value="0">Forbidden</option>
+					<option value="1">Authorized</option>
+				</select>
+
+				<label>WatchDog</label>
+				<div data-input-with-note>
+					<input name="Watchdog" type="number" min="0" max="7"/>
+					<output name="WatchdogMs"></output>
+				</div>
+			</fieldset>
+		</form>
+
+		<form method="dialog">
+			<fieldset>
+				<legend>Locks</legend>
+
+				<label>CC File Block 0</label>
+				<input name="CCFileBlock0" type="checkbox" />
+
+				<label>CC File Block 1</label>
+				<input name="CCFileBlock1" type="checkbox" />
+
+				<label>Configuration</label>
+				<input name="LockConfiguration" type="checkbox" />
+
+				<label>DSFI</label>
+				<input name="LockDSFI" type="checkbox" />
+
+				<label>AFI</label>
+				<input name="LockAFT" type="checkbox" />
+			</fieldset>
+
+		</form>
+	</div>
+
+	<div data-for-tab="interrupt">
+		<form method="dialog">
+			<label>Interrupt Pulse Duration</label>
+			<div data-input-with-note>
+				<input name="itTime" type="number" min="0" max="7"/>
+				<output name="itTimeUs"></output>
+			</div>
+
+			<fieldset>
+				<legend>GPO Interrupt Control</legend>
+
+				<label>RF User Controlled (set/reset)</label>
+				<input name="RFUser" type="checkbox" />
+
+				<label>RF Activity EOF</label>
+				<input name="RFActivity" type="checkbox" />
+
+				<label>RF User Controlled (pulse)</label>
+				<input name="RFInterrupt" type="checkbox" />
+
+				<label>RF Field Change (pulse)</label>
+				<input name="FieldChange" type="checkbox" />
+
+				<label>RF Write Command (pulse)</label>
+				<input name="RFPut" type="checkbox" />
+
+				<label>RF Read Command (pulse)</label>
+				<input name="RFGet" type="checkbox" />
+
+				<label>RF Write EEPROM (pulse)</label>
+				<input name="RFWrite" type="checkbox" />
+
+				<label>GPO Enable</label>
+				<input name="GPO" type="checkbox" />
+			</fieldset>
+		</form>
+
+	</div>
+
+	<div data-for-tab="password">
+		<div data-controls>
+			<button command="--password-present">Present</button>
+			<button command="--password-set">Set</button>
+		</div>
+
+		<form method="dialog">
+			<label>Password (HEX)</label>
+			<output name="PasswordHEX"></output>
+		</form>
+
+		<form method="dialog">
+			<label>Password (UTF-8)</label>
+			<input name="PasswordText" type="text" />
+		</form>
+
+		<form data-password method="dialog">
+			<label>Password (Bytes)</label>
+			<div data-password-bytes>
+				<input name="PasswordByte1" type="number" min="0" max="255" />
+				<input name="PasswordByte2" type="number" min="0" max="255" />
+				<input name="PasswordByte3" type="number" min="0" max="255" />
+				<input name="PasswordByte4" type="number" min="0" max="255" />
+				<input name="PasswordByte5" type="number" min="0" max="255" />
+				<input name="PasswordByte6" type="number" min="0" max="255" />
+				<input name="PasswordByte7" type="number" min="0" max="255" />
+				<input name="PasswordByte8" type="number" min="0" max="255" />
+			</div>
+		</form>
+	</div>
+</st25dv-system-config>

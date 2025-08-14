@@ -1,0 +1,137 @@
+<st25dv-user-config>
+
+
+	<div class="tabs">
+		<button data-tab="status" data-active>Status</button>
+		<button data-tab="config">Configuration</button>
+		<button data-tab="interrupt">Interrupt</button>
+	</div>
+
+
+	<div data-for-tab="status" data-active>
+		<div data-controls>
+			<button command="--refresh-status">Refresh</button>
+		</div>
+
+		<form method="dialog">
+			<fieldset>
+				<label>I²C Security Status</label>
+				<output name="I2CSecurityStatus"></output>
+			</fieldset>
+			<fieldset>
+				<legend>Interruption Status</legend>
+
+				<label>User</label>
+				<output name="RFUserStatus"></output>
+
+				<label>Activity</label>
+				<output name="RFActivityStatus"></output>
+
+				<label>Interrupt</label>
+				<output name="InterruptStatus"></output>
+
+				<label>Field Falling</label>
+				<output name="FieldFallingStatus"></output>
+
+				<label>Field Rising</label>
+				<output name="FieldRisingStatus"></output>
+
+				<label>RF Put Message</label>
+				<output name="RFPutStatus"></output>
+
+				<label>RF Get Message</label>
+				<output name="RFGetStatus"></output>
+
+				<label>RF Write EEPROM</label>
+				<output name="RFWriteStatus"></output>
+
+			</fieldset>
+			<fieldset>
+				<legend>Mailbox Control</legend>
+
+				<label>Mailbox Enabled</label>
+				<output name="MailboxEnabled"></output>
+
+				<label>Host Put Message</label>
+				<output name="HostPutMessage"></output>
+
+				<label>RF Put Message</label>
+				<output name="RFPutMessage"></output>
+
+				<label>Host Missed Message</label>
+				<output name="HostMissedMessage"></output>
+
+				<label>RF Missed Message</label>
+				<output name="RFMissedMessage"></output>
+
+				<label>Current Message From RF</label>
+				<output name="CurrentRF"></output>
+
+				<label>Current Message From Host</label>
+				<output name="CurrentHost"></output>
+			</fieldset>
+		</form>
+	</div>
+
+	<div data-for-tab="config">
+		<form method="dialog">
+				<fieldset>
+					<legend>RF Management</legend>
+
+					<label>RF Disabled</label>
+					<input name="RFDisabled" type="checkbox" />
+
+					<label>RF Sleep</label>
+					<input name="RFSleep" type="checkbox" />
+				</fieldset>
+		</form>
+
+		<form method="dialog">
+			<fieldset>
+				<legend>Energy Harvesting Control</legend>
+
+				<label>Harvesting</label>
+				<input name="EnableHarvesting" type="checkbox" />
+
+				<label>Harvesting</label>
+				<output name="harvestingOn"></output>
+
+				<label>Field</label>
+				<output name="FieldOn"></output>
+
+				<label>V<sub><small>CC</small></sub></label>
+				<output name="VccOn"></output>
+			</fieldset>
+		</form>
+	</div>
+
+	<form method="dialog" data-for-tab="interrupt">
+		<fieldset>
+			<legend>GPO Interrupt Control</legend>
+
+			<label>RF User Controlled (set/reset)</label>
+			<input name="RFUser" type="checkbox" />
+
+			<label>RF Activity EOF</label>
+			<input name="RFActivity" type="checkbox" />
+
+			<label>RF User Controlled (pulse)</label>
+			<input name="RFInterrupt" type="checkbox" />
+
+			<label>RF Field Change (pulse)</label>
+			<input name="FieldChange" type="checkbox" />
+
+			<label>RF Write Command (pulse)</label>
+			<input name="RFPut" type="checkbox" />
+
+			<label>RF Read Command (pulse)</label>
+			<input name="RFGet" type="checkbox" />
+
+			<label>RF Write EEPROM (pulse)</label>
+			<input name="RFWrite" type="checkbox" />
+
+			<label>GPO Enable</label>
+			<input name="GPO" type="checkbox" />
+		</fieldset>
+	</form>
+</st25dv-user-config>

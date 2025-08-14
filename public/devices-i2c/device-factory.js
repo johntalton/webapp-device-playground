@@ -20,6 +20,7 @@ import { DRV2605Builder } from './drv2605.js'
 import { DS3231Builder } from './ds3231.js'
 import { TSL2591Builder } from './tsl2591.js'
 import { AW9523Builder } from './aw9523.js'
+import { ST25DVUserBuilder, ST25DVSystemBuilder } from './st25dv.js'
 
 import {
 	HT16K33_INFO,
@@ -42,8 +43,11 @@ import {
 	DRV2605_INFO,
 	DS3231_INFO,
 	TSL2591_INFO,
-	AW9523_INFO
+	AW9523_INFO,
+	ST25DV_SYSTEM_INFO,
+	ST25DV_USER_INFO
 } from './guesses.js'
+
 
 const BY_NAME = {
 	'Adafruit 24LC32':  (definition, ui) => EEPROMBuilder.builder(definition, ui),
@@ -68,6 +72,9 @@ const BY_NAME = {
 	[DS3231_INFO.name]: (definition, ui) => DS3231Builder.builder(definition, ui),
 	[TSL2591_INFO.name]: (definition, ui) => TSL2591Builder.builder(definition, ui),
 	[AW9523_INFO.name]: (definition, ui) => AW9523Builder.builder(definition, ui),
+
+	[ST25DV_USER_INFO.name]: (definition, ui) => ST25DVUserBuilder.builder(definition, ui),
+	[ST25DV_SYSTEM_INFO.name]: (definition, ui) => ST25DVSystemBuilder.builder(definition, ui),
 }
 
 export class I2CDeviceBuilderFactory {
