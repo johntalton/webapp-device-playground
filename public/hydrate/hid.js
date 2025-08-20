@@ -11,9 +11,11 @@ export const SUPPORTED_HID_FILTER = [
  */
 async function addHIDDevice(ui, device, knownDevices) {
 	if(knownDevices.has(device)) {
-		console.log('HID:addHIDDevice: re-adding existing paired device ... ')
+		console.log('HID: re-adding existing paired device')
 		return
 	}
+
+	console.log('HID: New')
 
 	const controller = new AbortController()
 	const { signal } = controller
@@ -42,25 +44,21 @@ async function hydrateHIDEvents(addDevice, knownDevices) {
 		const { device } = event
 
 		if(!knownDevices.has(device)) {
-			console.log('hid unknown device disconnect')
+			console.log('Navigator.HID Disconnect Event: unknown device')
 			return
 		}
 
 		const { controller } = knownDevices.get(device)
-		controller.abort('hid disconnect')
+		controller.abort('HID Disconnect')
 
 	})
-}
-
-async function requestHIDDevice(filters) {
-	return navigator.hid.requestDevice({ filters })
 }
 
 function requestHIDHandler(addDevice, event) {
 	const all = event?.altKey
 	const filters = all ? [] : SUPPORTED_HID_FILTER
 
-	requestHIDDevice(filters)
+	navigator.hid.requestDevice({ filters })
 		.then(devices => devices.forEach(addDevice))
 		.catch(e => console.log('issues requesting hid device', e))
 }

@@ -65,6 +65,8 @@ main > section {
 
   & p[data-error] {
     display: flex;
+    gap: 1em;
+    align-items: center;
 
     margin-inline: 0 2em;
     padding: 1em;

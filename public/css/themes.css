@@ -1,6 +1,5 @@
-
 /* RED */
-[data-theme ~= "Red" i] {
+[data-theme~="Red" i] {
 	--color-accent: red;
 	--color-accent-text: red;
 
@@ -21,7 +20,7 @@
 }
 
 /* CRAZY */
-[data-theme ~= "Crazy" i] {
+[data-theme~="Crazy" i] {
 	--color-accent: cornflowerblue;
 	--color-accent-text: darkblue;
 
@@ -43,7 +42,7 @@
 }
 
 /* REGULAR_BLUE */
-[data-theme ~= "Water" i] {
+[data-theme~="Water" i] {
 	--color-accent--h: 225;
 	--color-accent--s: 50%;
 	--color-accent--l: 50%;
@@ -57,7 +56,7 @@
 }
 
 /* SLATE */
-[data-theme ~= "Slate" i] {
+[data-theme~="Slate" i] {
 	--color-accent--h: 220;
 	--color-accent--s: 20%;
 	--color-accent--l: 20%;
@@ -77,7 +76,7 @@
 }
 
 /* PAPER_GREY */
-[data-theme ~= "Paper" i] {
+[data-theme~="Paper" i] {
 	--color-accent--h: 299;
 	--color-accent--s: 0%;
 	--color-accent--l: 46%;
@@ -86,13 +85,13 @@
 }
 
 /* TODAYS_BLUE */
-[data-theme ~= "TodaysBlue" i] {
+[data-theme~="TodaysBlue" i] {
 	--color-accent--h: 222;
 	--color-accent--s: 42%;
 	--color-accent--l: 42%;
 }
 
-[data-theme ~= "DeepOcean" i] {
+[data-theme~="DeepOcean" i] {
 	--color-accent: oklch(0.36 0.07 199.78);
 	--color-accent-text: white;
 	--color-accent--light: oklch(0.37 0.07 198.5);
@@ -108,7 +107,7 @@
 }
 
 /* DREAM_BLUE */
-[data-theme ~= "Dream" i] {
+[data-theme~="Dream" i] {
 	--color-accent--h: 183;
 	--color-accent--s: 50%;
 	--color-accent--l: 50%;
@@ -121,7 +120,7 @@
 }
 
 /* GOLDEN */
-[data-theme ~= "Golden" i] {
+[data-theme~="Golden" i] {
 	--color-accent--h: 37;
 	--color-accent--s: 77%;
 	--color-accent--l: 42%;
@@ -133,21 +132,21 @@
 }
 
 /*  */
-[data-theme ~= "Lavender" i] {
+[data-theme~="Lavender" i] {
 	--color-accent--h: 300;
 	--color-accent--s: 30%;
 	--color-accent--l: 60%;
 }
 
 /*  */
-[data-theme ~= "Bright" i] {
+[data-theme~="Bright" i] {
 	--color-accent--h: 234;
 	--color-accent--s: 15%;
 	--color-accent--l: 62%;
 }
 
 /*  */
-[data-theme ~= "Plum" i] {
+[data-theme~="Plum" i] {
 	/* hsl(300deg 44.63% 65.29%); */
 	--color-accent--h: 300;
 	--color-accent--s: 44%;
@@ -171,7 +170,7 @@
 	/* --color-accent--darker-text: black; */
 }
 
-[data-theme ~= "Washed"] {
+[data-theme~="Washed"] {
 	--color-accent: oklab(0.62 -0.07 -0.21);
 	--color-accent-text: black;
 	--color-accent--light: oklab(0.62 -0.05 -0.2);
@@ -186,7 +185,7 @@
 	--color-accent--darker-text: black;
 }
 
-[data-theme ~= "MoodyPlum"] {
+[data-theme~="MoodyPlum"] {
 	--color-accent--h: 319;
 	--color-accent--s: 8%;
 	--color-accent--l: 53%;
@@ -197,7 +196,7 @@
 	--darker-percentage: 9%;
 }
 
-[data-theme ~= "NuLight"] {
+[data-theme~="NuLight"] {
 	--color-accent: oklab(0.95 -0.02 -0.01);
 	--color-accent-text: black;
 	--color-accent--light: oklab(0.78 -0.06 -0.06);
@@ -213,7 +212,7 @@
 }
 
 
-[data-theme ~= "NuDark"] {
+[data-theme~="NuDark"] {
 	--color-accent: oklab(0.72 0 0.02);
 	--color-accent-text: black;
 	--color-accent--light: oklab(0.6 0.08 0.14);
@@ -228,8 +227,8 @@
 	--color-accent--darker-text: white;
 }
 
-[data-theme ~= "Corp"] {
-	--color-accent: oklab(0.89 0 0);
+[data-theme~="Corp"] {
+	/* --color-accent: oklab(0.89 0 0);
 	--color-accent-text: black;
 	--color-accent--light: oklab(0.53 -0.07 -0.17);
 	--color-accent--light-text: white;
@@ -243,22 +242,39 @@
 	--color-accent--darker-text: white;
 
 	--color-set: oklab(0.73 -0.26 0.17);
-  --color-unset: rgb(41 41 41);
+	--color-unset: rgb(41 41 41); */
 
-	@media (prefers-color-scheme: dark) {
+	/* @media (prefers-color-scheme: dark) {
 		--color-accent: oklab(0.27 0 0);
-    --color-accent-text: white;
-    --color-accent--light: oklab(0.53 -0.07 -0.17);
-    --color-accent--light-text: white;
-    --color-accent--lighter: oklab(0.31 0 0);
-    --color-accent--lighter-text: white;
-    --color-accent--lightest: oklab(0.43 0 0);
-    --color-accent--lightest-text: white;
-    --color-accent--dark: oklab(0.27 0 0);
-    --color-accent--dark-text: white;
-    --color-accent--darker: oklab(0.68 -0.1 -0.17);
-    --color-accent--darker-text: white;
-	}
+		--color-accent-text: white;
+		--color-accent--light: oklab(0.53 -0.07 -0.17);
+		--color-accent--light-text: white;
+		--color-accent--lighter: oklab(0.31 0 0);
+		--color-accent--lighter-text: white;
+		--color-accent--lightest: oklab(0.43 0 0);
+		--color-accent--lightest-text: white;
+		--color-accent--dark: oklab(0.27 0 0);
+		--color-accent--dark-text: white;
+		--color-accent--darker: oklab(0.68 -0.1 -0.17);
+		--color-accent--darker-text: white;
+	} */
+
+	--color-accent:               light-dark(oklab(0.89 0 0),  oklab(0.27 0 0));
+	--color-accent-text:          light-dark(black,  white);
+	--color-accent--light:        light-dark(oklab(0.53 -0.07 -0.17),  oklab(0.53 -0.07 -0.17));
+	--color-accent--light-text:   light-dark(white,  white);
+	--color-accent--lighter:      light-dark(oklab(1 0 0),  oklab(0.31 0 0));
+	--color-accent--lighter-text: light-dark(black,  white);
+	--color-accent--lightest:     light-dark(oklab(0.96 0 0),  oklab(0.43 0 0));
+	--color-accent--lightest-text:light-dark(black,  white);
+	--color-accent--dark:         light-dark(oklab(0.89 0 0),  oklab(0.27 0 0));
+	--color-accent--dark-text:    light-dark(black,  white);
+	--color-accent--darker:       light-dark(oklab(0.68 -0.1 -0.17),  oklab(0.68 -0.1 -0.17));
+	--color-accent--darker-text:  light-dark(white,  white);
+
+	--color-set:light-dark(oklab(0.73 -0.26 0.17)), green;
+	--color-unset:light-dark(rgb(41 41 41), grey);
+
 
 }
 
@@ -266,15 +282,42 @@ html {
 	height: initial;
 }
 
-[data-theme ~= "Air"] {
-	--color-accent: orange;
+@property --background-gradient-start {
+	syntax: '<color>';
+	initial-value: light-dark(magenta, red);
+	inherits: false;
+}
+
+@property --background-gradient-end {
+	syntax: '<color>';
+	initial-value: grey;
+	inherits: false;
+}
+
+@property --color-accent {
+	syntax: '<color>';
+	initial-value: grey;
+	inherits: true;
+}
+
+[data-theme~="Air"] {
+	--color-accent: light-dark(orange, oklab(0.55 0.06 0.13));
 	--color-glass: rgb(from black r g b / 0.05);
 
-	background: linear-gradient(358deg, #fff6bb, #d3f4ff);
+
+	--background-gradient-start: light-dark(#fff6bb, oklab(0.31 -0.01 0.07));
+	--background-gradient-end: light-dark(#d3f4ff, oklab(0.37 -0.06 -0.07));
+	background: linear-gradient(358deg, var(--background-gradient-start), var(--background-gradient-end));
 	background-color: inherit;
 
+	--color-accent--lightest-text: light-dark(black, white);
+	--color-accent--lighter-text: light-dark(black, white);
+
+	/* transition: --color-accent 2s, --background-gradient-start 13s, --background-gradient-end 5s; */
+
+
 	& form {
-		--form-color-background: white;
+		--form-color-background: light-dark(white, black);
 		--form-color-accent: var(--color-accent);
 	}
 
@@ -287,14 +330,14 @@ html {
 		background: none;
 		background-color: inherit;
 
-		& > button {
+		&>button {
 			background-color: transparent;
 		}
 	}
 
 	& h1 {
 		background-color: inherit;
-		color: black;
+		color: light-dark(black, white);
 	}
 
 	& aside {
@@ -303,28 +346,41 @@ html {
 		& ul {
 			background-color: inherit;
 
-			& > li {
+			&>li {
 
-				& > button {
+				&>button {
 					background-color: unset;
+					border-radius: 0;
+
+					&:hover {
+						background-color: var(--color-glass);
+					}
 				}
 			}
 
-			& > li:has(+ li[data-active]) {
+			&> li:has(> button:hover) {
+				background-color: unset;
+			}
+
+			&>li:has(+ li[data-active]) {
 				background-color: inherit;
 				border-radius: 0;
 
-				& > button {
+				&>button {
 					background-color: unset;
 					border-radius: 0;
+
+					&:hover {
+						background-color: var(--color-glass);
+					}
 				}
 			}
 
 
-			& > li[data-active] {
+			&>li[data-active] {
 				background-color: inherit;
 
-				& > button {
+				&>button {
 					background-color: unset;
 					border-radius: 0;
 
@@ -333,18 +389,22 @@ html {
 				}
 			}
 
-			& > li[data-active] + li {
+			&>li[data-active]+li {
 				background-color: inherit;
 
-				& > button {
+				&>button {
 					background-color: unset;
 					border-radius: 0;
+
+					&:hover {
+						background-color: var(--color-glass);
+					}
 				}
 			}
 
 		}
 
-		& > ul::before, > ul::after {
+		&>ul::before, >ul::after {
 			background-color: inherit;
 		}
 	}
@@ -355,13 +415,17 @@ html {
 	}
 
 	button {
-		background-color: var(--color-glass);
-		color: black;
+		background-color: light-dark(var(--color-glass), oklab(1 0 0 / 0.32));
+		color: light-dark(black, white);
+
+		&:hover {
+			background-color: light-dark(white, white);
+		}
 	}
 
 	& .tabs {
 
-		& > button {
+		&>button {
 			background-color: inherit;
 			border: none;
 
@@ -383,7 +447,7 @@ html {
 	}
 
 
-	& ul[data-device-list] > li[data-acked] {
+	& ul[data-device-list]>li[data-acked] {
 		background-color: var(--color-glass);
 	}
 
@@ -394,11 +458,11 @@ html {
 			background-color: var(--color-glass);
 		}
 
-    & form[data-config] {
+		& form[data-config] {
 			background-color: var(--color-glass);
 		}
 
-		& form[data-manual-add-form] > fieldset {
+		& form[data-manual-add-form]>fieldset {
 			background-color: var(--color-glass);
 		}
 
@@ -406,5 +470,26 @@ html {
 			border: none;
 		}
 	}
-}
 
+	tca9548-config {
+		[data-nested] {
+			background-color: var(--color-glass);
+		}
+	}
+
+	drv2605-config {
+		& [data-waveform-listing] {
+			& li {
+				&:nth-child(odd) {
+					background-color: var(--color-glass);
+				}
+			}
+		}
+	}
+
+	pcf8523-config {
+    & form {
+			background-color: var(--color-glass);
+		}
+	}
+}

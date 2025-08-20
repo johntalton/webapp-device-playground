@@ -33,6 +33,7 @@ export class TCA9548Builder {
 	#abus
 	#device
 	#currentStrategy
+	#closeController = new AbortController()
 
 	static async builder(definition, ui) {
 		return new TCA9548Builder(definition, ui)
@@ -54,7 +55,10 @@ export class TCA9548Builder {
 		this.#device = await Tca9548a.from(this.#abus, {})
 	}
 
-	async close() {}
+	async close() {
+		console.log('Builder Close')
+		this.#closeController.abort('Builder Closed')
+	}
 
 	signature() {}
 
@@ -159,15 +163,11 @@ export class TCA9548Builder {
 						item.select.disabled = true
 						const deviceGuess = item.select.value
 
-						const controller = new AbortController()
-						const { signal } = controller
-
-
 						const cm = new EmittingChannelManager(this.#currentStrategy)
 						cm.addEventListener('after', () => {
 							refresh()
 								.catch(e => console.warn(e))
-						})
+						}, { signal: this.#closeController.signal })
 
 						this.#ui.addI2CDevice({
 							type: deviceGuess,
@@ -175,8 +175,8 @@ export class TCA9548Builder {
 							address: addr,
 
 							port: undefined,
-							signal
-						})
+							signal: this.#closeController.signal
+						},)
 
 
 					}, { once: true })

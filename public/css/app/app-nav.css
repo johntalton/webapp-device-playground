@@ -40,6 +40,16 @@ nav > button {
 
   background-color: transparent;
   color: var(--controls-color-text, red);
+
+  &[data-theme-roller] {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+
+    & > span:last-child {
+      font-size: 0.5em;
+    }
+  }
 }
 
 nav > button:hover {

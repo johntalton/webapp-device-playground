@@ -33,18 +33,40 @@
 				}
 			}
 
-			tsl2591-config [data-active][data-for-tab="data"] {
+			tsl2591-config [data-input-with-note] {
 				display: flex;
-				justify-content: center;
-				margin-inline-end: 2em;
-				gap: 1em;
-    		flex-wrap: wrap;
+				align-items: center;
+				gap: 2em;
 			}
 
-			tsl2591-config canvas {
+			tsl2591-config [data-for-tab="data"] {
+				display: flex;
+				flex-direction: column;
+				gap: 1em;
+
+				& [data-controls] {
+					background-color: var(--color-glass);
+					padding: 1em;
+					padding-inline: 2em;
+					border-radius: 1em;
+					display: flex;
+					gap: 2em;
+				}
+			}
+
+			tsl2591-config [data-canvas-container] {
+				display: flex;
+				flex-direction: row;
+				flex-wrap: nowrap;
+				justify-content: space-between;
+				gap: 1em;
+				font-size: 0.75em;
+			}
+
+			tsl2591-config  [data-canvas-container] > canvas {
+				max-width: 50%;
 				border: 1px solid var(--color-accent, red);
 				border-radius: 1em;
-				margin-inline: 1em;
 			}
 		</style>
 		<div class="tabs">
@@ -138,25 +160,37 @@
 			<output name="deviceID"></output>
 
 			<label>No Persist Interrupt</label>
-			<output name="noPersistInterruptFlag"></output>
+			<div data-input-with-note>
+				<output name="noPersistInterruptFlag"></output>
+				<button data-clear-interrupt="noPersist">Clear</button>
+			</div>
 
 			<label>Interrupt</label>
-			<output name="interruptFlag"></output>
+			<div data-input-with-note>
+				<output name="interruptFlag"></output>
+				<button data-clear-interrupt="persist">Clear</button>
+			</div>
 
 			<label>Valid</label>
 			<output name="valid"></output>
 
 			<fieldset data-actions>
 				<button data-refresh-status>Refresh</button>
-				<button data-clear-interrupt>Clear</button>
+				<button data-clear-interrupt="noPersist persist">Clear</button>
 				<button data-trigger-interrupt>Trigger</button>
 				<button data-reset>Reset</button>
 			</fieldset>
 		</form>
 
 		<section data-for-tab="data" class="tabsContent">
-			<canvas data-ch0 width="600" height="300"></canvas>
-			<canvas data-ch1 width="600" height="300"></canvas>
+			<div data-controls method="dialog">
+				<button command="--start-data">Start</button>
+				<button command="--stop-data" disabled>Stop</button>
+			</div>
+			<div data-canvas-container>
+				<canvas data-ch0 width="600" height="300"></canvas>
+				<canvas data-ch1 width="600" height="300"></canvas>
+			</div>
 		</section>
 	</tsl2591-config>
 </body>

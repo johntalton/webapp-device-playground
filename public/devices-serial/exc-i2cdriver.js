@@ -302,6 +302,7 @@ export class ExcameraI2CDriverUIBuilder {
 	#tbus
 	#vbus
 	#capture
+	#closeController
 
 	static async builder(port, ui) {
 		return new ExcameraI2CDriverUIBuilder(port, ui)
@@ -310,6 +311,7 @@ export class ExcameraI2CDriverUIBuilder {
 	constructor(port, ui) {
 		this.#port = port
 		this.#ui = ui
+		this.#closeController = new AbortController()
 	}
 
 	get title() {
@@ -326,28 +328,29 @@ export class ExcameraI2CDriverUIBuilder {
 			// bufferSize: 1
 		})
 
-		const signals = await this.#port.getSignals()
-		console.log(`Clear To Send:       ${signals.clearToSend}`)
-		console.log(`Data Carrier Detect: ${signals.dataCarrierDetect}`)
-		console.log(`Data Set Ready:      ${signals.dataSetReady}`)
-		console.log(`Ring Indicator:      ${signals.ringIndicator}`)
+		// const signals = await this.#port.getSignals()
+		// console.log(`Clear To Send:       ${signals.clearToSend}`)
+		// console.log(`Data Carrier Detect: ${signals.dataCarrierDetect}`)
+		// console.log(`Data Set Ready:      ${signals.dataSetReady}`)
+		// console.log(`Ring Indicator:      ${signals.ringIndicator}`)
 
 
 		// device author provided init script
 		await initScript(this.#port)
 
-		console.warn('allocing untracked vbus ... please cleanup hooks')
 		this.#i2cDriver = ExcameraLabsI2CDriverI2C.from({ port: this.#port })
 		const exbus = I2CBusExcameraI2CDriver.from(this.#i2cDriver)
 		this.#tbus = I2CTransactionBus.from(exbus)
 		this.#vbus = this.#tbus //  RestrictiveBus.from(RateLimitBus.from(this.#tbus))
 
+		// init CRC
 		const { crc } = await ExcameraLabsI2CDriver.transmitStatusInfo(this.#port)
 		this.#i2cDriver.crc = crc
-
 	}
 
 	async close(forget = false) {
+		console.log('Builder Close')
+		this.#closeController.abort('Builder Closed')
 		if(forget) { await this.#port.forget() }
 		return this.#port.close()
 	}
@@ -607,7 +610,8 @@ export class ExcameraI2CDriverUIBuilder {
 									port: self.#port,
 									type: deviceGuess,
 									bus: self.#vbus,
-									address: addr
+									address: addr,
+									signal: self.#closeController.signal
 								})
 							}, { once: true })
 						})
@@ -793,6 +797,8 @@ export class ExcameraI2CDriverUIBuilder {
 				type: deviceGuess,
 				bus: self.#vbus,
 				address: parseInt(addr)
+
+				// signal: ... leave off to test port disconnect fallback
 			})
 		}))
 

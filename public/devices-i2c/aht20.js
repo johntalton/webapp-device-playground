@@ -18,7 +18,9 @@ export class AHT20Builder {
 
 	async open() { this.#device = AHT20.from(this.#abus) }
 
-	async close() { }
+	async close() {
+		console.log('Builder Close')
+	}
 
 	signature() { }
 

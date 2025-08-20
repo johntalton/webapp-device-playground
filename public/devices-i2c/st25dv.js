@@ -1,5 +1,7 @@
+import { I2CBusSoft16 } from '@johntalton/and-other-delights'
 import { ST25DVUser, ST25DVSystem, I2C_SECURITY_STATUS, LENGTH_I2C_PASSWORD, IC_REFERENCE, UID_PRODUCT_CODE, UID_MANUFACTURE_CODE_ST } from '@johntalton/st25dv'
-import { CapabilityContainer } from '@johntalton/st25dv/ndef'
+import { CapabilityContainer } from '@johntalton/ndef'
+import { ConsoleLogRecords } from '@johntalton/ndef/log'
 
 import { bindTabRoot } from '../util/tabs.js'
 import { asyncEvent } from '../util/async-event.js'
@@ -15,6 +17,7 @@ const BASE_10 = 10
 function round2(f) {
 	return Math.trunc(f * 100) / 100
 }
+
 
 /** @extends {BasicBuilder<ST25DVUser>} */
 export class ST25DVUserBuilder extends BasicBuilder {
@@ -196,71 +199,32 @@ export class ST25DVUserBuilder extends BasicBuilder {
 		}))
 
 
+		// CapabilityContainer.encode({
+
+		// })
+
+
 		// I2CAddress buffer 128
 		// excamera i2cdriver 64
-		// const area1 = await this.device.readMemory(0, 64)
-		// console.log(area1)
-		//CapabilityContainer.parse(area1)
-		// console.log(...NDEF.parse(area1))
+		// mcp2221 ~32
 
-		const buffer = CapabilityContainer.encode({
-			records: [
-				// {
-				// 	recordType: 'url',
-				// 	data: 'https://github.com/johntalton/st25dv'
-				// },
-				{
-					recordType: 'text',
-					data: 'Now is the time for all good men to come to the aid ...'
-				}
-		]
-  	})
-
-		//console.log(buffer)
-
-		// let offset = 0
-		// const step = 60
-		// while(offset < buffer.length) {
-		// 	await this.device.writeMemory(offset, buffer.subarray(offset, offset + step))
-		// 	offset += step
-		// 	await delayMs(100)
+		// const readlength = 150
+		// const step = 32
+		// const resultArray = []
+		// for await (const offset of range(0, readlength - step, step)) {
+		// 	const ab = await this.device.readMemory(offset, step)
+		// 	const u8 = ArrayBuffer.isView(ab) ?
+		// 		new Uint8Array(ab.buffer, ab.byteOffset, step) :
+		// 		new Uint8Array(ab, 0, step)
+		// 	resultArray.push(u8.slice(0))
 		// }
-		// await delayMs(1000)
 
+		// const blob = new Blob(resultArray)
+		// const result = await blob.arrayBuffer()
 
+		// const cc = CapabilityContainer.decode(result)
+		// ConsoleLogRecords(cc.message.records)
 
-		const part1ab = await this.device.readMemory(0, 64)
-		const part1 = ArrayBuffer.isView(part1ab) ?
-			new Uint8Array(part1ab.buffer, part1ab.byteOffset, 64) :
-			new Uint8Array(part1ab, 0, 64)
-		const part1clone = part1.slice(0)
-
-		const part2ab = await this.device.readMemory(64, 64)
-		const part2 = ArrayBuffer.isView(part2ab) ?
-			new Uint8Array(part2ab.buffer, part2ab.byteOffset, 64) :
-			new Uint8Array(part2ab, 0, 64)
-		const part2clone = part2.slice(0)
-		// const part3 = await this.device.readMemory(0, 64)
-		// console.log(part1)
-		// console.log(part3)
-
-		const blob = new Blob([ part1clone, part2clone ])
-		const result = await blob.arrayBuffer()
-
-		console.log(result)
-		const cc = CapabilityContainer.parse(result)
-		console.log('CapabilityContainer')
-		console.log('	read:', cc.read)
-		console.log('	write:', cc.write)
-		for(const record of cc.message.records) {
-			console.log('	Record:')
-			console.log('		id:', record.id)
-			console.log('		recordType:', record.recordType)
-			console.log('		mediaType:', record.mediaType)
-			console.log('		lang', record.lang)
-			console.log('		encoding', record.encoding)
-			console.log('		data:', record.data)
-		}
 
 		bindTabRoot(root)
 	}

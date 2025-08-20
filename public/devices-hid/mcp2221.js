@@ -55,6 +55,7 @@ export class MCP2221UIBuilder {
 	}
 
 	async close(forget = false) {
+		console.log('close mcp2221', forget)
 		this.#closeController.abort('mcp2221 close')
 		if(forget) { await this.#hidDevice.forget() }
 		return this.#hidDevice.close()

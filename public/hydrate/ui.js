@@ -1,4 +1,8 @@
 import { DOMTokenListLike } from '../util/dom-token-list.js'
+
+//
+import { WebServiceBuilder } from '../devcie-web/bus-service.js'
+
 //
 import { ExcameraI2CDriverUIBuilder } from '../devices-serial/exc-i2cdriver.js'
 import { MCP2221UIBuilder } from '../devices-hid/mcp2221.js'
@@ -14,8 +18,6 @@ import {
 	EXCAMERA_LABS_MINI_PRODUCT_ID
 } from '@johntalton/excamera-i2cdriver'
 import { asyncEvent } from '../util/async-event.js'
-import { deviceGuessByAddress } from '../devices-i2c/guesses.js'
-import { appendDeviceListItem } from '../util/device-list.js'
 
 
 const MCP2221_USB_FILTER = {
@@ -38,7 +40,8 @@ export const UI_HOOKS = {
 	addSerialPort,
 	addUSBDevice,
 	addHIDDevice,
-	addI2CDevice
+	addI2CDevice,
+	addWebDevice
 }
 
 export function buildDeviceSection(builder) {
@@ -51,10 +54,7 @@ export function buildDeviceSection(builder) {
 	const loadView = async () => {
 		sectionElem.toggleAttribute('data-error', false)
 
-		const controller = new AbortController()
-		const signal = controller.signal
-
-		const customElem = await builder.buildCustomView({ signal })
+		const customElem = await builder.buildCustomView()
 		sectionElem.appendChild(customElem)
 		sectionElem.toggleAttribute('data-loading', false)
 	}
@@ -149,7 +149,7 @@ export function buildDeviceListItem(deviceListElem, builder) {
 
 	// demolisher
 	return () => {
-
+		console.log('Demolisher for', builder.title)
 		// virtualDevices.forEach(vdev => {
 		// 	console.log(vdev)
 		// })
@@ -178,28 +178,24 @@ export async function hydrateUI() {
 
 export async function addSerialPort(port, signal) {
 	const deviceListElem = document.getElementById('deviceList')
-	// console.log('addSerialPort')
-
 	const info =  port.getInfo()
 
-	// console.log(info)
-
-	//
 	if(isExcameraLabs(info.usbVendorId, info.usbProductId)) {
-		// console.log('adding excamera i2cdriver', port)
-
 		const builder = await ExcameraI2CDriverUIBuilder.builder(port, UI_HOOKS)
 		const demolisher = buildDeviceListItem(deviceListElem, builder)
 
-		signal.addEventListener('abort', event => {
-			console.log('signal said: abort - demo time')
+		signal?.addEventListener('abort', event => {
+			console.log('Demolish SerialPort ExCamera Builder (signal):', signal.reason)
 			demolisher()
 		})
 
-		// port.addEventListener('disconnect', event => {
-		// 	console.log('Excamera device disconnect - demo time', this)
-		// 	demolisher()
-		// })
+		if(signal === undefined) {
+			// fallback to listing to port event
+			port.addEventListener('disconnect', event => {
+				console.log('Demolish SerialPort ExCamera Builder (port disconnect)')
+				demolisher()
+			})
+		}
 	}
 
 	else if(true) {
@@ -225,25 +221,21 @@ export async function addUSBDevice(device) {
 }
 
 export async function addHIDDevice(hid, signal) {
-	////////
-	// return
-
 	const deviceListElem = document.getElementById('deviceList')
-	// console.log('UI:addHID', hid)
+
+	const customProductId = 220 // for testing as mcp2221 allows setting this
 
 	if(hid.vendorId === MCP2221_USB_FILTER.vendorId) {
-		if(hid.productId === MCP2221_USB_FILTER.productId || hid.productId === 220) {
-			//console.log('adding mcp2221', hid)
+		if(hid.productId === MCP2221_USB_FILTER.productId || hid.productId === customProductId) {
 
 			const builder = await MCP2221UIBuilder.builder(hid, UI_HOOKS)
 			const demolisher = buildDeviceListItem(deviceListElem, builder)
 
 			signal.addEventListener('abort', event => {
 				const { reason } = signal
-				console.log(`signal abort on hid mcp2221 (${reason}) - run ui demolisher`)
+				console.log('Demolish HID Builder (signal)', reason)
 				demolisher()
 			})
-
 
 			return
 		}
@@ -253,211 +245,32 @@ export async function addHIDDevice(hid, signal) {
 
 export async function addI2CDevice(definition) {
 	const deviceListElem = document.getElementById('deviceList')
-	// console.log('i2c device to list', definition)
+
 	const builder = await I2CDeviceBuilderFactory.from(definition, UI_HOOKS)
 	const demolisher = buildDeviceListItem(deviceListElem, builder)
 
-	definition.port?.addEventListener('disconnect', event => {
-		console.log('I²C device disconnect - run ui demolisher', this)
+	definition.signal?.addEventListener('abort', event => {
+		const { reason } = definition.signal
+		console.log('Demolish I²C Builder (signal):', reason)
 		demolisher()
 	})
 
-	definition.signal?.addEventListener('abort', event => {
-		const { reason } = definition.signal
-		console.log(`I²C device signaled disconnect (${reason}) - run ui demolisher`)
-		demolisher()
-	})
+	if(definition.signal === undefined) {
+		// fallback to listening to the port
+		definition.port?.addEventListener('disconnect', event => {
+			console.log('Demolish I²C Builder (port disconnect)')
+			demolisher()
+		})
+	}
 
 	return
 }
 
-
-
-// export class I2CBusWeb {
-// 	#url
-
-// 	constructor(url = 'http://localhost:3000/port') {
-// 		this.#url = url
-// 	}
-
-// 	get name() { return `WebI²C(${this.#url})`}
-
-// 	async postCommand(command, options) {
-// 		try {
-// 			const response = await fetch(this.#url, {
-// 				method: 'POST',
-// 				headers: {
-// 					'Content-Type': 'application/json',
-// 				},
-// 				body: JSON.stringify({
-// 					namespace: window.origin,
-// 					opaque: '🤷🏻‍♂️',
-// 					type: command,
-// 					...options
-// 				})
-// 			})
-
-// 			if(!response.ok) { throw new Error(`response not ok ${response.status}`) }
-
-// 			const result = await response.json()
-
-// 			if(result.type === 'error') {
-// 				throw new Error('WebI²C Remote Error: ' + result.why)
-// 			}
-
-// 			return {
-// 				...result,
-// 				buffer: (result.buffer !== undefined) ? Uint8Array.from(result.buffer) : undefined
-// 			}
-// 		}
-// 		catch(e) {
-// 			// console.warn('fetch exception', e)
-// 			throw e
-// 		}
-// 	}
-
-// 	async scan() {
-// 		const { ackedList } = await this.postCommand('scan', {})
-// 		return ackedList
-// 	}
-
-// 	async readI2cBlock(address, cmd, length, target) {
-// 		return this.postCommand('readI2cBlock', {
-// 			address,
-// 			cmd,
-// 			length
-// 		})
-// 	}
-
-// 	async writeI2cBlock(address, cmd, length, buffer) {
-// 		return this.postCommand('writeI2cBlock', {
-// 			address,
-// 			cmd,
-// 			length,
-//       buffer: [ ...buffer ]
-// 		})
-// 	}
-
-// 	async i2cRead(address, length, target) {
-// 		return this.postCommand('i2cRead', {
-// 			address,
-// 			length
-// 		})
-//   }
-
-//   async i2cWrite(address, length, buffer) {
-//     return this.postCommand('i2cWrite', {
-// 			address,
-// 			length,
-//       buffer: [ ...buffer ]
-// 		})
-//   }
-// }
-
-// addI2CDevice({
-// 	type: 'ht16k33',
-// 	address: 0x71,
-// 	bus: new I2CBusWeb()
-// })
-
-const deviceListElem = document.getElementById('deviceList')
-const builder = {
-	title: '☠️',
-	open() {
-
-	},
-	async buildCustomView() {
-		const response = await fetch('./custom-elements/web.html')
-		if (!response.ok) { throw new Error('no html for view') }
-		const view = await response.text()
-		const doc = (new DOMParser()).parseFromString(view, 'text/html')
-
-		const root = doc?.querySelector('web-config')
-		if (root === null) { throw new Error('no root for template') }
-
-		const urlText = root.querySelector('input[name="url"]')
-		const scanButton = root.querySelector('button[data-scan]')
-		const deviceList = root.querySelector('[data-device-list]')
-		const addressElem = root.querySelector('addr-display[name="scanResults"]')
-
-		scanButton?.addEventListener('click', asyncEvent(async event => {
-			scanButton.disabled = true
-
-			const bus = new I2CBusWeb(urlText.value)
-
-			const existingHexs = addressElem.querySelectorAll('hex-display')
-			existingHexs.forEach(eh => eh.remove())
-
-			const existingLis = root.querySelectorAll('li')
-			existingLis.forEach(el => el.remove())
-
-
-			try {
-				const ackedList = await bus.scan()
-
-				ackedList.forEach(addr => {
-					const acked = true
-
-
-					const hexElem = document.createElement('hex-display')
-
-					hexElem.setAttribute('slot', addr)
-
-					hexElem.toggleAttribute('acked', true)
-					// hexElem.toggleAttribute('arbitration', arbitration)
-					// hexElem.toggleAttribute('timedout', timedout)
-
-					hexElem.textContent = addr.toString(16).padStart(2, '0')
-
-					addressElem.append(hexElem)
-
-					//
-					const listElem = document.createElement('li')
-					listElem.textContent = addr
-
-					listElem.setAttribute('slot', 'vdevice-guess-list')
-					listElem.toggleAttribute('data-acked', true)
-
-					const guesses = deviceGuessByAddress(addr)
-					const item = appendDeviceListItem(deviceList, addr, { acked, guesses })
-
-					item.button.addEventListener('click', e => {
-						e.preventDefault()
-
-						//
-						item.button.disabled = true
-						const deviceGuess = item.select.value
-
-						const controller = new AbortController()
-						const { signal } = controller
-
-						UI_HOOKS.addI2CDevice({
-							type: deviceGuess,
-							bus,
-							address: addr,
-
-							port: undefined,
-							signal
-						})
-
-
-					}, { once: true })
-
-				})
-			}
-			catch(e) {
-				console.log(e)
-			}
-
-			scanButton.disabled = false
-		}))
-
-		return root
-	}
+export async function addWebDevice() {
+	const deviceListElem = document.getElementById('deviceList')
+	const builder = new WebServiceBuilder({}, UI_HOOKS)
+	const demolisher = buildDeviceListItem(deviceListElem, builder)
 }
-// const demolisher = buildDeviceListItem(deviceListElem, builder)
-
-
 
 
 

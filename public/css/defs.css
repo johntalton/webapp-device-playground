@@ -26,6 +26,19 @@
 }
 
 
+@media (prefers-color-scheme: dark) {
+	[data-scheme] {
+		color-scheme: dark;
+	}
+}
+
+[data-scheme ~= "Dark"] {
+	color-scheme: dark;
+}
+
+[data-scheme ~= "Light"] {
+	color-scheme: light;
+}
 
 [data-theme] {
 	--color-white: white;

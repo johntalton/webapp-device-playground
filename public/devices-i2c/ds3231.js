@@ -61,14 +61,17 @@ export class DS3231Builder {
 
 			// time
 			const { year, month, day, date, hours, minutes, seconds } = time
-			const storedDate = new Date(Date.UTC(
+			const storedDateUTC = Date.UTC(
 				century + year,
 				month - 1,
 				date,
-				hours, minutes, seconds))
+				hours, minutes, seconds)
+			const storedDate = new Date(storedDateUTC)
 
 			const dayMatch = (storedDate.getUTCDay() + 1) === day
 
+			const timeUTCOutput = root.querySelector('[data-time-utc]')
+			timeUTCOutput.value = `${storedDate.toUTCString()}`
 			const timeOutput = root.querySelector('[data-time]')
 			timeOutput.value = `${storedDate} ${dayMatch ? '' : '(day mismatch)'}`
 

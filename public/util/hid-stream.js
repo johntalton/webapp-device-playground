@@ -35,6 +35,7 @@ function makeHandler(controller, supportBYOB = false) {
  * @implements UnderlyingSource
  */
 export class ReadableStreamUnderlyingSourceWebHID {
+	/** @type {ReadableStreamType} */
 	type = 'bytes'
 	autoAllocateChunkSize = undefined
 
@@ -97,10 +98,52 @@ export class WritableStreamUnderlyingSourceWebHID {
 }
 
 
+
 /**
  * @implements ReadableWritablePair
  */
 export class WebHIDStreamSource {
+	#hid
+	#readableUS
+	#writableUS
+	#readable
+	#writable
+	#queuingStrategy
+
+	/** @param {HIDDevice} hid  */
+	constructor(hid) {
+		this.#hid = hid
+		this.#queuingStrategy = new ByteLengthQueuingStrategy({
+			highWaterMark: 1
+		})
+
+		// this.#readableUS = new ReadableStreamUnderlyingSourceWebHID(hid)
+		// this.#writable = new WritableStream(new WritableStreamUnderlyingSourceWebHID(hid), queuingStrategy)
+	}
+
+	get readable() {
+		if(this.#readableUS === undefined || this.#readableUS.closed) {
+			this.#readableUS = new ReadableStreamUnderlyingSourceWebHID(this.#hid)
+			this.#readable = new ReadableStream(this.#readableUS)
+		}
+
+		return this.#readable
+	}
+	get writable() {
+		if(this.#writableUS === undefined || this.#writableUS.closed) {
+			this.#writableUS = new WritableStreamUnderlyingSourceWebHID(this.#hid)
+			this.#writable = new WritableStream(this.#writableUS, this.#queuingStrategy)
+		}
+
+		return this.#writable
+	}
+}
+
+
+/**
+ * @implements ReadableWritablePair
+ */
+export class _WebHIDStreamSource {
 	#r = null
 	#ur = null
 	#w = null

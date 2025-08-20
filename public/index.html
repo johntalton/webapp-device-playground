@@ -16,9 +16,12 @@
 		<script type="importmap">
 			{
 				"imports": {
+					"@johntalton/i2c-bus-service/client": "/node_modules/@johntalton/i2c-bus-service/client/src/index.js",
 
 					"@johntalton/and-other-delights": "/node_modules/@johntalton/and-other-delights/lib/index.js",
 					"@johntalton/bitsmush": "/node_modules/@johntalton/bitsmush/lib/bitsmush.js",
+					"@johntalton/ndef": "/node_modules/@johntalton/ndef/src/index.js",
+					"@johntalton/ndef/log": "/node_modules/@johntalton/ndef/src/util_console.js",
 
 					"@johntalton/excamera-i2cdriver": "/node_modules/@johntalton/excamera-i2cdriver/src/index.js",
 					"@johntalton/excamera-i2cdriver/capture": "/node_modules/@johntalton/excamera-i2cdriver/src/capture-generator/index.js",
@@ -52,21 +55,20 @@
 					"@johntalton/mcp23": "/node_modules/@johntalton/mcp23/lib/index.js",
 					"@johntalton/aht20": "/node_modules/@johntalton/aht20/src/index.js",
 					"@johntalton/drv2605": "/node_modules/@johntalton/drv2605/src/index.js",
-					"@johntalton/st25dv": "/node_modules/@johntalton/st25dv/src/index.js",
-					"@johntalton/st25dv/ndef": "/node_modules/@johntalton/st25dv/src/ndef/index.js"
+					"@johntalton/st25dv": "/node_modules/@johntalton/st25dv/src/index.js"
 				}
 			}
 		</script>
 		<script src="./index.js" type="module" async defer crossorigin="anonymous"></script>
 		<link rel="stylesheet" type="text/css" href="./index.css"></link>
 	</head>
-	<body data-theme="Air" data-view="aside" data-supports="initial">
+	<body data-theme="Air" data-scheme="" data-view="aside" data-supports="initial">
 		<html-import id="addr-display" src="./custom-elements/address-display.html"></html-import>
 		<h1>⚙️ Web I²C Playground</h1>
 
 		<nav>
 			<button data-aside-toggle>🔖 Menu</button>
-			<button data-theme-roller>♲</button>
+			<button data-theme-roller><span>♲</span><span></span></button>
 			<button disabled id="requestWeb">🔌 Web</button>
 			<button disabled id="requestSerial">🔌 Serial</button>
 			<button disabled id="requestUSB">🔌 USB</button>
