@@ -35,7 +35,9 @@ export async function hydrateTheme() {
 			return
 		}
 
-		const theme = GOOD_THEME_NAMES[Math.floor(Math.random() * GOOD_THEME_NAMES.length)]
+		const current = document.body.getAttribute('data-theme')
+		const themeList = GOOD_THEME_NAMES.filter(t => t !== current)
+		const theme = themeList[Math.floor(Math.random() * themeList.length)]
 
 		themRollerButton.setAttribute('title', theme)
 

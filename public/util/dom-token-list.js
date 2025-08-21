@@ -47,8 +47,8 @@ export class DOMTokenListLike {
 	 */
 	add(...tokens) {
 		for(const token of tokens) {
-			if(token === EMPTY_SPACE) { throw new SyntaxError('token empty') }
-			if(token.includes(SINGLE_SPACE)) { throw new InvalidCharacterError('token whitespace') }
+			if(token === EMPTY_SPACE) { throw new DOMException('token empty', 'SyntaxError') }
+			if(token.includes(SINGLE_SPACE)) { throw new DOMException('token whitespace', 'InvalidCharacterError') }
 		}
 
 		for(const token of tokens) {
@@ -63,8 +63,8 @@ export class DOMTokenListLike {
 	 */
 	remove(...tokens) {
 		for(const token of tokens) {
-			if(token === EMPTY_SPACE) { throw new SyntaxError('token empty') }
-			if(token.includes(SINGLE_SPACE)) { throw new InvalidCharacterError('token whitespace') }
+			if(token === EMPTY_SPACE) { throw new DOMException('token empty', 'SyntaxError') }
+			if(token.includes(SINGLE_SPACE)) { throw new DOMException('token whitespace', 'InvalidCharacterError') }
 		}
 
 		for(const token of tokens) {
@@ -76,11 +76,11 @@ export class DOMTokenListLike {
 
 	/**
 	 * @param {String} token
-	 * @param {Boolean} force
+	 * @param {Boolean|undefined} force
 	 */
-	toggle(token, force) {
-		if(token === EMPTY_SPACE) { throw new SyntaxError('token empty') }
-		if(token.includes(SINGLE_SPACE)) { throw new InvalidCharacterError('token whitespace') }
+	toggle(token, force = undefined) {
+		if(token === EMPTY_SPACE) { throw new DOMException('token empty', 'SyntaxError') }
+		if(token.includes(SINGLE_SPACE)) { throw new DOMException('token whitespace', 'InvalidCharacterError') }
 
 		if(this.#set.has(token)) {
 			if(force === undefined || force === false) {

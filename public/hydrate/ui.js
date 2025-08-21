@@ -107,6 +107,7 @@ export function buildDeviceListItem(deviceListElem, builder) {
 	const first = lis.length === 0
 
 	if(first) {
+		buttonElem.disabled = true
 		liElem.toggleAttribute('data-active', true)
 		sectionElem.toggleAttribute('data-active', true)
 	}
@@ -130,11 +131,10 @@ export function buildDeviceListItem(deviceListElem, builder) {
 				bElem.disabled = false
 			})
 
-			liElem.toggleAttribute('data-active', true)
-			buttonElem.disabled = true
-
 			mainElem.querySelectorAll(':scope > section').forEach(s => s.removeAttribute('data-active'))
 
+			buttonElem.disabled = true
+			liElem.toggleAttribute('data-active', true)
 			sectionElem.toggleAttribute('data-active', true)
 		}
 

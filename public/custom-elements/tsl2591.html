@@ -15,12 +15,10 @@
 			} */
 
 
-			tsl2591-config form[data-active] {
+			tsl2591-config form {
 				display: grid;
 				grid-template-columns: 1fr 1fr;
 				gap: 1em;
-				align-items: stretch;
-				justify-items: stretch;
 
 				margin-inline-end: 2em;
 
@@ -37,6 +35,10 @@
 				display: flex;
 				align-items: center;
 				gap: 2em;
+
+				& :first-child {
+					min-width: 10ch;
+				}
 			}
 
 			tsl2591-config [data-for-tab="data"] {
@@ -67,6 +69,7 @@
 				max-width: 50%;
 				border: 1px solid var(--color-accent, red);
 				border-radius: 1em;
+				background-color: oklab(1 0 0 / 0.24);
 			}
 		</style>
 		<div class="tabs">

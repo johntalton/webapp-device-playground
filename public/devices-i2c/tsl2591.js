@@ -13,6 +13,7 @@ export class TSL2591Builder {
 	#device
 
 	#config
+	#closeController = new AbortController()
 
 	static async builder(definition, ui) {
 		return new TSL2591Builder(definition, ui)
@@ -21,7 +22,7 @@ export class TSL2591Builder {
 	constructor(definition, ui) {
 		const { bus, address } = definition
 
-		this.#abus = new I2CAddressedBus(bus, address)
+		this.#abus = new I2CAddressedBus(bus, address, { reuse: false })
 	}
 
 
@@ -36,18 +37,25 @@ export class TSL2591Builder {
 		if(!ok) { throw new Error(`invalid device Id: ${id}`) }
 	}
 
-	async close() { }
+	async close() {
+		this.#closeController.abort('Close')
+	}
 
 	signature() { }
 
-
 	async buildCustomView(selectionElem) {
-		// const ff = document.createElement('fencedframe')
-		// const ff = document.createElement('iframe')
-		// ff.setAttribute('src', './custom-elements/tsl2591.html')
-		// ff.setAttribute('height', '90%')
-		// ff.setAttribute('width', '90%')
-		// return ff
+		/**
+		 * @template T
+		 * @param {string} query
+		 * @param {new (...args: any[]) => T} type
+		 * @returns {T}
+		 */
+		function elem(root, query, type) {
+			const element = root?.querySelector(query)
+			if(element === null) { throw new Error('missing element') }
+			if(!(element instanceof type)) { throw new Error('type miss-match') }
+			return element
+		}
 
 		// fetch template
 		const response = await fetch('./custom-elements/tsl2591.html')
@@ -58,23 +66,38 @@ export class TSL2591Builder {
 		const root = doc?.querySelector('tsl2591-config')
 		if(root === null) { throw new Error('no root for template')}
 
+		// profile
+		const gainSelect = elem(root, 'select[name="gain"]', HTMLSelectElement)
+		const timeSelect = elem(root, 'select[name="time"]', HTMLSelectElement)
+		const enableNoPersistInterruptCheckbox = elem(root, 'input[name="enableNoPersistInterrupt"]', HTMLInputElement)
+		const enableInterruptCheckbox = elem(root, 'input[name="enableInterrupt"]', HTMLInputElement)
+		const enableSleepAfterInterruptCheckbox = elem(root, 'input[name="enableSleepAfterInterrupt"]', HTMLInputElement)
+		const enabledCheckbox = elem(root, 'input[name="enabled"]', HTMLInputElement)
+		const powerOnCheckbox = elem(root, 'input[name="powerOn"]', HTMLInputElement)
+
 
 		// status
-		const noPersistInterruptOutput = root.querySelector('output[name="noPersistInterruptFlag"]')
-		const interruptOutput = root.querySelector('output[name="interruptFlag"]')
-		const validOutput = root.querySelector('output[name="valid"]')
+		const noPersistInterruptOutput = elem(root, 'output[name="noPersistInterruptFlag"]', HTMLOutputElement)
+		const interruptOutput = elem(root, 'output[name="interruptFlag"]', HTMLOutputElement)
+		const validOutput = elem(root, 'output[name="valid"]', HTMLOutputElement)
+
 		// deviceID
-		const deviceIdOutput = root?.querySelector('output[name="deviceID"]')
+		const deviceIdOutput = elem(root, 'output[name="deviceID"]', HTMLOutputElement)
+
+		// threshold
+		const thresholdInterruptLowNumber = elem(root, 'input[name="interruptThresholdLow"]', HTMLInputElement)
+		const thresholdInterruptHighNumber = elem(root, 'input[name="interruptThresholdHigh"]', HTMLInputElement)
+		const thresholdInterruptPersistSelect = elem(root, 'select[name="persist"]', HTMLSelectElement)
+		const thresholdNoPersistLowNumber = elem(root, 'input[name="nePersistInterruptThresholdLow"]', HTMLInputElement)
+		const thresholdNoPersistHighNumber = elem(root, 'input[name="noPersistInterruptThresholdHigh"]', HTMLInputElement)
 
 
 		const refreshStatus = async () => {
-			const status = await this.#device.getStatus()
-
 			const {
 				noPersistInterruptFlag,
 				interruptFlag,
 				valid
-			} = status
+			} = await this.#device.getStatus()
 
 			noPersistInterruptOutput.value = noPersistInterruptFlag ? '🔔 (true)' : '🔕'
 			interruptOutput.value = interruptFlag ? '🔔 (true)' : '🔕'
@@ -85,28 +108,23 @@ export class TSL2591Builder {
 			const deviceId = await this.#device.getDeviceID()
 
 			const ok = deviceId === DEVICE_ID
-			deviceIdOutput.value = `0x${deviceId.toString(16)} ${ok ? '' : '🛑'}`
+			deviceIdOutput.value = `0x${deviceId.toString(16).padStart(2, '0')} ${ok ? '' : '🛑'}`
 		}
 
 		const refreshThreshold = async () => {
-			const thresholds = await this.#device.getThresholds()
-
 			const {
 				interruptLow,
 				interruptHigh,
 				noPersistInterruptLow,
 				noPersistInterruptHigh,
 				persist
-			} = thresholds
+			} = await this.#device.getThresholds()
 
-			root.querySelector('input[name="interruptThresholdLow"]').value = interruptLow
-			root.querySelector('input[name="interruptThresholdHigh"]').value = interruptHigh
-
-			root.querySelector('select[name="persist"]').value = persist
-
-			root.querySelector('input[name="nePersistInterruptThresholdLow"]').value = noPersistInterruptLow
-			root.querySelector('input[name="noPersistInterruptThresholdHigh"]').value = noPersistInterruptHigh
-
+			thresholdInterruptLowNumber.value = interruptLow.toString()
+			thresholdInterruptHighNumber.value = interruptHigh.toString()
+			thresholdInterruptPersistSelect.value = persist.toString()
+			thresholdNoPersistLowNumber.value = noPersistInterruptLow.toString()
+			thresholdNoPersistHighNumber.value = noPersistInterruptHigh.toString()
 
 			this.#config.ch0.threshold.high = interruptHigh
 			this.#config.ch0.threshold.low = interruptLow
@@ -115,35 +133,23 @@ export class TSL2591Builder {
 		}
 
 		const refreshProfile = async () => {
-			const profile = await this.#device.getProfile()
-
-
 			const {
 				noPersistInterruptEnabled,
 				interruptEnabled,
 				sleepAfterInterrupt,
 				enabled,
 				powerOn,
-
 				gain,
 				time
-			} = profile
+			} = await this.#device.getProfile()
 
-			const check = (name, value) => { root.querySelector(`input[name="${name}"]`).checked = value }
-
-			check('enableNoPersistInterrupt', noPersistInterruptEnabled)
-			check('enableInterrupt', interruptEnabled)
-			check('enableSleepAfterInterrupt', sleepAfterInterrupt)
-			check('enabled', enabled)
-			check('powerOn', powerOn)
-
-			// console.log({ gain, time })
-			const gainSelect = root?.querySelector('select[name="gain"]')
-			gainSelect.value = gain
-
-			const timeSelect = root?.querySelector('select[name="time"]')
-			timeSelect.value = time
-
+			enableNoPersistInterruptCheckbox.checked = noPersistInterruptEnabled
+			enableInterruptCheckbox.checked = interruptEnabled
+			enableSleepAfterInterruptCheckbox.checked = sleepAfterInterrupt
+			enabledCheckbox.checked = enabled
+			powerOnCheckbox.checked = powerOn
+			gainSelect.value = gain.toString()
+			timeSelect.value = time.toString()
 		}
 
 		const refreshAll = async () => {
@@ -155,8 +161,8 @@ export class TSL2591Builder {
 
 
 
-		const statusButton = root.querySelector('form button[data-refresh-status]')
-		statusButton?.addEventListener('click', asyncEvent(async event => {
+		const statusButton = elem(root, 'form button[data-refresh-status]', HTMLButtonElement)
+		statusButton.addEventListener('click', asyncEvent(async event => {
 			event.preventDefault()
 
 			statusButton.disabled = true
@@ -177,7 +183,6 @@ export class TSL2591Builder {
 			const clearNonPersist = dtl.contains('noPersist')
 			const clearPersist = dtl.contains('persist')
 
-			console.log({ clearNonPersist, clearPersist })
 			if(!clearNonPersist && !clearPersist) {
 				console.warn('Not set to Clear either, skip')
 				return
@@ -191,8 +196,8 @@ export class TSL2591Builder {
 		const clearButtons = root.querySelectorAll('form button[data-clear-interrupt]')
 		clearButtons.forEach(clearButton => clearButton.addEventListener('click', handleCommonClear))
 
-		const triggerButton = root.querySelector('form button[data-trigger-interrupt]')
-		triggerButton?.addEventListener('click', asyncEvent(async event => {
+		const triggerButton = elem(root, 'form button[data-trigger-interrupt]', HTMLButtonElement)
+		triggerButton.addEventListener('click', asyncEvent(async event => {
 			event.preventDefault()
 
 			await this.#device.triggerInterrupt()
@@ -200,8 +205,8 @@ export class TSL2591Builder {
 			await refreshStatus()
 		}))
 
-		const resetButton = root.querySelector('form button[data-reset]')
-		resetButton?.addEventListener('click', asyncEvent(async event => {
+		const resetButton = elem(root, 'form button[data-reset]', HTMLButtonElement)
+		resetButton.addEventListener('click', asyncEvent(async event => {
 			event.preventDefault()
 
 			await this.#device.reset()
@@ -209,56 +214,45 @@ export class TSL2591Builder {
 			await refreshAll()
 		}))
 
-		const setThresholdButton = root.querySelector('form button[data-set-threshold]')
-		setThresholdButton?.addEventListener('click', asyncEvent(async event => {
+		const setThresholdButton = elem(root, 'form button[data-set-threshold]', HTMLButtonElement)
+		setThresholdButton.addEventListener('click', asyncEvent(async event => {
 			event.preventDefault()
 
 			await this.#device.setThreshold({
-				interruptLow: root.querySelector('input[name="interruptThresholdLow"]')?.value,
-				interruptHigh: root.querySelector('input[name="interruptThresholdHigh"]')?.value,
+				interruptLow: parseInt(thresholdInterruptLowNumber.value),
+				interruptHigh: parseInt(thresholdInterruptHighNumber.value),
 
-				persist: root?.querySelector('select[name="persist"]')?.value,
+				persist: parseInt(thresholdInterruptPersistSelect.value),
 
-				noPersistInterruptLow: root.querySelector('input[name="nePersistInterruptThresholdLow"]')?.value,
-				noPersistInterruptHigh: root.querySelector('input[name="noPersistInterruptThresholdHigh"]')?.value,
+				noPersistInterruptLow: parseInt(thresholdNoPersistLowNumber.value),
+				noPersistInterruptHigh: parseInt(thresholdNoPersistHighNumber.value),
 			})
 
 			await refreshThreshold()
 			await refreshStatus()
 		}))
 
-
-
-		const profileForm = root.querySelector('form[data-config]')
-		profileForm?.addEventListener('change', asyncEvent(async event => {
-			const enableNoPersistInterruptCheckbox = root.querySelector('input[name="enableNoPersistInterrupt"]')
-			const enableInterruptCheckbox = root.querySelector('input[name="enableInterrupt"]')
-			const enableSleepAfterInterruptCheckbox = root.querySelector('input[name="enableSleepAfterInterrupt"]')
-			const enabledCheckbox = root.querySelector('input[name="enabled"]')
-			const powerOnCheckbox = root.querySelector('input[name="powerOn"]')
-			const gainSelect = root.querySelector('select[name="gain"]')
-			const timeSelect = root.querySelector('select[name="time"]')
-
+		const profileForm = elem(root, 'form[data-config]', HTMLFormElement)
+		profileForm.addEventListener('change', asyncEvent(async event => {
 			await this.#device.setProfile({
 				enableNoPersistInterrupt: enableNoPersistInterruptCheckbox.checked,
 				enableInterrupt: enableInterruptCheckbox.checked,
 				enableSleepAfterInterrupt: enableSleepAfterInterruptCheckbox.checked,
 				enabled: enabledCheckbox.checked,
 				powerOn: powerOnCheckbox.checked,
-				gain: gainSelect.value,
-				time : timeSelect.value
+				gain: parseInt(gainSelect.value),
+				time: parseInt(timeSelect.value)
 			})
 
 			await refreshProfile()
 		}))
 
-
-		const startDataButton = root.querySelector('button[command="--start-data"]')
-		const stopDataButton = root.querySelector('button[command="--stop-data"]')
-		startDataButton?.addEventListener('click', event => {
+		const startDataButton = elem(root, 'button[command="--start-data"]', HTMLButtonElement)
+		const stopDataButton = elem(root, 'button[command="--stop-data"]', HTMLButtonElement)
+		startDataButton.addEventListener('click', event => {
 
 			const controller = new AbortController()
-			const signal = controller.signal // AbortSignal.timeout(1000 * 10)
+			const signal = AbortSignal.any([ controller.signal, this.#closeController.signal ]) // AbortSignal.timeout(1000 * 10)
 			signal.addEventListener('abort', () => {
 				this.#config.paused = true
 			})
@@ -278,7 +272,7 @@ export class TSL2591Builder {
 			startDataButton.disabled = true
 			stopDataButton.disabled = false
 
-			stopDataButton?.addEventListener('click', event => {
+			stopDataButton.addEventListener('click', event => {
 				controller.abort('Stop')
 				stopDataButton.disabled = true
 			}, { once: true })
@@ -286,8 +280,7 @@ export class TSL2591Builder {
 			requestAnimationFrame(render)
 		})
 
-
-
+		//
 		bindTabRoot(root)
 
 
@@ -303,11 +296,8 @@ export class TSL2591Builder {
 		// dataPollObserver.observe(dataTab, { attributes: true, attributeFilter: [ 'data-active'] })
 
 
-		const ch0Canvas = root.querySelector('canvas[data-ch0]')
-		const ch1Canvas = root.querySelector('canvas[data-ch1]')
-
-		if(!(ch0Canvas instanceof HTMLCanvasElement)) { throw new Error('ch0 canvas in no a canvas') }
-		if(!(ch1Canvas instanceof HTMLCanvasElement)) { throw new Error('ch1 canvas in no a canvas') }
+		const ch0Canvas = elem(root, 'canvas[data-ch0]', HTMLCanvasElement)
+		const ch1Canvas = elem(root, 'canvas[data-ch1]', HTMLCanvasElement)
 
 		const DEFAULT_ITEM =  {
 			sum: 0,
@@ -372,13 +362,7 @@ export class TSL2591Builder {
 					break
 				}
 
-				// try {
-					yield device.getColor()
-				// }
-				// catch(e) {
-				// 	console.log('break', e)
-				// 	break
-				// }
+				yield device.getColor()
 			}
 		}
 
@@ -588,6 +572,6 @@ export class TSL2591Builder {
 
 		await refreshAll()
 
-		return doc.body.children[0]
+		return root
 	}
 }
