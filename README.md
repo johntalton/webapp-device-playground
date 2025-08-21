@@ -44,7 +44,7 @@ The above mentioned I2CBus-Service provides a REST API client that exposes a `I2
 
 NodeJS (on devices like a Raspberry PI) can access the native Linux I²C Bus.  A common implantation for this is [`i2c-bus`](https://github.com/fivdi/i2c-bus) library.
 
-In order to make it compatible with AOD `I2CBus` API the adapter has been provided [I2CBusFivdi](https://github.com/i2c-bus-fivdi).
+In order to make it compatible with AOD `I2CBus` API the adapter has been provided [I2CBusFivdi](https://github.com/johntalton/i2c-bus-fivdi).
 
 This can be used withing the `I2CBuService` or standalone in order to use AOD compatible devices.
 
