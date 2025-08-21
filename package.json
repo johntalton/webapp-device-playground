@@ -33,6 +33,6 @@
     "@johntalton/tsl2591": "^1.0.1",
     "@johntalton/st25dv": "^1.2.0",
     "@johntalton/ndef": "^1.0.1",
-    "@johntalton/i2c-bus-service": "../i2c-bus-service/"
+    "@johntalton/i2c-bus-service": "https://github.com/johntalton/i2c-bus-service"
   }
 }
