@@ -1,0 +1,210 @@
+<si5351-config>
+	<div class="tabs">
+		<button data-tab="status" data-active type="button">Status</button>
+		<button data-tab="config">Config</button>
+		<button data-tab="clocks">Clocks</button>
+	</div>
+
+
+	<form method="dialog" data-for-tab="status" data-active>
+		<div data-controls>
+			<button type="button" command="--refresh-status">Refresh ⏰</button>
+			<button type="button" command="--reset-pll-a">Reset PLL A</button>
+			<button type="button" command="--reset-pll-b">Reset PLL B</button>
+			<button type="button" command="--disable-all">Disable All</button>
+			<button type="button" command="--power-down-all">Power Down All</button>
+		</div>
+
+		<fieldset>
+			<label>Revision</label>
+			<output name="Revision"></output>
+
+			<label>Initializing</label>
+			<output name="Initializing"></output>
+
+			<label>Loss of Lock PLL A</label>
+			<output name="LOLA"></output>
+
+			<label>Loss of Lock PLL B</label>
+			<output name="LOLB"></output>
+
+			<label>Loss of Signal</label>
+			<output name="LOS"></output>
+		</fieldset>
+
+		<fieldset>
+			<legend>Sticky</legend>
+
+			<label>Calibration</label>
+			<div data-input-with-control>
+				<output name="Calibration"></output>
+				<button type="button" command="--clear-sticky" data-sticky="calibration">Clear</button>
+			</div>
+
+			<label>Loss of Lock PLL A</label>
+			<div data-input-with-control>
+				<output name="StickyLOLA"></output>
+				<button type="button" command="--clear-sticky" data-sticky="lolA">Clear</button>
+			</div>
+
+			<label>Loss of Lock PLL B</label>
+			<div data-input-with-control>
+				<output name="StickyLOLB"></output>
+				<button type="button" command="--clear-sticky" data-sticky="lolB">Clear</button>
+			</div>
+
+			<label>Loss of Signal</label>
+			<div data-input-with-control>
+				<output name="StickyLOS"></output>
+				<button type="button" command="--clear-sticky" data-sticky="los">Clear</button>
+			</div>
+		</fieldset>
+	</form>
+
+	<form data-for-tab="config">
+		<fieldset>
+			<label>Crystal Load Capacitance</label>
+			<select name="CrystalCapacitance">
+				<option value="1">6 pF</option>
+				<option value="2">8 pF</option>
+				<option value="3">10 pF</option>
+			</select>
+		</fieldset>
+
+		<fieldset>
+			<legend>Interrupt Mask</legend>
+
+			<label>System Initializing</label>
+			<input name="InterruptMaskSystemInitializing" type="checkbox">
+
+			<label>Loss of Lock PLL A</label>
+			<input name="InterruptMaskLossOfLockPLLA" type="checkbox">
+
+			<label>Loss of Lock PLL A</label>
+			<input name="InterruptMaskLossOfLockPLLB" type="checkbox">
+
+			<label>Loss of Signal</label>
+			<input name="InterruptMaskLossOfSignal" type="checkbox">
+		</fieldset>
+
+		<fieldset>
+			<legend>PLL Input Source</legend>
+
+			<label>PLL A</label>
+			<select name="InputSourcePLLA">
+				<option value="0">Oscillator (XTAL)</option>
+				<option value="1">Clock In (CLKIN)</option>
+			</select>
+
+			<label>PLL B</label>
+			<select name="InputSourcePLLB">
+				<option value="0">Oscillator (XTAL)</option>
+				<option value="1">Clock In (CLKIN)</option>
+			</select>
+		</fieldset>
+	</form>
+
+	<div data-for-tab="clocks">
+		<form method="dialog">
+			<fieldset>
+				<label>Select Clock</label>
+				<select name="SelectClock">
+					<option value="0" selected>Clock 0</option>
+					<option value="1">Clock 1</option>
+					<option value="2">Clock 2</option>
+					<option value="3">Clock 3</option>
+					<option value="4">Clock 4</option>
+					<option value="5">Clock 5</option>
+					<option value="6">Clock 6</option>
+					<option value="7">Clock 7</option>
+				</select>
+			</fieldset>
+
+			<fieldset>
+				<label>Output Enable</label>
+				<input name="ClockOutputEnabled" type="checkbox" >
+
+				<label>PIN Controlled</label>
+				<input name="ClockPINControl" type="checkbox" >
+
+				<label>Disable State</label>
+				<select name="ClockDisableState">
+					<option value="0">Low</option>
+					<option value="1">High</option>
+					<option value="2">High Impedance</option>
+					<option value="3">Never</option>
+				</select>
+
+				<div data-phase-offset>
+					<label>Phase Offset</label>
+					<input name="ClockPhaseOffset" type="number" min="0" max="127">
+				</div>
+			</fieldset>
+
+			<fieldset>
+				<legend>Control</legend>
+
+				<label>Power Down</label>
+				<input name="ClockPowerDown" type="checkbox">
+
+				<label>Mode</label>
+				<select name="ClockMode">
+					<option value="true">Integer</option>
+					<option value="false">Fractional Division</option>
+				</select>
+
+				<label>MultiSynth Source</label>
+				<select name="ClockMultiSynthSource">
+					<option value="0">PLL A</option>
+					<option value="1">PLL B or VCXO</option>
+				</select>
+
+				<label>Inverted</label>
+				<input name="ClockInverted" type="checkbox">
+
+				<label>Input Source</label>
+				<select name="ClockInputSource">
+					<option value="0">Oscillator (XTAL)</option>
+					<option value="1">Clock In (CLKIN)</option>
+					<!-- option value="2">Reserved</option -->
+					<option value="3">MultiSynth</option>
+				</select>
+
+				<label>Strength</label>
+				<select name="ClockStrength">
+					<option value="0">2 mA</option>
+					<option value="1">4 mA</option>
+					<option value="2">6 mA</option>
+					<option value="3">8 mA</option>
+				</select>
+			</fieldset>
+
+			<fieldset>
+				<legend>Parameters</legend>
+
+				<label>P1 (integer part of divider)</label>
+				<input name="ParameterP1" type="number" min="0">
+
+				<div data-extended-parameters>
+					<label>P2 (numerator of fractional part of divider)</label>
+					<input name="ParameterP2" type="number" min="0">
+
+					<label>P3 (denominator of fractional part of divider)</label>
+					<input name="ParameterP3" type="number" min="0">
+				</div>
+
+				<label>Divider</label>
+				<select name="ParameterDivider">
+					<option value="0">Divide by 1</option>
+					<option value="1">Divide by 2</option>
+					<option value="2">Divide by 4</option>
+					<option value="3">Divide by 8</option>
+					<option value="4">Divide by 16</option>
+					<option value="5">Divide by 32</option>
+					<option value="6">Divide by 64</option>
+					<option value="7">Divide by 128</option>
+				</select>
+			</fieldset>
+		</form>
+	</div>
+</si5351-config>

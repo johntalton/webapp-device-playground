@@ -1,0 +1,209 @@
+<generic-eeprom-config>
+	<div class="tabs">
+		<button data-tab="config" data-active>Config</button>
+		<button data-tab="PeekPoke">Peek/Poke</button>
+		<button data-tab="FS">FS</button>
+	</div>
+
+
+	<form data-for-tab="config" data-active method="dialog">
+		<select name="DeviceType">
+			<option>Manual</option>
+			<option disabled>Sparkfun QUIIC EEPROM 512 Kbit</option>
+			<option disabled>Adafruit 24LC32 I2C EEPROM Breakout - 32Kbit / 4 KB</option>
+		</select>
+
+		<fieldset>
+			<!-- legend -->
+
+			<label>Memory Size</label>
+			<select name="MemorySize">
+				<option value="32">32 K</option>
+				<option value="64">64 K</option>
+				<option value="128">128 K</option>
+				<option value="512">512 K</option>
+				<option value="1024">1 M</option>
+			</select>
+
+			<label>Write Buffer Size</label>
+			<select name="WriteBufferSize">
+				<option value="32">32 Bytes</option>
+				<option value="128">128 Bytes</option>
+			</select>
+
+			<label>Address Size</label>
+			<select name="AddressSize">
+				<option value="2">16-bit</option>
+				<option value="1">8-bit</option>
+			</select>
+
+			<!-- <label>Page Count</label>
+      <select>
+        <option>512</option>
+      </select>
+
+      <label>Bytes Per Page</label>
+      <select>
+        <option>128</option>
+      </select>
+
+      <label>Write Time (ms)</label>
+      <input type="number" value="5" />
+
+      -->
+
+		</fieldset>
+	</form>
+
+	<div data-for-tab="PeekPoke">
+		<form>
+			<fieldset>
+				<legend>Peek</legend>
+
+				<label>Address</label>
+				<div data-input-with-page-buttons>
+					<input name="PeekAddress" type="number" min="0" value="0">
+					<button type="button" command="--peek-address-up">⬆ Page Up</button>
+					<button type="button" command="--peek-address-down">⬇ Page Down</button>
+				</div>
+
+				<label>Length</label>
+				<input name="PeekLength" type="number" min="1" max="64" value="1">
+
+				<label>Type</label>
+				<select name="PeekType">
+					<option value="U8" selected>Unsigned 8-bit</option>
+					<option value="U16">Unsigned 16-bit</option>
+					<option value="U32">Unsigned 32-bit</option>
+					<option value="UTF8">UTF-8 String</option>
+				</select>
+
+				<label>Little Endian</label>
+				<input name="PeekLittleEndian" type="checkbox">
+
+				<button type="button" command="peek">Peek</button>
+			</fieldset>
+
+			<code>
+				<output name="PeekResults"></output>
+			</code>
+		</form>
+
+
+	</div>
+
+	<div data-for-tab="FS" data-selected-fs="">
+		<form method="dialog">
+			<fieldset>
+				<label>File System</label>
+				<select name="FileSystem">
+					<option value="none">-</option>
+					<option value="EEFS">NASA EEFS</option>
+					<option value="Cyclic">Cyclic</option>
+					<option value="LittleFS" disabled>LittleFS</option>
+					<option value="FAT-16" disabled>FAT-16</option>
+					<option value="FAT-32" disabled>FAT-32</option>
+				</select>
+			</fieldset>
+		</form>
+
+		<form data-for-fs="EEFS" method="dialog">
+			<fieldset>
+				<legend>Partition</legend>
+
+				<label>Base Address</label>
+				<input name="EEFSBaseAddress" type="number" min="0" value="0">
+
+				<label>File System Size</label>
+				<select name="EEFSSize">
+					<option>Full</option>
+
+				</select>
+			</fieldset>
+
+			<div data-controls>
+				<label>Upload file</label>
+				<div>
+					<input data-upload-file type="file" />
+					<button type="button">Upload 💾</button>
+				</div>
+
+				<button type="button" command="clear">Clear 🧼</button>
+				<button data-format-fs type="button">Format ☠️</button>
+				<button data-scan-fs type="button">Scan 🧐</button>
+				<button type="button" command="--eefs-load">Load from eeprom</button>
+				<button type="button" command="--eefs-store">Store to eeprom</button>
+			</div>
+
+
+			<fieldset>
+				<label>Free Space</label>
+				<output name=""></output>
+
+				<label>Total Size</label>
+				<output name=""></output>
+
+				<label>File Count</label>
+				<output name=""></output>
+			</fieldset>
+
+			<progress name="EEFSProgress" value="0"></progress>
+
+			<fs-display size="">
+				<fs-fat size="24"></fs-fat>
+				<fs-fat size="64"></fs-fat>
+				<fs-file size="64" filename=""></fs-file>
+				<fs-data></fs-data>
+				<fs-empty></fs-empty>
+			</fs-display>
+		</form>
+
+		<form data-for-fs="Cyclic">
+			<fieldset>
+				<legend>Partition</legend>
+
+				<label>Base Address</label>
+				<input type="number" min="0" value="0" />
+
+				<label>Size</label>
+				<div>
+					<select>
+						<option>Full</option>
+						<option>Custom</option>
+					</select>
+					<input type="number">
+				</div>
+
+				<label>Slot Size</label>
+				<input type="number" min="4" value="4" />
+
+				<label>Little Endian</label>
+				<input type="checkbox" />
+
+				<label>Full Scan</label>
+				<input type="checkbox" />
+			</fieldset>
+
+			<div data-controls>
+				<button type="button" command="clear">Clear 🧼</button>
+				<button type="button" command="--cyclic-list">List 📋</button>
+			</div>
+
+			<fs-display size="">
+				<fs-empty></fs-empty>
+				<fs-data></fs-data>
+				<fs-data></fs-data>
+				<fs-data></fs-data>
+				<fs-data></fs-data>
+			</fs-display>
+		</form>
+	</div>
+
+
+
+	<!-- <section data-fs>
+		<memory-map>
+
+		</memory-map>
+	</section> -->
+</generic-eeprom-config>

@@ -11,7 +11,7 @@ export class BasicBuilder {
 	/**
 	 * @param {string} title
 	 * @param {string} element
-	 * @param {typeof <T>} clazz
+	 * @param {typeof T} clazz
 	 */
 	constructor(title, element, clazz, definition, ui) {
 		this.#element = element
@@ -33,6 +33,7 @@ export class BasicBuilder {
 
 	/** @returns {T} */
 	get device() { return this.#device }
+	set device(d) { this.#device = d }
 
 	async bindCustomView(root) {
 		//

@@ -31,6 +31,9 @@ export class MCP2221UIBuilder {
 		return new MCP2221UIBuilder(hidDevice, ui, source)
 	}
 
+	/**
+	 * @param {HIDDevice} hidDevice
+	*/
 	constructor(hidDevice, ui, source) {
 		this.#hidDevice = hidDevice
 		this.#source = source
@@ -42,6 +45,7 @@ export class MCP2221UIBuilder {
 
 	async open() {
 		if(this.#hidDevice !== undefined) {
+			if(this.#hidDevice.opened) { throw new Error('HID Device already opened') }
 			await this.#hidDevice.open()
 			const source = new WebHIDStreamSource(this.#hidDevice)
 			this.#device = MCP2221A.from(source)

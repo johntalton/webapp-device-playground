@@ -13,17 +13,20 @@
     "@johntalton/aw9523": "^2.0.0",
     "@johntalton/bitsmush": "^1.0.2",
     "@johntalton/boschieu": "^6.0.1",
+    "@johntalton/cyclic-fs": "^1.0.0",
     "@johntalton/drv2605": "^2.1.0",
     "@johntalton/ds1841": "^2.0.0",
     "@johntalton/ds3231": "^1.1.1",
     "@johntalton/ds3502": "^5.0.0",
+    "@johntalton/eefs": "^2.0.0",
+    "@johntalton/eeprom": "^1.1.0",
     "@johntalton/excamera-i2cdriver": "^3.1.1",
     "@johntalton/ht16k33": "^1.1.1",
     "@johntalton/i2c-bus-excamera-i2cdriver": "^4.0.0",
     "@johntalton/i2c-bus-mcp2221": "^4.2.0",
     "@johntalton/i2c-bus-service": "https://github.com/johntalton/i2c-bus-service",
     "@johntalton/i2c-bus-tca9548a": "^3.0.1",
-    "@johntalton/i2c-port": "^4.0.0",
+    "@johntalton/i2c-port": "^4.0.1",
     "@johntalton/mcp2221": "^4.0.3",
     "@johntalton/mcp23": "^6.0.2",
     "@johntalton/ndef": "^1.0.1",
@@ -33,6 +36,10 @@
     "@johntalton/ssd1306": "^2.0.1",
     "@johntalton/st25dv": "^1.2.0",
     "@johntalton/tca9548a": "^5.1.1",
-    "@johntalton/tsl2591": "^1.0.1"
+    "@johntalton/tsl2591": "^1.0.1",
+    "@johntalton/si5351": "^1.0.0"
+  },
+  "devDependencies": {
+    "http-server": "^14.1.1"
   }
 }

@@ -1,20 +1,94 @@
-eeprom-config {
+generic-eeprom-config {
 	display: flex;
 	flex-direction: column;
 	margin-inline-end: 2em;
-	gap: 1em;
+	margin-block-end: 2em;
 
-	& fieldset {
-		padding: 1em;
-		display: flex;
+
+
+	& code:has([name="PeekResults"]){
+		grid-column: 1 / -1;
+		width: 100%;
+		border-width: 1px;
+		border-color: var(--color-accent--darker, red);
+		border-radius: 1em;
+		padding: 2em;
+	}
+
+
+	& [data-input-with-page-buttons] {
+		display: inline flex;
 		gap: 1em;
-		align-items: center;
-		flex-wrap: wrap;
+	}
+
+
+	& :where([data-selected-fs=""], [data-selected-fs="none"]) [data-for-fs] {
+		display: none;
+	}
+
+	& [data-selected-fs="EEFS"] [data-for-fs]:not([data-for-fs="EEFS"]) {
+		display: none;
+	}
+
+	& [data-selected-fs="Cyclic"] [data-for-fs]:not([data-for-fs="Cyclic"]) {
+		display: none;
+	}
+
+	& [data-controls] {
+		display: flex;
+		flex-direction: row;
+		gap: 1em;
+	}
+}
+
+fs-display {
+	--fs-color-fat: lightsteelblue;
+	--fs-color-empty: cadetblue;
+	--fs-color-file-header: cornflowerblue;
+	--fs-color-file-data: lightskyblue;
+	--fs-size: attr(size);
+
+
+	grid-column: 1 / -1;
+
+	width: 100%;
+	display: flex;
+	height: 4em;
+	margin-block: 2em;
+
+	/* background-color: white; */
+	/* border-radius: 1em; */
+
+	& :first-child {
+		border-radius: 1em 0 0 1em;
+	}
+
+	& :last-child {
+		border-radius: 0 1em 1em 0;
+	}
+
+	& > fs-fat {
+		background-color: var(--fs-color-fat);
+		width: attr(size %);
+	}
+
+	& > fs-file {
+		background-color: var(--fs-color-file-header);
+		width: 10%;
+	}
+
+	& > fs-data {
+		background-color: var(--fs-color-file-data);
+		width: 10%;
+	}
+
+	& > fs-empty {
+		background-color: white;
 	}
 }
 
 
-[data-memory-map] {
+memory-map {
 	display: flex;
 	flex-wrap: wrap;
 

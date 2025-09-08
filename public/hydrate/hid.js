@@ -1,3 +1,5 @@
+import { delayMs } from '../util/delay.js'
+
 // import { MCP2111_USB_FILTER } from '../devices-usb/mcp2111a.js'
 export const MCP2111_HID_FILTER = { vendorId: 1240, productId: 221 }
 
@@ -6,23 +8,45 @@ export const SUPPORTED_HID_FILTER = [
 	{ vendorId: 1240, productId: 220 } // for testing productId change feature
 ]
 
+
+
 /**
- * @param {Map} knownDevices
+ * @param {Map<string, any>} knownDevices
  */
 async function addHIDDevice(ui, device, knownDevices) {
-	if(knownDevices.has(device)) {
-		console.log('HID: re-adding existing paired device')
-		return
-	}
+	const key = `${device.vendorId}-${device.productId}`
 
-	console.log('HID: New')
+	console.log('HID: Lock', key)
+	const state = await navigator.locks.query()
+	console.log(state)
 
-	const controller = new AbortController()
-	const { signal } = controller
+	const { promise, resolve, reject } = Promise.withResolvers()
+	navigator.locks.request(key, { mode: 'exclusive', signal: AbortSignal.timeout(100) }, async lock => {
+		console.log('lock status', lock)
 
-	knownDevices.set(device, { controller })
 
-	return ui.addHIDDevice(device, signal)
+		if(knownDevices.has(key)) {
+			console.log('HID: re-adding existing paired device')
+			return
+		}
+
+		console.log('HID: New')
+
+		const controller = new AbortController()
+		const { signal } = controller
+		signal.addEventListener('abort', e => resolve(true))
+
+		knownDevices.set(key, { device, controller })
+
+		await ui.addHIDDevice(device, signal)
+
+
+		return promise
+	})
+	.catch(e => console.log('lock error', e))
+
+
+
 }
 
 async function hydrateHIDBackgroundDevices(addDevice) {
@@ -31,6 +55,9 @@ async function hydrateHIDBackgroundDevices(addDevice) {
 }
 
 
+/**
+ * @param {Map<string, any>} knownDevices
+ */
 async function hydrateHIDEvents(addDevice, knownDevices) {
 	navigator.hid.addEventListener('connect', event => {
 		const { device } = event
@@ -43,12 +70,15 @@ async function hydrateHIDEvents(addDevice, knownDevices) {
   navigator.hid.addEventListener('disconnect', event => {
 		const { device } = event
 
-		if(!knownDevices.has(device)) {
+		const key = `${device.vendorId}-${device.productId}`
+
+		if(!knownDevices.has(key)) {
 			console.log('Navigator.HID Disconnect Event: unknown device')
 			return
 		}
 
-		const { controller } = knownDevices.get(device)
+		const { controller } = knownDevices.get(key)
+		knownDevices.delete(key)
 		controller.abort('HID Disconnect')
 
 	})
@@ -80,3 +110,4 @@ export async function hydrateHID(requestHIDButton, ui) {
 		hydrateHIDRequestButton(requestHIDButton, add)
 	])
 }
+

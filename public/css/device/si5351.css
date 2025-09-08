@@ -1,0 +1,32 @@
+si5351-config {
+
+
+	& [data-controls] {
+		grid-column: 1 / -1;
+		display: flex;
+		flex-direction: row;
+		gap: 1em;
+	}
+
+	& [data-input-with-control] {
+		display: flex;
+		gap: 1em;
+		align-items: center;
+	}
+
+	& [data-phase-offset] {
+		display: contents;
+
+		&:not([data-active]) {
+			display: none;
+		}
+	}
+
+	& [data-extended-parameters] {
+		display: contents;
+
+		&:not([data-active]) {
+			display: none;
+		}
+	}
+}

@@ -21,6 +21,7 @@ import { DS3231Builder } from './ds3231.js'
 import { TSL2591Builder } from './tsl2591.js'
 import { AW9523Builder } from './aw9523.js'
 import { ST25DVUserBuilder, ST25DVSystemBuilder } from './st25dv.js'
+import { SI5351Builder } from './si5351.js'
 
 import {
 	HT16K33_INFO,
@@ -45,7 +46,8 @@ import {
 	TSL2591_INFO,
 	AW9523_INFO,
 	ST25DV_SYSTEM_INFO,
-	ST25DV_USER_INFO
+	ST25DV_USER_INFO,
+	SI5351_INFO
 } from './guesses.js'
 
 
@@ -75,6 +77,8 @@ const BY_NAME = {
 
 	[ST25DV_USER_INFO.name]: (definition, ui) => ST25DVUserBuilder.builder(definition, ui),
 	[ST25DV_SYSTEM_INFO.name]: (definition, ui) => ST25DVSystemBuilder.builder(definition, ui),
+
+	[SI5351_INFO.name]: (definition, ui) => SI5351Builder.builder(definition, ui),
 }
 
 export class I2CDeviceBuilderFactory {

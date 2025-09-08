@@ -82,6 +82,7 @@ export const AW9523_INFO = { addresses: [ 0x58 ], name: 'AW9523 (LED/GPIO)' }
 export const ST25DV_USER_INFO = { addresses: [ 0x53 ], name: 'st25dv16k-user' }
 export const ST25DV_SYSTEM_INFO = { addresses: [ 0x57 ], name: 'st25dv16k-system' }
 
+export const SI5351_INFO = { addresses: [ 0x60 ], name: 'SI5351 Clock' }
 
 
 export const I2C_GUESSES = [
@@ -115,6 +116,7 @@ export const I2C_GUESSES = [
 	{ addresses: [ ...range(0x50, 0x57) ], name: 'Adafruit 24LC32' },
 	{ addresses: [ ...range(0x50, 0x57) ], name: 'mb85rc' },
 	// 0x60
+	SI5351_INFO,
 	{ addresses: [ 0x62, 0x63 ], name: 'mcp4725a1'},
 	DS3231_INFO,
 	PCF_8523_INFO,
