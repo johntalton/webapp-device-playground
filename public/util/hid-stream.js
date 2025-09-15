@@ -2,6 +2,7 @@ import { delayMs } from "./delay.js"
 
 export const REPORT_ID = 0
 
+	/** @param {ReadableByteStreamController} controller  */
 function makeHandler(controller, supportBYOB = false) {
 	return event => {
 		const { reportId, data, device } = event
@@ -9,7 +10,7 @@ function makeHandler(controller, supportBYOB = false) {
 		// for now only report zero, until we return in buffer
 		if(reportId !== REPORT_ID) { controller.error('report id miss-match') }
 
-		if (supportBYOB && controller.byobRequest !== null) {
+		if (supportBYOB && controller.byobRequest !== null && controller.byobRequest.view !== null) {
 			const { view } = controller.byobRequest
 			const bytesRead = data.byteLength
 
@@ -32,13 +33,14 @@ function makeHandler(controller, supportBYOB = false) {
 }
 
 /**
- * @implements UnderlyingSource
+ * @implements UnderlyingByteSource
  */
 export class ReadableStreamUnderlyingSourceWebHID {
 	/** @type {ReadableStreamType} */
 	type = 'bytes'
 	autoAllocateChunkSize = undefined
 
+	/** @type {HIDDevice}  */
 	#hid
 	#handler
 	#closed = false

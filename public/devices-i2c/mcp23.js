@@ -56,6 +56,7 @@ const assertModeBank1Sequential = mode => assertMode(mode, BANK_1, true)
 
 class MCP23GuardedMode {
 	#mode
+	/**@type {MCP23} */
 	#mcp23
 
 	constructor(host, mode = MODE.INTERLACED_BLOCK) {
@@ -168,6 +169,7 @@ export class MCP23GuardedModeTransactional extends MCP23GuardedMode {
 
 export class MCP23Builder {
 	#abus
+	/**@type {MCP23GuardedMode} */
 	#device
 
 	static async builder(definition, ui) {

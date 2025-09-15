@@ -2,159 +2,369 @@
 <html>
 	<body>
 		<pcf8523-config lang="us-EN">
-			<details>
-				<summary part="summary">Control (1) Settings</summary>
+			<div class="tabs">
+				<button data-tab="Config" data-active>Config</button>
+				<button data-tab="Alarm">Alarm</button>
+				<button data-tab="Timers">Timers</button>
+				<button data-tab="Time">Time</button>
+			</div>
 
-				<form data-control1-form method="dialog" part="form">
-					<slot>
+			<div  data-for-tab="Config" data-active>
+				<div data-controls >
+					<button type="button" command="--refresh">Refresh</button>
+					<button type="button" command="--set-time">⏱️ Set Time</button>
+					<button type="button" command="--reset">⚡️ Reset</button>
+
+					<div data-accent>
+						<output name="Integrity"></output>
+						<output name="CurrentTime"></output>
+					</div>
+				</div>
+
+				<form method="dialog" name="FormControl1">
+					<fieldset>
+						<legend>Control 1</legend>
+
 						<label>Capacitor Selection</label>
-						<select name="capacitorSelection" data-capacitor-selection readonly>
+						<select name="capacitorSelection">
 							<option value="7pF">7 pF</option>
 							<option value="12.5pF">12.5 pF</option>
 						</select>
-					</slot>
 
-					<label>Oscillator Status</label>
-					<output data-stop></output>
+						<label>AM/PM Mode</label>
+						<input name="amPmMode" type="checkbox" />
 
-					<label>Mode</label>
-					<select name="ampm" data-ampm>
-						<option name="twelve" value="12">12 hour mode (AM/PM)</option>
-						<option name="twentyFour" value="24">24 hour mode</option>
+						<label>Second Interrupt Enabled</label>
+						<input name="secondInterruptEnabled" type="checkbox" />
+
+						<label>Alarm Interrupt Enabled</label>
+						<input name="alarmInterruptEnabled" type="checkbox"></input>
+
+						<label>Correction Interrupt Enabled</label>
+						<input name="correctionInterruptEnabled" type="checkbox"></input>
+					</fieldset>
+				</form>
+
+				<form method="dialog" name="FormControl2">
+					<fieldset>
+						<legend>Control 2</legend>
+
+						<label>Watchdog Timer A Interrupt</label>
+						<div data-output-with-control>
+							<output name="WatchdogFlag"></output>
+							<button type="button" command="--clear-interrupt" data-interrupt="watchdog">Clear</button>
+						</div>
+
+						<label>Countdown Timer A Interrupt</label>
+						<div data-output-with-control>
+							<output name="CountdownAFlag"></output>
+							<button type="button" command="--clear-interrupt" data-interrupt="countdownA">Clear</button>
+						</div>
+
+						<label>Countdown Timer B Interrupt</label>
+						<div data-output-with-control>
+							<output name="CountdownBFlag"></output>
+							<button type="button" command="--clear-interrupt" data-interrupt="countdownB">Clear</button>
+						</div>
+
+						<label>Second Interrupt</label>
+						<div data-output-with-control>
+							<output name="SecondFlag"></output>
+							<button type="button" command="--clear-interrupt" data-interrupt="second">Clear</button>
+						</div>
+
+						<label>Alarm Interrupt</label>
+						<div data-output-with-control>
+							<output name="AlarmFlag"></output>
+							<button type="button" command="--clear-interrupt" data-interrupt="alarm">Clear</button>
+						</div>
+
+						<label>Watchdog Timer A Interrupt Enabled</label>
+						<input name="WatchdogEnabled" type="checkbox"></input>
+
+						<label>Countdown Timer A Interrupt Enabled</label>
+						<input name="CountdownAEnabled" type="checkbox"></input>
+
+						<label>Countdown Timer B Interrupt Enabled</label>
+						<input name="CountdownBEnabled" type="checkbox"></input>
+					</fieldset>
+				</form>
+
+				<form method="dialog" name="FormControl3">
+					<fieldset>
+						<legend>Control 3</legend>
+
+						<label>Power Mode</label>
+						<fieldset data-power-mode>
+							<select name="PowerModeSwitchover">
+								<option value="true">Switch-over Enabled</option>
+								<option value="false">Switch-over Disabled</option>
+							</select>
+							<select name="PowerModeMode">
+								<option value="undefined" disabled>Vdd (only one power supply)</option>
+								<option value="true">Standard</option>
+								<option value="false">Direct</option>
+							</select>
+							<select name="PowerModeDetection">
+								<option value="true">Low Detection Enabled</option>
+								<option value="false">Low Detection Disabled</option>
+							</select>
+						</fieldset>
+
+						<label>Battery Switchover Interrupt</label>
+						<div data-output-with-control>
+							<output name="BatterySwitchoverFlag"></output>
+							<button type="button" command="--clear-interrupt" data-interrupt="batterySwitchover">Clear</button>
+						</div>
+
+						<label>Battery Status Low Interrupt</label>
+						<div data-output-with-control>
+							<output name="BatteryLowFlag"></output>
+						</div>
+
+						<label>Battery Switchover Interrupt Enabled</label>
+						<input name="BatterySwitchoverEnabled" type="checkbox"></input>
+
+						<label>Battery Status Low Interrupt Enabled</label>
+						<input name="BatteryLowEnabled" type="checkbox"></input>
+					</fieldset>
+				</form>
+
+				<form method="dialog" name="FormOffset">
+					<fieldset>
+						<legend>Offset</legend>
+
+						<label>Mode</label>
+						<select name="OffsetMode">
+							<option value="0">Once Every Two Hours</option>
+							<option value="1">Once Every Minute</option>
+						</select>
+
+						<label>Offset</label>
+						<div data-input-with-note>
+							<input name="OffsetValue" type="number" min="-64" max="63" />
+							<output name="OffsetPPM"></output>
+						</div>
+					</fieldset>
+				</form>
+			</div>
+
+			<form method="dialog" data-for-tab="Alarm">
+				<!-- <div data-controls>
+					<button command="--save-alarm">Set</button>
+				</div> -->
+
+				<fieldset>
+
+					<label>Enable Minute</label>
+					<input name="AlarmEnableMinute" type="checkbox" />
+
+					<label>Minute</label>
+					<input name="AlarmMinute" type="number" min="0" max="59" />
+
+					<label>Enable Hour</label>
+					<input name="AlarmEnableHour" type="checkbox" />
+
+					<label>Hour</label>
+					<input name="AlarmHour" type="number" min="0" max="23" />
+
+					<label>AM/PM</label>
+					<select name="AlarmAMPM">
+						<option value="24" disabled>24 hour mode</option>
+						<option value="am">AM</option>
+						<option value="pm">PM</option>
 					</select>
 
-					<label>Second Interrupt Enabled</label>
-					<input name="secondInterruptEnabled" data-second-interrupt-enabled type="checkbox" />
+					<label>Enable Day</label>
+					<input name="AlarmEnableDay" type="checkbox" />
 
-					<label>Alarm Interrupt Enabled</label>
-					<input name="alarmInterruptEnabled" data-alarm-interrupt-enabled type="checkbox"></input>
+					<label>Day</label>
+					<input name="AlarmDay" type="number" min="0" max="31" />
 
-					<label>Correction Interrupt Enabled</label>
-					<input name="correctionInterruptEnabled" data-correction-interrupt-enabled type="checkbox"></input>
+					<label>Enable Weekday</label>
+					<input name="AlarmEnableWeekday" type="checkbox" />
 
-					<button data-refresh-control1 type="button">refresh</button>
-					<button data-save-control1 type="submit" disabled>save</button>
-				</form>
-			</details>
-
-			<details>
-				<summary part="summary">Control (2) Settings</summary>
-
-				<form data-control2-form method="dialog" part="form">
-					<label>Watchdog Timer A Interrupt</label>
-					<output data-watchdog-flag></output>
-
-					<label>Countdown Timer A Interrupt</label>
-					<output data-countdownA-flag></output>
-
-					<label>Countdown Timer B Interrupt</label>
-					<output data-countdownB-flag></output>
-
-					<label>Second Interrupt</label>
-					<output data-second-flag></output>
-
-					<label>Alarm Interrupt</label>
-					<output data-alarm-flag></output>
-
-
-					<label>Watchdog Timer A Interrupt Enabled</label>
-					<input data-watchdog-enabled type="checkbox"></input>
-
-					<label>Countdown Timer A Interrupt Enabled</label>
-					<input data-countdownA-enabled type="checkbox"></input>
-
-					<label>Countdown Timer B Interrupt Enabled</label>
-					<input data-countdownB-enabled type="checkbox"></input>
-
-					<button data-refresh-control2 type="button">refresh (and clear watchdog)</button>
-					<button data-save-control2 disabled type="submit">save</button>
-				</form>
-			</details>
-
-			<details>
-				<summary part="summary">Control (3) Settings</summary>
-
-				<form method="dialog" part="form">
-					<label>Power Mode</label>
-
-					<fieldset>
-						<select disabled>
-							<option>switch-over enabled</option>
-							<option>switch-over disabled</option>
-						</select>
-						<select disabled>
-							<option>standard-mode</option>
-							<option>direct-mode</option>
-						</select>
-						<select disabled>
-							<option>detection enabled</option>
-							<option>detection disabled</option>
-						</select>
-					</fieldset>
-
-
-					<label>Battery Switchover Interrupt</label>
-					<output data-battery-switchover-flag></output>
-
-					<label>Battery Status Low Interrupt</label>
-					<output data-battery-low-flag></output>
-
-					<label>Battery Switchover Interrupt Enabled</label>
-					<input type="checkbox" disabled data-switchover-enable></input>
-
-					<label>Battery Status Low Interrupt Enabled</label>
-					<input type="checkbox" disabled data-status-low-enable></input>
-
-					<button data-refresh-control3>refresh</button>
-					<button disabled>save</button>
-				</form>
-			</details>
-
-			<details>
-				<summary part="summary">Offset Settings</summary>
-
-				<form method="dialog" part="form">
-					<button>refresh</button>
-					<button disabled>save</button>
-				</form>
-			</details>
-
-			<details>
-				<summary part="summary">Alarm Settings</summary>
-
-				<form method="dialog" part="form">
-					<button>refresh</button>
-					<button disabled>save</button>
-				</form>
-			</details>
-
-			<details>
-				<summary part="summary">Timer Settings</summary>
-
-				<form method="dialog" part="form">
-					<button data-refresh-timer>refresh</button>
-					<button disabled>save</button>
-				</form>
-			</details>
-
-			<details open>
-				<summary part="summary">Utilities</summary>
-
-				<form method="dialog" part="form">
-					<button data-poll-time>⏱️ Poll Time</button>
-					<button data-reset>⚡️ Reset</button>
-					<button data-toggle-oscillator--start>Start Oscillator</button>
-					<button data-toggle-oscillator--stop>Stop Oscillator</button>
-					<button data-set-time-now>Set Time Now</button>
-					<button data-on-battery-mode>Enable Battery and Monitor</button>
-				</form>
-			</details>
-
-			<form method="dialog">
-				<output data-display-integrity></output>
-				<output data-display-time></output>
+					<label>Weekday</label>
+					<select name="AlarmWeekday">
+						<option value="0">Sunday</option>
+						<option value="1">Monday</option>
+						<option value="2">Tuesday</option>
+						<option value="3">Wednesday</option>
+						<option value="4">Thursday</option>
+						<option value="5">Friday</option>
+						<option value="6">Saturday</option>
+					</select>
+				</fieldset>
 			</form>
 
+			<div data-for-tab="Timers">
+				<form method="dialog" name="FormTimerControl">
+					<fieldset>
+						<legend>Timer Control</legend>
+
+						<label>Interrupt A/Second Mode</label>
+						<select name="TimerAInterruptMode">
+							<option value="permanent">Permanent</option>
+							<option value="pulse">Pulse</option>
+						</select>
+
+						<label>Interrupt B Mode</label>
+						<select name="TimerBInterruptMode">
+							<option value="permanent">Permanent</option>
+							<option value="pulse">Pulse</option>
+						</select>
+
+						<label>Clock Frequency</label>
+						<select name="TimerClockFrequency">
+							<option value="0">32768 Hz</option>
+							<option value="1">16384 Hz</option>
+							<option value="2">8192 Hz</option>
+							<option value="3">4096 Hz</option>
+							<option value="4">1024 Hz</option>
+							<option value="5">32 Hz</option>
+							<option value="6">1 Hz</option>
+							<option value="7">Disabled</option>
+						</select>
+
+						<label>Timer A Configuration</label>
+						<select name="TimerAConfiguration">
+							<option value="0">Disabled</option>
+							<option value="1">Countdown</option>
+							<option value="2">Watchdog</option>
+							<!-- <option value="3">Disabled (alt)</option> -->
+						</select>
+
+						<label>Timer B Configuration</label>
+						<select name="TimerBConfiguration">
+							<option value="false">Disabled</option>
+							<option value="true">Countdown</option>
+						</select>
+					</fieldset>
+				</form>
+
+				<form method="dialog">
+					<fieldset>
+						<legend>Timer A</legend>
+
+						<label>Source Clock</label>
+						<select name="TimerASourceClock">
+							<option value="0">4.096 kHz</option>
+							<option value="1">64 Hz</option>
+							<option value="2">1 Hz</option>
+							<option value="3"><sup>1</sup> &frasl; <sub>60</sub> Hz</option>
+							<option value="4" disabled><sup>1</sup> &frasl; <sub>3600</sub>Hz</option>
+							<!-- <option value="5"><sup>1</sup> &frasl; <sub>3600</sub>Hz</option> -->
+							<option value="6" disabled><sup>1</sup> &frasl; <sub>3600</sub>Hz</option>
+							<option value="7"><sup>1</sup> &frasl; <sub>3600</sub>Hz</option>
+						</select>
+
+						<label>Value</label>
+						<div>
+							<input name="TimerAValue" type="number" min="0" max="255" />
+							<output name="TimerAValueSeconds"></output>
+						</div>
+
+					</fieldset>
+				</form>
+
+				<form method="dialog">
+					<fieldset>
+						<legend>Timer B</legend>
+
+						<label>Source Clock</label>
+						<select name="TimerBSourceClock">
+							<option value="0">4.096 kHz</option>
+							<option value="1">64 Hz</option>
+							<option value="2">1 Hz</option>
+							<option value="3"><sup>1</sup> &frasl; <sub>60</sub> Hz</option>
+							<option value="4" disabled><sup>1</sup> &frasl; <sub>3600</sub>Hz</option>
+							<!-- <option value="5"><sup>1</sup> &frasl; <sub>3600</sub>Hz</option> -->
+							<option value="6" disabled><sup>1</sup> &frasl; <sub>3600</sub>Hz</option>
+							<option value="7"><sup>1</sup> &frasl; <sub>3600</sub>Hz</option>
+						</select>
+
+						<label>Value</label>
+						<div>
+							<input name="TimerBValue" type="number" min="0" max="255" />
+							<output name="TimerBValueSeconds"></output>
+						</div>
+
+						<label>Pulse Width</label>
+						<select name="TimerBPulseWidth">
+							<option value="0">46.875 ms</option>
+							<option value="1">62.500 ms</option>
+							<option value="2">78.125 ms</option>
+							<option value="3">93.750 ms</option>
+							<option value="4">125.000 ms</option>
+							<option value="5">156.250 ms</option>
+							<option value="6">187.500 ms</option>
+							<option value="7">218.750 ms</option>
+						</select>
+					</fieldset>
+				</form>
+			</div>
+
+			<form method="dialog" data-for-tab="Time">
+				<div data-controls>
+					<button type="button" command="--refresh-time-only">⏰ Refresh</button>
+				</div>
+				<fieldset>
+					<legend>Interpreted As:</legend>
+
+					<label>Time</label>
+					<output name="TimeAsDefault"></output>
+
+					<label>Local Time</label>
+					<output name="TimeAsLocal"></output>
+
+					<label>UTC Time</label>
+					<output name="TimeAsUTC"></output>
+				</fieldset>
+
+				<fieldset>
+					<legend>Raw</legend>
+
+					<label>Integrity</label>
+					<output name="TimeIntegrity"></output>
+
+					<label>Year</label>
+					<output name="TimeYear"></output>
+
+					<label>Month</label>
+					<output name="TimeMonth"></output>
+
+					<label>Day</label>
+					<output name="TimeDay"></output>
+
+					<label>Weekday</label>
+					<output name="TimeWeekday"></output>
+
+					<label>Hour</label>
+					<output name="TimeHour"></output>
+
+					<label>Minute</label>
+					<output name="TimeMinute"></output>
+
+					<label>Second</label>
+					<output name="TimeSecond"></output>
+
+				</fieldset>
+			</form>
+
+
+
+
+
+
+
+
+
+
+<!--
+
+					<button data-toggle-oscillator--start>Start Oscillator</button>
+					<button data-toggle-oscillator--stop>Stop Oscillator</button>
+		-->
 		</pcf8523-config>
 	</body>
 </html>

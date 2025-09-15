@@ -6,6 +6,7 @@ export class BasicBuilder {
 	#clazz
 	#element
 	#abus
+	/** @type {T|undefined} */
 	#device
 
 	/**
@@ -32,13 +33,22 @@ export class BasicBuilder {
 	signature() { }
 
 	/** @returns {T} */
-	get device() { return this.#device }
+	get device() {
+		if(this.#device === undefined) { throw new Error('device is undefined') }
+		return this.#device
+	}
 	set device(d) { this.#device = d }
 
+	/**
+	 * @param {Element} root
+	 */
 	async bindCustomView(root) {
 		//
 	}
 
+	/**
+	 * @param {Element} selectionElem
+	 */
 	async buildCustomView(selectionElem) {
 		const response = await fetch(`./custom-elements/${this.#element}.html`)
 		if (!response.ok) { throw new Error('no html for view') }

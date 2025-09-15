@@ -505,8 +505,59 @@ html {
 		}
 	}
 
-	pcf8523-config {
+	/* pcf8523-config {
     & form {
+			background-color: var(--color-glass);
+		}
+	} */
+
+	mcp23-config {
+
+		& div[data-port] {
+
+			& ul {
+				background-color: var(--color-glass);
+
+				& > li button {
+        	&[data-active]:not(:hover) {
+						background-color: var(--color-accent);
+						color: var(--color-accent--lighter-text);
+					}
+				}
+			}
+		}
+	}
+
+	aw9523-config {
+		& details {
+
+			& > summary {
+				color: light-dark(black, white);
+			}
+
+			&[open] {
+				background-color: initial;
+			}
+
+			&:not([open]) > summary {
+				&:hover {
+					background-color: var(--color-accent);
+
+				}
+			}
+		}
+	}
+
+	ds1841-config {
+		& ol[data-lut-list] {
+			& li {
+				background-color: var(--color-glass);
+			}
+		}
+	}
+
+	pcf8574-config {
+    & > form {
 			background-color: var(--color-glass);
 		}
 	}

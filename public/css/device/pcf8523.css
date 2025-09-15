@@ -1,13 +1,61 @@
 pcf8523-config {
-	& details > summary {
+
+
+	& [data-controls] {
+		grid-column: 1/-1;
+		width: 100%;
+
+		display: flex;
+		flex-direction: row;
+		gap: 1em;
+		padding-inline: 2em;
+		padding-block-start: 2em;
+		padding-block-end: 1em;
+
+		align-items: center;
+
+		/* background-color: var(--color-accent--lightest, red); */
+    color: var(--color-accent--lightest-text, red);
+
+
+		& > [data-accent]:last-child {
+			display: flex;
+			flex-grow: 1;
+			gap: 1em;
+    	justify-content: end;
+		}
+	}
+
+	& [data-output-with-control] {
+		display: flex;
+		gap: 1em;
+		align-items: center;
+	}
+
+	& [data-input-with-note] {
+		display: flex;
+		gap: 1em;
+		align-items: center;
+	}
+
+	& fieldset[data-power-mode] {
+		display: flex;
+		flex-direction: row;
+		gap: 1em;
+	}
+
+
+
+
+	/* & details > summary {
 		display: block;
 		cursor: pointer;
 
 		font-size: 1.5em;
 		margin-block: .5em;
-	}
+	} */
 
-	& form {
+	/* & form {
 		border-radius: 1em;
 		margin-block-end: 0.5em;
 		margin-inline-end: 1em;
@@ -17,13 +65,13 @@ pcf8523-config {
 		background-color: var(--color-accent--lightest, red);
   	color: var(--color-accent--lightest-text, red);
 
-	}
+	} */
 
-	& fieldset {
+	/* & fieldset {
 		display: flex;
 		flex-direction: row;
 		gap: 1em;
 		justify-content: space-between;
 		border: none;
-	}
+	} */
 }

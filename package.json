@@ -5,7 +5,7 @@
     "server": "http-server --port 8080 --cors --brotli -c-1 --proxy http://localhost/api ."
   },
   "dependencies": {
-    "@johntalton/adt7410": "^2.0.0",
+    "@johntalton/adt7410": "^2.0.1",
     "@johntalton/adxl375": "^1.0.0",
     "@johntalton/aht20": "^1.2.1",
     "@johntalton/am2320": "^1.0.0",
@@ -31,7 +31,7 @@
     "@johntalton/mcp23": "^6.0.2",
     "@johntalton/ndef": "^1.0.1",
     "@johntalton/pca9536": "^1.0.2",
-    "@johntalton/pcf8523": "^2.0.2",
+    "@johntalton/pcf8523": "2.1.0",
     "@johntalton/pcf8574": "^2.1.0",
     "@johntalton/ssd1306": "^2.0.1",
     "@johntalton/st25dv": "^1.2.0",
