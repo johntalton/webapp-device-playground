@@ -31,7 +31,7 @@
     "@johntalton/mcp23": "^6.0.2",
     "@johntalton/ndef": "^1.0.1",
     "@johntalton/pca9536": "^1.0.2",
-    "@johntalton/pcf8523": "2.1.0",
+    "@johntalton/pcf8523": "^2.1.1",
     "@johntalton/pcf8574": "^2.1.0",
     "@johntalton/ssd1306": "^2.0.1",
     "@johntalton/st25dv": "^1.2.0",

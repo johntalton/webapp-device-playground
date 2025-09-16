@@ -1,5 +1,5 @@
 
-import { PCF8523, BASE_CENTURY_Y2K, decodeTimeToDate, encodeTimeFromDate } from '@johntalton/pcf8523'
+import { PCF8523, BASE_CENTURY_Y2K, decodeTimeToDate, encodeTimeFromDate, timerValueToUnit } from '@johntalton/pcf8523'
 import { BasicBuilder } from './builder.js'
 import { bindTabRoot } from '../util/tabs.js'
 import { asyncEvent } from '../util/async-event.js'
@@ -89,11 +89,11 @@ export class PCF8523Builder extends BasicBuilder {
 		//
 		const timerASourceClockSelect = elem(root, 'select[name="TimerASourceClock"]', HTMLSelectElement)
 		const timerAValueNumber = elem(root, 'input[name="TimerAValue"]', HTMLInputElement)
-		const timerAValueSecondsOutput = elem(root, 'output[name="TimerAValueSeconds"]', HTMLOutputElement)
+		const timerAValueUintOutput = elem(root, 'output[name="TimerAValueUnit"]', HTMLOutputElement)
 		const timerBSourceClockSelect = elem(root, 'select[name="TimerBSourceClock"]', HTMLSelectElement)
 		const timerBPulseWidthSelect = elem(root, 'select[name="TimerBPulseWidth"]', HTMLSelectElement)
 		const timerBValueNumber = elem(root, 'input[name="TimerBValue"]', HTMLInputElement)
-		const timerBValueSecondsOutput = elem(root, 'output[name="TimerBValueSeconds"]', HTMLOutputElement)
+		const timerBValueUnitOutput = elem(root, 'output[name="TimerBValueUnit"]', HTMLOutputElement)
 
 		//
 		const timeAsDefaultOutput = elem(root, 'output[name="TimeAsDefault"]', HTMLOutputElement)
@@ -293,9 +293,13 @@ export class PCF8523Builder extends BasicBuilder {
 			} = await this.device.getTimerAControl()
 			const aValue = await this.device.getTimerAValue()
 
+			const human = timerValueToUnit(sourceClock, aValue)
+			const preferredUnit = human.preferred[human.preferred.length - 1]
+			const preferred = human[preferredUnit]
+
 			timerASourceClockSelect.value = `${sourceClock}`
 			timerAValueNumber.valueAsNumber = aValue
-			// timerAValueSecondsOutput.value =
+			timerAValueUintOutput.value = `${preferred} ${preferredUnit}`
 		}
 
 		const refreshTimerB = async () => {
@@ -305,9 +309,13 @@ export class PCF8523Builder extends BasicBuilder {
 			} = await this.device.getTimerBControl()
 			const bValue = await this.device.getTimerBValue()
 
+			const human = timerValueToUnit(sourceClock, bValue)
+			const preferredUnit = human.preferred[human.preferred.length - 1]
+			const preferred = human[preferredUnit]
+
 			timerBSourceClockSelect.value = `${sourceClock}`
 			timerBValueNumber.valueAsNumber = bValue
-			// timerBValueSecondsOutput.value =
+			timerBValueUnitOutput.value = `${preferred} ${preferredUnit}`
 
 			timerBPulseWidthSelect.value = `${pulseWidth}`
 		}
