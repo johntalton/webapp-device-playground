@@ -25,6 +25,9 @@ function elem(root, query, type) {
  * @extends {BasicBuilder<PCF8523>}
  */
 export class PCF8523Builder extends BasicBuilder {
+	#ampm_mode = false
+	#century = BASE_CENTURY_Y2K
+
 	static async builder(definition, ui) {
 		return new PCF8523Builder(definition, ui)
 	}
@@ -37,13 +40,11 @@ export class PCF8523Builder extends BasicBuilder {
 	 * @param {Element} root
 	 */
 	async bindCustomView(root) {
-		const century = BASE_CENTURY_Y2K
-		const ampm_mode = false
-
 		//
 		const configTimeOutput = elem(root, 'output[name="CurrentTime"]', HTMLOutputElement)
 		const configTimeIntegrityOutput = elem(root, 'output[name="Integrity"]', HTMLOutputElement)
 		//
+		const oscillatorStatusOutput = elem(root, 'output[name="OscillatorStatus"]', HTMLOutputElement)
 		const capacitorSelectionSelect = elem(root, 'select[name="capacitorSelection"]', HTMLSelectElement)
 		const amPmModeCheckbox = elem(root, 'input[name="amPmMode"]', HTMLInputElement)
 		const secondInterruptEnabledCheckbox = elem(root, 'input[name="secondInterruptEnabled"]', HTMLInputElement)
@@ -88,17 +89,18 @@ export class PCF8523Builder extends BasicBuilder {
 		const timerBConfigurationSelect = elem(root, 'select[name="TimerBConfiguration"]', HTMLSelectElement)
 		//
 		const timerASourceClockSelect = elem(root, 'select[name="TimerASourceClock"]', HTMLSelectElement)
-		const timerAValueNumber = elem(root, 'input[name="TimerAValue"]', HTMLInputElement)
-		const timerAValueUintOutput = elem(root, 'output[name="TimerAValueUnit"]', HTMLOutputElement)
+		const timerAProposedValueNumber = elem(root, 'input[name="TimerAProposedValue"]', HTMLInputElement)
+		const timerAProposedValueUintOutput = elem(root, 'output[name="TimerAProposedValueUnit"]', HTMLOutputElement)
 		const timerBSourceClockSelect = elem(root, 'select[name="TimerBSourceClock"]', HTMLSelectElement)
 		const timerBPulseWidthSelect = elem(root, 'select[name="TimerBPulseWidth"]', HTMLSelectElement)
-		const timerBValueNumber = elem(root, 'input[name="TimerBValue"]', HTMLInputElement)
-		const timerBValueUnitOutput = elem(root, 'output[name="TimerBValueUnit"]', HTMLOutputElement)
+		const timerBProposedValueNumber = elem(root, 'input[name="TimerBProposedValue"]', HTMLInputElement)
+		const timerBProposedValueUnitOutput = elem(root, 'output[name="TimerBProposedValueUnit"]', HTMLOutputElement)
 
 		//
 		const timeAsDefaultOutput = elem(root, 'output[name="TimeAsDefault"]', HTMLOutputElement)
 		const timeAsLocalOutput = elem(root, 'output[name="TimeAsLocal"]', HTMLOutputElement)
 		const timeAsUTCOutput = elem(root, 'output[name="TimeAsUTC"]', HTMLOutputElement)
+		const timeAsISOOutput = elem(root, 'output[name="TimeAsISO"]', HTMLOutputElement)
 		const timeIntegrityOutput = elem(root, 'output[name="TimeIntegrity"]', HTMLOutputElement)
 		const timeYearOutput = elem(root, 'output[name="TimeYear"]', HTMLOutputElement)
 		const timeMonthOutput = elem(root, 'output[name="TimeMonth"]', HTMLOutputElement)
@@ -109,7 +111,7 @@ export class PCF8523Builder extends BasicBuilder {
 		const timeSecondOutput = elem(root, 'output[name="TimeSecond"]', HTMLOutputElement)
 
 		const refreshTime_Full = async (/** @type {Time|undefined} */ fromTime = undefined) => {
-			const time = fromTime ?? await this.device.getTime()
+			const time = fromTime ?? await this.device.getTime(this.#ampm_mode, this.#century)
 			const {
 				second,
 				minute,
@@ -129,6 +131,7 @@ export class PCF8523Builder extends BasicBuilder {
 			timeAsDefaultOutput.value = date.toString()
 			timeAsLocalOutput.value = date.toLocaleString()
 			timeAsUTCOutput.value = date.toUTCString()
+			timeAsISOOutput.value = date.toISOString()
 
 			timeIntegrityOutput.value = `${integrity}`
 			timeYearOutput.value = `${year4digit}`
@@ -141,15 +144,15 @@ export class PCF8523Builder extends BasicBuilder {
 		}
 
 		const refreshTime_Config = async (/** @type {Time|undefined} */ fromTime = undefined) => {
-			const time = fromTime ?? await this.device.getTime(ampm_mode, century)
+			const time = fromTime ?? await this.device.getTime(this.#ampm_mode, this.#century)
 			const date = decodeTimeToDate(time)
 
 			configTimeIntegrityOutput.value = time.integrity ? '👍' : '👎'
-			configTimeOutput.value = date.toString()//date.toUTCString() //date.toLocaleString('en-US')
+			configTimeOutput.value = date.toLocaleString() //date.toUTCString() //date.toString()
 		}
 
 		const refreshTime_All = async () => {
-			const time = await this.device.getTime()
+			const time = await this.device.getTime(this.#ampm_mode, this.#century)
 			await refreshTime_Config(time)
 			await refreshTime_Full(time)
 		}
@@ -170,7 +173,10 @@ export class PCF8523Builder extends BasicBuilder {
 			alarmInterruptEnabledCheckbox.checked = alarmInterruptEnabled
 			correctionInterruptEnabledCheckbox.checked = correctionInterruptEnabled
 
-			console.log('control1 stop', stop)
+			oscillatorStatusOutput.value = `${stop ? 'Stopped' : 'Oscillating'}`
+
+			// refresh from current mode
+			this.#ampm_mode = ampm
 		}
 
 		const refreshControl2 = async () => {
@@ -233,7 +239,7 @@ export class PCF8523Builder extends BasicBuilder {
 		}
 
 		const refreshConfig = async () => {
-			await refreshTime_Config()
+			await refreshTime_All()
 			await refreshControl1()
 			await refreshControl2()
 			await refreshControl3()
@@ -251,9 +257,9 @@ export class PCF8523Builder extends BasicBuilder {
 				day,
 				weekdayEnabled,
 				weekdayValue,
-			} = await this.device.getAlarm(ampm_mode)
+			} = await this.device.getAlarm(this.#ampm_mode)
 
-			alarmAMPMSelect.disabled = !ampm_mode
+			alarmAMPMSelect.disabled = !this.#ampm_mode
 
 			alarmMinuteNumber.disabled = !minuteEnabled
 			alarmHourNumber.disabled = !hourEnabled
@@ -264,7 +270,7 @@ export class PCF8523Builder extends BasicBuilder {
 			alarmMinuteNumber.valueAsNumber = minute
 			alarmEnableHourCheckbox.checked = hourEnabled
 			alarmHourNumber.valueAsNumber = hour
-			alarmAMPMSelect.value = ampm_mode ? (pm ? 'pm' : 'am') : '24'
+			alarmAMPMSelect.value = this.#ampm_mode ? (pm ? 'pm' : 'am') : '24'
 			alarmEnableDayCheckbox.checked = dayEnabled
 			alarmDayNumber.valueAsNumber = day
 			alarmEnableWeekdayCheckbox.checked = weekdayEnabled
@@ -287,43 +293,55 @@ export class PCF8523Builder extends BasicBuilder {
 			timerBConfigurationSelect.value = countdownTimerBEnabled ? 'true' : 'false'
 		}
 
-		const refreshTimerA = async () => {
+		const refreshTimerAControl = async () => {
 			const {
 				sourceClock
 			} = await this.device.getTimerAControl()
-			const aValue = await this.device.getTimerAValue()
+
+			timerASourceClockSelect.value = `${sourceClock}`
+		}
+
+		const refreshTimerAProposed = async () => {
+			const sourceClock = parseInt(timerASourceClockSelect.value)
+			const aValue = timerAProposedValueNumber.valueAsNumber
 
 			const human = timerValueToUnit(sourceClock, aValue)
 			const preferredUnit = human.preferred[human.preferred.length - 1]
 			const preferred = human[preferredUnit]
 
-			timerASourceClockSelect.value = `${sourceClock}`
-			timerAValueNumber.valueAsNumber = aValue
-			timerAValueUintOutput.value = `${preferred} ${preferredUnit}`
+			timerAProposedValueNumber.valueAsNumber = aValue
+			timerAProposedValueUintOutput.value = `${preferred} ${preferredUnit}`
 		}
 
-		const refreshTimerB = async () => {
+		const refreshTimerBControl = async () => {
 			const {
 				sourceClock,
 				pulseWidth
 			} = await this.device.getTimerBControl()
-			const bValue = await this.device.getTimerBValue()
+
+			timerBSourceClockSelect.value = `${sourceClock}`
+			timerBPulseWidthSelect.value = `${pulseWidth}`
+		}
+
+		const refreshTimerBProposed = async () => {
+			const sourceClock = parseInt(timerBSourceClockSelect.value)
+			const bValue = timerBProposedValueNumber.valueAsNumber
 
 			const human = timerValueToUnit(sourceClock, bValue)
 			const preferredUnit = human.preferred[human.preferred.length - 1]
 			const preferred = human[preferredUnit]
 
-			timerBSourceClockSelect.value = `${sourceClock}`
-			timerBValueNumber.valueAsNumber = bValue
-			timerBValueUnitOutput.value = `${preferred} ${preferredUnit}`
+			timerBProposedValueNumber.valueAsNumber = bValue
+			timerBProposedValueUnitOutput.value = `${preferred} ${preferredUnit}`
 
-			timerBPulseWidthSelect.value = `${pulseWidth}`
 		}
 
 		const refreshTimers = async () => {
 			await refreshTimerControl()
-			await refreshTimerA()
-			await refreshTimerB()
+			await refreshTimerAControl()
+			await refreshTimerBControl()
+			await refreshTimerAProposed()
+			await refreshTimerBProposed()
 		}
 
 		const refreshAll = async () => {
@@ -385,7 +403,10 @@ export class PCF8523Builder extends BasicBuilder {
 		}
 
 		const updateTimerAValue = async () => {
-			await this.device.setTimerAValue(timerAValueNumber.valueAsNumber)
+			await this.device.setTimerAValue(timerAProposedValueNumber.valueAsNumber)
+
+			const value = await this.device.getTimerAValue()
+			console.log('timer A value', value)
 		}
 
 
@@ -397,7 +418,10 @@ export class PCF8523Builder extends BasicBuilder {
 		}
 
 		const updateTimerBValue = async () => {
-			await this.device.setTimerBValue(timerBValueNumber.valueAsNumber)
+			await this.device.setTimerBValue(timerBProposedValueNumber.valueAsNumber)
+
+			const value = await this.device.getTimerBValue()
+			console.log('timer B value', value)
 		}
 
 
@@ -412,7 +436,7 @@ export class PCF8523Builder extends BasicBuilder {
 			await this.device.setAlarmHour({
 				hour: alarmHourNumber.valueAsNumber,
 				hourEnabled: alarmEnableHourCheckbox.checked
-			})
+			}, this.#ampm_mode)
 		}
 
 		const updateAlarmDay = async () => {
@@ -429,6 +453,13 @@ export class PCF8523Builder extends BasicBuilder {
 			})
 		}
 
+		const updateOscillator = async (/** @type {boolean} */ stop) => {
+			const control = await this.device.getControl1()
+			await this.device.setControl1({
+				...control,
+				stop
+			})
+		}
 
 
 		const clearButtons = root.querySelectorAll('button[command="--clear-interrupt"]')
@@ -437,7 +468,6 @@ export class PCF8523Builder extends BasicBuilder {
 			if(interrupt === null) { return }
 
 			const control2interrupts = [
-				'watchdog',
 				'countdownA',
 				'countdownB',
 				'second',
@@ -450,7 +480,6 @@ export class PCF8523Builder extends BasicBuilder {
 				const control2 = await this.device.getControl2()
 				await this.device.setControl2({
 					...control2,
-					clearWatchdogAFlag: interrupt === 'watchdog',
 					clearCountdownAFlag: interrupt === 'countdownA',
 					clearCountdownBFlag: interrupt === 'countdownB',
 					clearSecondFlag: interrupt === 'second',
@@ -482,8 +511,8 @@ export class PCF8523Builder extends BasicBuilder {
 		const setTimeNowButton = elem(root, 'button[command="--set-time"]', HTMLButtonElement)
 		setTimeNowButton.addEventListener('click', asyncEvent(async () => {
 				const now = new Date(Date.now())
-				const time = encodeTimeFromDate(now)
-				await this.device.setTime(time, ampm_mode, century)
+				const time = encodeTimeFromDate(now, this.#ampm_mode)
+				await this.device.setTime(time, this.#ampm_mode, this.#century)
 
 				await refreshTime_All()
 		}))
@@ -491,6 +520,17 @@ export class PCF8523Builder extends BasicBuilder {
 		const resetButton = elem(root, 'button[command="--reset"]', HTMLButtonElement)
 		resetButton.addEventListener('click', asyncEvent(async () => {
 			await this.device.softReset()
+			await refreshAll()
+		}))
+
+		const oscillatorStartButton = elem(root, 'button[command="--oscillator-start"]', HTMLButtonElement)
+		oscillatorStartButton.addEventListener('click', asyncEvent(async () => {
+			await updateOscillator(false)
+			await refreshConfig()
+		}))
+		const oscillatorStopButton = elem(root, 'button[command="--oscillator-stop"]', HTMLButtonElement)
+		oscillatorStopButton.addEventListener('click', asyncEvent(async () => {
+			await updateOscillator(true)
 			await refreshConfig()
 		}))
 
@@ -532,26 +572,33 @@ export class PCF8523Builder extends BasicBuilder {
 
 		timerASourceClockSelect.addEventListener('change', asyncEvent(async () => {
 			await updateTimerAControl()
-			await refreshTimerA()
+			await refreshTimerAProposed()
+			await refreshTimerAControl()
 		}))
-		timerAValueNumber.addEventListener('change', asyncEvent(async () => {
+		timerAProposedValueNumber.addEventListener('change', asyncEvent(async () => {
+			await refreshTimerAProposed()
+		}))
+		const loadTimerAValue = elem(root, 'button[command="--load-a-value"]', HTMLButtonElement)
+		loadTimerAValue.addEventListener('click', asyncEvent(async () => {
 			await updateTimerAValue()
-			await refreshTimerA()
 		}))
-
 
 
 		timerBSourceClockSelect.addEventListener('change', asyncEvent(async () => {
 			await updateTimerBControl()
-			await refreshTimerB()
+			await refreshTimerBProposed()
+			await refreshTimerBControl()
 		}))
 		timerBPulseWidthSelect.addEventListener('change', asyncEvent(async () => {
 			await updateTimerBControl()
-			await refreshTimerB()
+			await refreshTimerBControl()
 		}))
-		timerBValueNumber.addEventListener('change', asyncEvent(async () => {
+		timerBProposedValueNumber.addEventListener('change', asyncEvent(async () => {
+			await refreshTimerBProposed()
+		}))
+		const loadTimerBValue = elem(root, 'button[command="--load-b-value"]', HTMLButtonElement)
+		loadTimerBValue.addEventListener('click', asyncEvent(async () => {
 			await updateTimerBValue()
-			await refreshTimerB()
 		}))
 
 

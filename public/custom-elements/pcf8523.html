@@ -11,8 +11,10 @@
 
 			<div  data-for-tab="Config" data-active>
 				<div data-controls >
-					<button type="button" command="--refresh">Refresh</button>
+					<button type="button" command="--refresh">⏰ Refresh</button>
 					<button type="button" command="--set-time">⏱️ Set Time</button>
+					<button type="button" command="--oscillator-start">Start Oscillator</button>
+					<button type="button" command="--oscillator-stop">Stop Oscillator</button>
 					<button type="button" command="--reset">⚡️ Reset</button>
 
 					<div data-accent>
@@ -24,6 +26,9 @@
 				<form method="dialog" name="FormControl1">
 					<fieldset>
 						<legend>Control 1</legend>
+
+						<label>Oscillator Status</label>
+						<output name="OscillatorStatus"></output>
 
 						<label>Capacitor Selection</label>
 						<select name="capacitorSelection">
@@ -52,7 +57,7 @@
 						<label>Watchdog Timer A Interrupt</label>
 						<div data-output-with-control>
 							<output name="WatchdogFlag"></output>
-							<button type="button" command="--clear-interrupt" data-interrupt="watchdog">Clear</button>
+							<p>Cleared on Read</p>
 						</div>
 
 						<label>Countdown Timer A Interrupt</label>
@@ -259,9 +264,10 @@
 						</select>
 
 						<label>Value</label>
-						<div>
-							<input name="TimerAValue" type="number" min="0" max="255" />
-							<output name="TimerAValueUnit"></output>
+						<div data-input-with-note data-output-with-control>
+							<input name="TimerAProposedValue" type="number" value="0" min="0" max="255" />
+							<output name="TimerAProposedValueUnit"></output>
+							<button type="button" command="--load-a-value">Set</button>
 						</div>
 
 					</fieldset>
@@ -284,9 +290,10 @@
 						</select>
 
 						<label>Value</label>
-						<div>
-							<input name="TimerBValue" type="number" min="0" max="255" />
-							<output name="TimerBValueUnit"></output>
+						<div data-input-with-note data-output-with-control>
+							<input name="TimerBProposedValue" type="number" value="0" min="0" max="255" />
+							<output name="TimerBProposedValueUnit"></output>
+							<button type="button" command="--load-b-value">Set</button>
 						</div>
 
 						<label>Pulse Width</label>
@@ -319,6 +326,9 @@
 
 					<label>UTC Time</label>
 					<output name="TimeAsUTC"></output>
+
+					<label>ISO 8601</label>
+					<output name="TimeAsISO"></output>
 				</fieldset>
 
 				<fieldset>
@@ -351,20 +361,6 @@
 				</fieldset>
 			</form>
 
-
-
-
-
-
-
-
-
-
-<!--
-
-					<button data-toggle-oscillator--start>Start Oscillator</button>
-					<button data-toggle-oscillator--stop>Stop Oscillator</button>
-		-->
 		</pcf8523-config>
 	</body>
 </html>

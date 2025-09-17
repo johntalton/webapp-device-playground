@@ -30,6 +30,10 @@ pcf8523-config {
 		display: flex;
 		gap: 1em;
 		align-items: center;
+
+		& > * {
+			align-self: unset;
+		}
 	}
 
 	& [data-input-with-note] {
