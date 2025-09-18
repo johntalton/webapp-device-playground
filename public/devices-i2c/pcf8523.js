@@ -215,7 +215,7 @@ export class PCF8523Builder extends BasicBuilder {
 
 
 			powerModeSwitchoverSelect.value = pmSwitchoverEnabled ? 'true' : 'false'
-			powerModeModeSelect.value = pmDirectSwitchingEnabled === undefined ? 'undefined' : (pmDirectSwitchingEnabled ? 'true' : 'false')
+			powerModeModeSelect.value = pmDirectSwitchingEnabled === undefined ? 'undefined' : (pmDirectSwitchingEnabled ? 'direct' : 'standard')
 			powerModeDetectionSelect.value = pmBatteryLowDetectionEnabled ? 'true' : 'false'
 
 			powerModeModeSelect.disabled = pmDirectSwitchingEnabled === undefined
@@ -371,10 +371,13 @@ export class PCF8523Builder extends BasicBuilder {
 		}
 
 		const updateControl3 = async () => {
+			const pmSwitchoverEnabled = powerModeSwitchoverSelect.value === 'true'
+			const pmDirectSwitchingEnabled = !pmSwitchoverEnabled || (powerModeModeSelect.value !== 'standard')
+
 			await this.device.setControl3({
 				pmBatteryLowDetectionEnabled: powerModeDetectionSelect.value === 'true',
-				pmSwitchoverEnabled: powerModeSwitchoverSelect.value === 'true',
-				pmDirectSwitchingEnabled: powerModeModeSelect.value === 'true',
+				pmSwitchoverEnabled,
+				pmDirectSwitchingEnabled,
 
 				batterySwitchoverInterruptEnabled: batterySwitchoverEnabledCheckbox.checked,
 				batteryLowInterruptEnabled: batteryLowEnabledCheckbox.checked
