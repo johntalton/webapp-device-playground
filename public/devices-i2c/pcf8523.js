@@ -371,6 +371,8 @@ export class PCF8523Builder extends BasicBuilder {
 		}
 
 		const updateControl3 = async () => {
+			// prevent disable switching in standard mode (not allowed)
+			// and return (when enabling) from unknown (!= standard) into direct mode
 			const pmSwitchoverEnabled = powerModeSwitchoverSelect.value === 'true'
 			const pmDirectSwitchingEnabled = !pmSwitchoverEnabled || (powerModeModeSelect.value !== 'standard')
 

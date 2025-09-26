@@ -1,11 +1,9 @@
 @import url("./css/layers.css");
 @import url("./css/defs.css") layer(defs);
+@import url("./css/themes.css");
 @import url("./css/libs/index.css") layer(libs);
 @import url("./css/app/index.css") layer(app);
-
 @import url("./css/device/index.css");
-
-@import url("./css/themes.css");
 
 @layer defs {
 	* {
