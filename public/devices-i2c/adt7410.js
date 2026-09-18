@@ -11,6 +11,8 @@ import { bindTabRoot } from '../util/tabs.js'
 
 export class ADT7410Builder {
 	#abus
+
+	/** @type {ADT7410} */
 	#device
 	#id
 

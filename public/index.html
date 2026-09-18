@@ -13,6 +13,7 @@
 		<title>Web I²C Playground</title>
 		<meta name="description" content="Device exploration and configuration for I2C and other interactions">
 
+		<link rel="icon" href="/favicon.svg" type="image/svg+xml">
 		<link rel="manifest" href="manifest.json" />
 		<script type="importmap">
 			{
@@ -67,19 +68,19 @@
 			}
 		</script>
 		<script src="./index.js" type="module" async defer crossorigin="anonymous"></script>
-		<link rel="stylesheet" type="text/css" href="./index.css"></link>
+		<link rel="stylesheet" type="text/css" href="./index.css" />
 	</head>
 	<body data-theme="Air" data-scheme="" data-view="aside" data-supports="initial">
 		<html-import id="addr-display" src="./custom-elements/address-display.html"></html-import>
 		<h1>⚙️ Web I²C Playground</h1>
 
 		<nav>
-			<button data-aside-toggle>🔖 Menu</button>
-			<button data-theme-roller><span>♲</span><span></span></button>
-			<button disabled id="requestWeb">🔌 Web</button>
-			<button disabled id="requestSerial">🔌 Serial</button>
-			<button disabled id="requestUSB">🔌 USB</button>
-			<button disabled id="requestHID">🔌 HID</button>
+			<button type="button" data-aside-toggle>🔖 Menu</button>
+			<button type="button" data-theme-roller><span>♲</span><span></span></button>
+			<button type="button" disabled id="requestWeb">🔌 Web</button>
+			<button type="button" disabled id="requestSerial">🔌 Serial</button>
+			<button type="button" disabled id="requestUSB">🔌 USB</button>
+			<button type="button" disabled id="requestHID">🔌 HID</button>
 		</nav>
 
 		<aside>
@@ -91,7 +92,7 @@
 				<!--  -->
 				<template>
 					<li>
-						<button name="title"></button>
+						<button type="button" name="title"></button>
 					</li>
 				</template>
 			</ul>
@@ -101,7 +102,7 @@
 			<div data-no-support>
 				<b>😢</b>
 				No supported bus types
-				<button name="dismissNoSupport">Dismiss</button>
+				<button type="button" name="dismissNoSupport">Dismiss</button>
 			</div>
 			<!--  -->
 			<template>
@@ -112,7 +113,7 @@
 					<p data-error>
 						<b>Error!</b>
 						<output name="errorMessage"></output>
-						<button name="retryOpen">Retry</button>
+						<button type="button" name="retryOpen">Retry</button>
 					</p>
 				</section>
 			</template>

@@ -1,15 +1,15 @@
-import { hydrateSerial } from './hydrate/serial.js'
-import { hydrateUSB } from './hydrate/usb.js'
-import { hydrateHID } from './hydrate/hid.js'
-import { hydrateCustomElements } from './hydrate/elements.js'
 import { hydrateEffects } from './hydrate/effects.js'
-import {
-	UI_HOOKS,
-	hydrateUI
-} from './hydrate/ui.js'
+import { hydrateCustomElements } from './hydrate/elements.js'
+import { hydrateHID } from './hydrate/hid.js'
+import { hydrateSerial } from './hydrate/serial.js'
 import { hydrateTheme } from './hydrate/theme.js'
-import { DOMTokenListLike } from './util/dom-token-list.js';
+import {
+	hydrateUI,
+	UI_HOOKS,
+} from './hydrate/ui.js'
+import { hydrateUSB } from './hydrate/usb.js'
 import { hydrateWeb } from './hydrate/web.js'
+import { DOMTokenListLike } from './util/dom-token-list.js';
 
 async function onContentLoaded() {
 	if (!HTMLScriptElement.supports && HTMLScriptElement.supports('importmap')) {

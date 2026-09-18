@@ -1,14 +1,26 @@
-import { MCP2221A, VoltageOff, Divider00375, GpioDirectionIn, GpioDirectionOut, Logic0, Logic1, Gp0DesignationGPIO, Gp1DesignationGPIO, Gp2DesignationGPIO, Gp3DesignationGPIO } from '@johntalton/mcp2221'
-import { I2CBusMCP2221 } from '@johntalton/i2c-bus-mcp2221'
-import { dumpHIDDevice } from '../util/hid-info.js'
-import { range } from '../util/range.js'
-import { deviceGuessByAddress } from '../devices-i2c/guesses.js'
-import { delayMs } from '../util/delay.js'
-import { WebHIDStreamSource } from '../util/hid-stream.js'
-import { bindTabRoot } from '../util/tabs.js'
-import { appendDeviceListItem } from '../util/device-list.js'
-import { asyncEvent } from '../util/async-event.js'
 import { I2CTransactionBus } from '@johntalton/and-other-delights'
+import { I2CBusMCP2221 } from '@johntalton/i2c-bus-mcp2221'
+import {
+	// Divider00375,
+	Gp0DesignationGPIO,
+	Gp1DesignationGPIO,
+	Gp2DesignationGPIO,
+	Gp3DesignationGPIO,
+	GpioDirectionIn,
+	GpioDirectionOut,
+	Logic0,
+	Logic1,
+	MCP2221A,
+	// VoltageOff
+} from '@johntalton/mcp2221'
+import { deviceGuessByAddress } from '../devices-i2c/guesses.js'
+import { asyncEvent } from '../util/async-event.js'
+// import { delayMs } from '../util/delay.js'
+import { appendDeviceListItem } from '../util/device-list.js'
+// import { dumpHIDDevice } from '../util/hid-info.js'
+import { WebHIDStreamSource } from '../util/hid-stream.js'
+import { range } from '../util/range.js'
+import { bindTabRoot } from '../util/tabs.js'
 
 
 

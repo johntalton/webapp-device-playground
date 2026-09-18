@@ -1,13 +1,18 @@
 import { I2CAddressedBus } from '@johntalton/and-other-delights'
 import { HT16K33, Segment } from '@johntalton/ht16k33'
 
-import { bindTabRoot } from '../util/tabs.js'
 import { asyncEvent } from '../util/async-event.js'
-import { range } from '../util/range.js'
 import { DOMTokenListLike } from '../util/dom-token-list.js'
+import { range } from '../util/range.js'
+import { bindTabRoot } from '../util/tabs.js'
 
 import '../custom-elements/segment-display.js'
-import { FONT_LIST, SEGMENT_LAYOUT_LIST, populateFont, populateSegmentProduct } from './ht16k33-segment.js'
+import {
+	FONT_LIST,
+	populateFont,
+	populateSegmentProduct,
+	SEGMENT_LAYOUT_LIST,
+} from './ht16k33-segment.js'
 
 
 export class HT16K33Builder {

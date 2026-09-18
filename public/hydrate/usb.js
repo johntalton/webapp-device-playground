@@ -1,13 +1,13 @@
 import { FT232H_PRODUCT_ID, FT232H_VENDOR_ID } from '../devices-usb/ft232h.js'
 //
-// export const FT232H_USB_FILTER = { vendorId: FT232H_VENDOR_ID, productId: FT232H_PRODUCT_ID }
+export const FT232H_USB_FILTER = { vendorId: FT232H_VENDOR_ID, productId: FT232H_PRODUCT_ID }
 
 const CH9012F_VENDOR_ID = 6790
 const CH9102F_PRODUCT_ID = 21972
 export const CH9102F_USB_FILTER = { vendorId: CH9012F_VENDOR_ID, productId: CH9102F_PRODUCT_ID }
 
 export const SUPPORTED_USB_FILTER = [
-	// FT232H_USB_FILTER,
+	FT232H_USB_FILTER,
 	CH9102F_USB_FILTER
 ]
 
@@ -51,6 +51,27 @@ function hydrateUSBWorker() {
 }
 
 
+function addUSBDevice(ui, device, knownDevices) {
+	console.log('Adding USB Device', device)
+
+	const controller = new AbortController()
+	const { signal } = controller
+
+	navigator.usb.addEventListener('disconnect', event => {
+		console.log('USB Device disconnected', event.device)
+		controller.abort('usb disconnect')
+	})
+
+	ui.addUSBDevice(device, signal)
+}
+
+
+async function hydrateUSBBackgroundDevices(add) {
+	const devices = await navigator.usb.getDevices()
+	console.log('existing paired devices', devices)
+	devices.forEach(add)
+}
+
 //
 async function requestUSBDevice(filters) {
 	return navigator.usb.requestDevice({ filters })
@@ -67,11 +88,21 @@ function requestUSBPHandler(add, event) {
 
 const build_requestUSBHandler = add => event => requestUSBPHandler(add, event)
 
-async function hydrateUSBReqeustButton(requestUSBButton, add) {
+async function hydrateUSBRequestButton(requestUSBButton, add) {
 	requestUSBButton.addEventListener('click', build_requestUSBHandler(add), { once: false })
 	requestUSBButton.disabled = false
 }
 
+
+async function hydrateUSBEvents(add, knownDevices) {
+	navigator.usb.addEventListener('connect', event => {
+		const { device } = event
+		console.log('usb connect', device)
+
+		addUSBDevice(device)
+			// .catch(e => console.warn('USB add device error on connect', e))
+	})
+}
 
 // requestUSBButton.disabled = true
 // requestUSBButton.addEventListener('click', event => {
@@ -91,9 +122,11 @@ async function hydrateUSBReqeustButton(requestUSBButton, add) {
 //
 export async function hydrateUSB(requestUSBButton, ui) {
 	const devlist = []
-	const add = device => ui.addUSBDevice(device)
+	const add = device => addUSBDevice(ui, device, devlist)
 
 	return Promise.all([
-		hydrateUSBReqeustButton(requestUSBButton, add)
+		hydrateUSBEvents(add, devlist),
+		hydrateUSBBackgroundDevices(add),
+		hydrateUSBRequestButton(requestUSBButton, add)
 	])
 }

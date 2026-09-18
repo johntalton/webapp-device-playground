@@ -5,6 +5,7 @@
     "server": "http-server --port 8080 --cors --brotli -c-1 --proxy http://localhost/api ."
   },
   "dependencies": {
+    "@biomejs/biome": "^2.5.13",
     "@johntalton/adt7410": "^2.0.1",
     "@johntalton/adxl375": "^1.0.0",
     "@johntalton/aht20": "^1.2.1",
@@ -21,6 +22,7 @@
     "@johntalton/eefs": "^2.1.0",
     "@johntalton/eeprom": "^1.1.0",
     "@johntalton/excamera-i2cdriver": "^3.1.4",
+    "@johntalton/ft232H": "../ft232H",
     "@johntalton/ht16k33": "^1.1.1",
     "@johntalton/i2c-bus-excamera-i2cdriver": "^4.0.2",
     "@johntalton/i2c-bus-mcp2221": "^4.2.0",
@@ -33,13 +35,14 @@
     "@johntalton/pca9536": "^1.0.2",
     "@johntalton/pcf8523": "^2.2.0",
     "@johntalton/pcf8574": "^2.1.0",
+    "@johntalton/si5351": "^1.0.0",
     "@johntalton/ssd1306": "^2.0.1",
     "@johntalton/st25dv": "^1.2.0",
     "@johntalton/tca9548a": "^5.1.1",
-    "@johntalton/tsl2591": "^1.0.1",
-    "@johntalton/si5351": "^1.0.0"
+    "@johntalton/tsl2591": "^1.0.1"
   },
   "devDependencies": {
+    "@types/w3c-web-usb": "^1.0.14",
     "http-server": "^14.1.1"
   }
 }

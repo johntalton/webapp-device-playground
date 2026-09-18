@@ -1,24 +1,24 @@
 import { DOMTokenListLike } from '../util/dom-token-list.js'
-
 //
+
 import { WebServiceBuilder } from '../devcie-web/bus-service.js'
-
 //
-import { ExcameraI2CDriverUIBuilder } from '../devices-serial/exc-i2cdriver.js'
+
 import { MCP2221UIBuilder } from '../devices-hid/mcp2221.js'
+import { ExcameraI2CDriverUIBuilder } from '../devices-serial/exc-i2cdriver.js'
 import { MashUIBuilder } from '../devices-serial/mash.js'
-
 //
-import { I2CDeviceBuilderFactory } from '../devices-i2c/device-factory.js'
 
+import { I2CDeviceBuilderFactory } from '../devices-i2c/device-factory.js'
+//
 
 import {
-	EXCAMERA_LABS_VENDOR_ID,
+	EXCAMERA_LABS_MINI_PRODUCT_ID,
 	EXCAMERA_LABS_PRODUCT_ID,
-	EXCAMERA_LABS_MINI_PRODUCT_ID
+	EXCAMERA_LABS_VENDOR_ID,
 } from '@johntalton/excamera-i2cdriver'
+import { FT232H_PRODUCT_ID, FT232H_VENDOR_ID, FT232HUIBuilder } from '../devices-usb/ft232h.js'
 import { asyncEvent } from '../util/async-event.js'
-
 
 const MCP2221_USB_FILTER = {
 	vendorId: 1240,
@@ -155,7 +155,8 @@ export function buildDeviceListItem(deviceListElem, builder) {
 		// })
 
 		builder.close()
-			.catch(e => console.warn(e))
+			.then(() => console.log('Devices closed', builder.title))
+			.catch(e => console.warn('Close failure', builder.title, e))
 
 
 		liElem.remove()
@@ -216,8 +217,27 @@ export async function addSerialPort(port, signal) {
 	}
 }
 
-export async function addUSBDevice(device) {
+export async function addUSBDevice(device, signal) {
 	console.log('UI:addUSB', device)
+	const deviceListElem = document.getElementById('deviceList')
+
+	// isFT232H
+	if(device.vendorId === FT232H_VENDOR_ID) {
+		if(device.productId === FT232H_PRODUCT_ID) {
+			const builder = await FT232HUIBuilder.builder(device, UI_HOOKS)
+			const demolisher = buildDeviceListItem(deviceListElem, builder)
+
+			signal?.addEventListener('abort', event => {
+				const { reason } = signal
+				console.log('Demolish USB Builder (signal)', reason)
+				demolisher()
+			})
+
+			return
+		}
+	}
+
+	console.log('unknown USB device')
 }
 
 export async function addHIDDevice(hid, signal) {

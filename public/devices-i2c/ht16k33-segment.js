@@ -1,17 +1,15 @@
 import {
-	AdafruitMatrix8x8BiColor,
+	Bespoke,
+	Font7SegmentASCII,
+	Font7SegmentDSEG,
+	Font14SegmentBespoke,
+	Font14SegmentOpenAI,
+} from '@johntalton/ht16k33/fonts'
+import {
 	Adafruit4Digit7SegmentBackpack,
 	Adafruit4Digit14SegmentFeatherwing,
+	AdafruitMatrix8x8BiColor,
 } from '@johntalton/ht16k33/layouts'
-import {
-	Font14SegmentBespoke,
-	Font7SegmentDSEG,
-	Font7SegmentASCII,
-	Font14SegmentOpenAI,
-	Bespoke
-} from '@johntalton/ht16k33/fonts'
-
-
 
 export const FONT_LIST = {
 	'dseg7': { name: 'DSEG7', font: Font7SegmentDSEG },
