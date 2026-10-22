@@ -63,18 +63,27 @@ aside > ul > li {
 }
 
 aside > ul > li > button {
-	display: block;
+	/* display: block; */
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	justify-content: center;
+
 	cursor: pointer;
 	border: none;
 	width: 100%;
 
 	height: 4em;
-	padding: 0.25em;
-	padding-inline: 10ch;
+	/* padding: 0.25em;
+	padding-inline: 10ch; */
 	border-radius: 0;
 
 	background-color: var(--background, red);
 	color: var(--color, red);
+
+	& > [data-subtitle] {
+		font-size: smaller;
+	}
 }
 
 aside > ul > li:has(> button:hover) {

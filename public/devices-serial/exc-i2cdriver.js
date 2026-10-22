@@ -385,7 +385,7 @@ export class ExcameraI2CDriverUIBuilder {
 		const PREFERRED_DEVICE = 'pcf8523'
 		const manualOptionsTemplate = manualDeviceSelection?.querySelector('template')
 		manualDeviceSelection?.append(...I2C_GUESSES
-				.sort((a, b) => a.name.localeCompare(b.name))
+				.toSorted((a, b) => a.name.localeCompare(b.name))
 				.map(({ addresses, name }) => {
 					const templateDoc = manualOptionsTemplate?.content.cloneNode(true)
 					const optionElem = templateDoc?.querySelector('option')

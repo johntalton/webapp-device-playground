@@ -347,10 +347,13 @@ html {
 			background-color: inherit;
 
 			&>li {
+				display: flex;
 
 				&>button {
 					background-color: unset;
 					border-radius: 0;
+					border-inline-start: 9px solid transparent;
+					padding-inline-start: 0;
 
 					&:disabled {
 						color: light-dark(black, white);
@@ -360,6 +363,7 @@ html {
 						background-color: var(--color-glass);
 						color: light-dark(black, white);
 					}
+
 				}
 			}
 

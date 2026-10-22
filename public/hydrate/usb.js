@@ -1,63 +1,77 @@
-import { FT232H_PRODUCT_ID, FT232H_VENDOR_ID } from '../devices-usb/ft232h.js'
+import {
+	DEFAULT_FT232H_PRODUCT_ID,
+	DEFAULT_FT232R_PRODUCT_ID,
+	DEFAULT_FTDI_VENDOR_ID,
+} from '@johntalton/ftdi'
 //
-export const FT232H_USB_FILTER = { vendorId: FT232H_VENDOR_ID, productId: FT232H_PRODUCT_ID }
+export const FT232H_USB_FILTER = { vendorId: DEFAULT_FTDI_VENDOR_ID, productId: DEFAULT_FT232H_PRODUCT_ID }
+export const FT232R_USB_FILTER = { vendorId: DEFAULT_FTDI_VENDOR_ID, productId: DEFAULT_FT232R_PRODUCT_ID  }
 
-const CH9012F_VENDOR_ID = 6790
-const CH9102F_PRODUCT_ID = 21972
-export const CH9102F_USB_FILTER = { vendorId: CH9012F_VENDOR_ID, productId: CH9102F_PRODUCT_ID }
+
+export const DEFAULT_CH9102F_VENDOR_ID = 6790
+export const DEFAULT_CH9102F_PRODUCT_ID = 21972
+export const CH9102F_USB_FILTER = { vendorId: DEFAULT_CH9102F_VENDOR_ID, productId: DEFAULT_CH9102F_PRODUCT_ID }
 
 export const SUPPORTED_USB_FILTER = [
 	FT232H_USB_FILTER,
+	FT232R_USB_FILTER,
 	CH9102F_USB_FILTER
 ]
 
-const isFT232H = (vendorId, productId) => {
-	//
-	if(vendorId !== FT232H_VENDOR_ID) { return false }
 
-	//
-	if(productId === FT232H_PRODUCT_ID) { return true }
+// function hydrateUSBWorker() {
+// 	const usbWorker = new Worker('./workers/usb-worker.js', { type: 'module' })
+// 	usbWorker.onmessage = event => {
+// 		const { data: message } = event
+// 		const { type, info, port } = message
 
-	return false
-}
+// 		console.log('main: message from usb worker', type)
 
+// 		if(type === 'usb-added' && isFT232H(info.vendorId, info.productId)) {
 
-function hydrateUSBWorker() {
-	const usbWorker = new Worker('./workers/usb-worker.js', { type: 'module' })
-	usbWorker.onmessage = event => {
-		const { data: message } = event
-		const { type, info, port } = message
+// 			console.log('main: added FT232H message', info, port)
 
-		console.log('main: message from usb worker', type)
+// 			port.onmessage = event => {
+// 				console.log('main: ft port message', event)
+// 			}
 
-		if(type === 'usb-added' && isFT232H(info.vendorId, info.productId)) {
+// 			//const liElem = makeListItem()
+// 			// Promise.resolve()
+// 			// 	.then(async () => {
+// 			// 		const builder = await FTDIUIBuilder.builder(port, ui)
+// 			// 		const demolisher = buildDeviceListItem(deviceListElem, builder)
+// 			// 	})
+// 		}
+// 	}
 
-			console.log('main: added FT232H message', info, port)
+// 	usbWorker.postMessage({ type: 'scan' })
+// }
 
-			port.onmessage = event => {
-				console.log('main: ft port message', event)
-			}
-
-			//const liElem = makeListItem()
-			// Promise.resolve()
-			// 	.then(async () => {
-			// 		const builder = await FT232HUIBuilder.builder(port, ui)
-			// 		const demolisher = buildDeviceListItem(deviceListElem, builder)
-			// 	})
-		}
+/**
+ * @param {Array<Object>} knownDevices
+ */
+function addUSBDevice(ui, device, knownDevices) {
+	if(knownDevices.includes(device)) {
+		console.log('USB Device is Know')
+		return
 	}
 
-	usbWorker.postMessage({ type: 'scan' })
-}
-
-
-function addUSBDevice(ui, device, knownDevices) {
 	console.log('Adding USB Device', device)
+	knownDevices.push(device)
 
 	const controller = new AbortController()
 	const { signal } = controller
 
 	navigator.usb.addEventListener('disconnect', event => {
+		if(event.device !== device) {
+			//
+			return
+		}
+
+		const index = knownDevices.indexOf(device)
+		if(index >= 0) { knownDevices.splice(index, 1) }
+
+
 		console.log('USB Device disconnected', event.device)
 		controller.abort('usb disconnect')
 	})
@@ -94,12 +108,12 @@ async function hydrateUSBRequestButton(requestUSBButton, add) {
 }
 
 
-async function hydrateUSBEvents(add, knownDevices) {
+async function hydrateUSBEvents(add) {
 	navigator.usb.addEventListener('connect', event => {
 		const { device } = event
 		console.log('usb connect', device)
 
-		addUSBDevice(device)
+		add(device)
 			// .catch(e => console.warn('USB add device error on connect', e))
 	})
 }
@@ -125,7 +139,7 @@ export async function hydrateUSB(requestUSBButton, ui) {
 	const add = device => addUSBDevice(ui, device, devlist)
 
 	return Promise.all([
-		hydrateUSBEvents(add, devlist),
+		hydrateUSBEvents(add),
 		hydrateUSBBackgroundDevices(add),
 		hydrateUSBRequestButton(requestUSBButton, add)
 	])

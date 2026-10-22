@@ -3,7 +3,6 @@ import { MASH_USB_FILTER } from '../devices-serial/mash.js'
 
 export const SUPPORTED_SERIAL_FILTER = [
 	EXCAMERA_LABS_USB_FILTER,
-	//FT232H_USB_FILTER,
 	MASH_USB_FILTER
 ]
 

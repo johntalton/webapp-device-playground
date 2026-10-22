@@ -12,13 +12,27 @@ import { MashUIBuilder } from '../devices-serial/mash.js'
 import { I2CDeviceBuilderFactory } from '../devices-i2c/device-factory.js'
 //
 
+// import {
+// 	DEFAULT_CH9102F_VENDOR_ID,
+// 	DEFAULT_CH9102F_PRODUCT_ID
+// } from '@johntalton/ch9102F'
 import {
 	EXCAMERA_LABS_MINI_PRODUCT_ID,
 	EXCAMERA_LABS_PRODUCT_ID,
 	EXCAMERA_LABS_VENDOR_ID,
 } from '@johntalton/excamera-i2cdriver'
-import { FT232H_PRODUCT_ID, FT232H_VENDOR_ID, FT232HUIBuilder } from '../devices-usb/ft232h.js'
+import {
+	DEFAULT_FT232H_PRODUCT_ID,
+	DEFAULT_FT232R_PRODUCT_ID,
+	DEFAULT_FTDI_VENDOR_ID,
+} from '@johntalton/ftdi'
+import { FTDIUIBuilder } from '../devices-usb/ftdi.js'
 import { asyncEvent } from '../util/async-event.js'
+import { dumpUSBDevice } from '../util/usb-info.js'
+import {
+	DEFAULT_CH9102F_PRODUCT_ID,
+	DEFAULT_CH9102F_VENDOR_ID
+} from './usb.js'
 
 const MCP2221_USB_FILTER = {
 	vendorId: 1240,
@@ -47,11 +61,12 @@ export const UI_HOOKS = {
 export function buildDeviceSection(builder) {
 	//
 	const mainElem = document.querySelector('main')
-	const { content } = mainElem?.querySelector(':scope > template')
+	const { content } = mainElem.querySelector(':scope > template')
 	const clone = content.cloneNode(true)
 	const sectionElem = clone.querySelector('section')
 
 	const loadView = async () => {
+		sectionElem.toggleAttribute('data-loading', true)
 		sectionElem.toggleAttribute('data-error', false)
 
 		const customElem = await builder.buildCustomView()
@@ -94,12 +109,34 @@ export function buildDeviceSection(builder) {
 export function buildDeviceListItem(deviceListElem, builder) {
 	const mainElem = document.querySelector('main')
 
-	const { content } = deviceListElem?.querySelector(':scope > template')
+	const { content } = deviceListElem.querySelector(':scope > template')
 	const clone = content.cloneNode(true)
 	const liElem = clone.querySelector('li')
 	const buttonElem = liElem.querySelector('button')
 
-	buttonElem.textContent = builder.title
+	const titleElem = buttonElem.querySelector('[data-title]')
+	const subtitleElem = buttonElem.querySelector('[data-subtitle]')
+
+	// buttonElem.textContent = builder.title
+	titleElem.textContent = builder.title
+	// subtitleElem.textContent = '(test)'
+
+	const observationController = new AbortController()
+	if('when' in builder) {
+		builder.when('subtitle')
+			.map(e => e.detail)
+			.subscribe(value => {
+				console.log('Subtitle Observation', value)
+				subtitleElem.textContent = `(${value})`
+			}, { signal: observationController.signal })
+	}
+	else if('addEventListener' in builder) {
+		builder.addEventListener('subtitle', event => {
+			console.log('Subtitle Event', event)
+			const value = event.detail
+			subtitleElem.textContent = `(${value})`
+		}, { signal: observationController.signal })
+	}
 
 	const sectionElem = buildDeviceSection(builder)
 
@@ -116,11 +153,28 @@ export function buildDeviceListItem(deviceListElem, builder) {
 	mainElem.appendChild(sectionElem)
 
 	//
+	const demolisher = async (forget = false) => {
+		console.log('Demolisher for', builder.title)
+
+		observationController.abort('demolisher')
+
+		builder.close(forget)
+			.then(() => console.log('Devices closed', builder.title))
+			.catch(e => console.warn('Close failure', builder.title, e))
+
+		liElem.remove()
+		sectionElem.remove()
+	}
+
+	//
 	liElem.addEventListener('click', asyncEvent(async event => {
 		if(event.shiftKey) {
-			await builder.close(event.metaKey)
-			liElem.remove()
-			sectionElem.remove()
+			// await builder.close(event.metaKey)
+			// liElem.remove()
+			// sectionElem.remove()
+
+			await demolisher(event.metaKey)
+
 			return
 		}
 
@@ -147,21 +201,7 @@ export function buildDeviceListItem(deviceListElem, builder) {
 
 	}), { once: false })
 
-	// demolisher
-	return () => {
-		console.log('Demolisher for', builder.title)
-		// virtualDevices.forEach(vdev => {
-		// 	console.log(vdev)
-		// })
-
-		builder.close()
-			.then(() => console.log('Devices closed', builder.title))
-			.catch(e => console.warn('Close failure', builder.title, e))
-
-
-		liElem.remove()
-		sectionElem.remove()
-	}
+	return demolisher
 }
 
 export function buildAsideToggle() {
@@ -221,10 +261,10 @@ export async function addUSBDevice(device, signal) {
 	console.log('UI:addUSB', device)
 	const deviceListElem = document.getElementById('deviceList')
 
-	// isFT232H
-	if(device.vendorId === FT232H_VENDOR_ID) {
-		if(device.productId === FT232H_PRODUCT_ID) {
-			const builder = await FT232HUIBuilder.builder(device, UI_HOOKS)
+	// isFTDI
+	if(device.vendorId === DEFAULT_FTDI_VENDOR_ID) {
+		if(device.productId === DEFAULT_FT232H_PRODUCT_ID || device.productId === DEFAULT_FT232R_PRODUCT_ID) {
+			const builder = await FTDIUIBuilder.builder(device, UI_HOOKS)
 			const demolisher = buildDeviceListItem(deviceListElem, builder)
 
 			signal?.addEventListener('abort', event => {
@@ -235,7 +275,23 @@ export async function addUSBDevice(device, signal) {
 
 			return
 		}
+	} else if(device.vendorId === DEFAULT_CH9102F_VENDOR_ID) {
+		if(device.productId === DEFAULT_CH9102F_PRODUCT_ID) {
+			console.log('CH9102F builder')
+			dumpUSBDevice(device)
+			// const builder = await CH9102FBuilder.builder(device, UI_HOOKS)
+			// const demolisher = buildDeviceListItem(deviceListElem, builder)
+
+			// signal?.addEventListener('abort', event => {
+			// 	const { reason } = signal
+			// 	console.log('Demolish USB Builder (signal)', reason)
+			// 	demolisher()
+			// })
+
+			return
+		}
 	}
+
 
 	console.log('unknown USB device')
 }

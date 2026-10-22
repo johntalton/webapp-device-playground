@@ -22,7 +22,7 @@
     "@johntalton/eefs": "^2.1.0",
     "@johntalton/eeprom": "^1.1.0",
     "@johntalton/excamera-i2cdriver": "^3.1.4",
-    "@johntalton/ft232H": "../ft232H",
+    "@johntalton/ft232h": "^1.0.1",
     "@johntalton/ht16k33": "^1.1.1",
     "@johntalton/i2c-bus-excamera-i2cdriver": "^4.0.2",
     "@johntalton/i2c-bus-mcp2221": "^4.2.0",

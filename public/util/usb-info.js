@@ -3,6 +3,11 @@ export function dumpUSBDevice(device) {
   console.log('Manufacturer', device.manufacturerName)
   console.log('Product', device.productName)
   console.log('Serial', device.serialNumber)
+  console.log('Class', device.deviceClass)
+  console.log('Sublass', device.deviceSubclass)
+  console.log('Version', device.deviceVersionMajor, device.deviceVersionMinor)
+  console.log('USB Version', device.usbVersionMajor, device.usbVersionMinor, device.usbVersionSubminor)
+
 
   device.configurations.forEach(c => {
     const defaultConfig = c === device.configuration ? '*' : '-'
@@ -17,7 +22,7 @@ export function dumpUSBDevice(device) {
         const aClass = a.interfaceClass === 10 ? '"CDC-Data"' :
           a.interfaceClass === 2 ? '"Com / CDC-Ctrl"' :
           a.interfaceClass === 3 ? '"HID"' :
-          a.interfaceClass === 0xFF ? '"Vendor' :
+          a.interfaceClass === 0xFF ? '"Vendor"' :
           a.interfaceClass
         console.log('\t\t', defaultAlt, 'Alternate: ', a.interfaceName, 'alt:', a.alternateSetting, 'class', aClass, 'subclass', a.interfaceSubclass, 'protocol', a.interfaceProtocol)
 

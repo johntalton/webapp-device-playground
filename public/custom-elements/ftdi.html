@@ -1,0 +1,468 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head></head>
+	<body>
+		<ftdi-config >
+			<style>
+				[data-button-group] {
+					display: flex;
+					gap: 1em;
+					margin-block: 1em;
+				}
+
+				ftdi-config label {
+					line-height: 1lh;
+				}
+			</style>
+
+			<div class="tabs">
+				<button type="button" data-tab="common" data-active>Common</button>
+				<button type="button" data-tab="eeprom">EEPROM</button>
+				<button type="button" data-tab="mpsse">MPSSE</button>
+				<button type="button" data-tab="i2c">I²C Host</button>
+			</div>
+
+			<div data-for-tab="common" data-active>
+
+				<div data-button-group>
+					<button type="button" command="--reset">USB Reset</button>
+					<button type="button" command="--reset-device">Device Reset</button>
+					<button type="button" command="--flush-rx">Flush RX</button>
+					<button type="button" command="--flush-tx">Flush TX</button>
+				</div>
+
+				<form>
+					<fieldset>
+						<legend>Chip</legend>
+
+						<label>
+							<span>Version</span>
+							<output name="ChipVersion"></output>
+						</label>
+
+						<label>
+							<span>Device</span>
+							<output name="Chip"></output>
+						</label>
+					</fieldset>
+
+					<fieldset>
+						<legend>EEPROM</legend>
+
+						<label>
+							<span>EEPROM Type</span>
+							<output name="EEPROMType"></output>
+						</label>
+
+						<label>
+							<span>Manufacture</span>
+							<output name="Manufacture"></output>
+						</label>
+
+						<label>
+							<span>Product</span>
+							<output name="Product"></output>
+						</label>
+
+						<label>
+							<span>Serial</span>
+							<output name="Serial"></output>
+						</label>
+
+						<lable>
+							<span>Checksum</span>
+							<output name="Checksum"></output>
+							<output name="ChecksumStatus"></output>
+						</lable>
+					</fieldset>
+
+					<fieldset>
+						<legend></legend>
+
+						<label>
+							<span>Bitmode</span>
+							<select name="Bitmode">
+								<option>Reset (UART)</option>
+								<option disabled>Bitbang</option>
+								<option>MPSSE</option>
+								<option disabled>Synchronous Bitbang</option>
+								<option disabled>MCU Host Bus Emulation</option>
+
+							</select>
+						</label>
+
+						<label>
+							<span>Latency Timer</span>
+							<input type="number" name="LatencyTimer" min="1" max="255" step="1" disabled />
+						</label>
+					</fieldset>
+
+					<fieldset>
+						<legend>Modem Control</legend>
+					</fieldset>
+
+					<fieldset>
+						<legend>Flow Control</legend>
+					</fieldset>
+
+
+					<fieldset>
+						<legend>Status</legend>
+
+						<button type="button" name="RefreshStatus">Refresh</button>
+						<span></span>
+
+						<label>
+							<span>Clear to Send</span>
+							<output name="ClearToSend"></output>
+						</label>
+
+						<label>
+							<span>Data Set Ready</span>
+							<output name="DataSetReady"></output>
+						</label>
+
+						<label>
+							<span>Ring</span>
+							<output name="Ring"></output>
+						</label>
+
+						<label>
+							<span>Carrier Detect</span>
+							<output name="CarrierDetect"></output>
+						</label>
+
+
+
+						<label>
+							<span>Data Ready</span>
+							<output name="DataReady"></output>
+						</label>
+
+						<label>
+							<span>Overrun Error</span>
+							<output name="OverrunError"></output>
+						</label>
+
+						<label>
+							<span>Parity Error</span>
+							<output name="ParityError"></output>
+						</label>
+
+						<label>
+							<span>Framing Error</span>
+							<output name="FramingError"></output>
+						</label>
+
+						<label>
+							<span>Interrupt</span>
+							<output name="Interrupt"></output>
+						</label>
+
+						<label>
+							<span>TX Holding Empty</span>
+							<output name="TXHoldingEmpty"></output>
+						</label>
+
+						<label>
+							<span>TX Empty</span>
+							<output name="TXEmpty"></output>
+						</label>
+
+						<label>
+							<span>Receiver Error</span>
+							<output name="ReceiverError"></output>
+						</label>
+
+					</fieldset>
+
+				</form>
+			</div>
+
+			<div data-for-tab="mpsse">
+
+			</div>
+
+			<div data-for-tab="eeprom">
+				<div data-button-group>
+					<button type="button" command="--write">Write</button>
+					<button type="button" command="--erase">Erase</button>
+				</div>
+
+				<form>
+					<label>
+						<span>Product</span>
+						<input type="text">
+					</label>
+				</form>
+
+				<form name="Type232H">
+					<fieldset>
+						<legend></legend>
+
+						<label>
+							<span>Channel A Drive</span>
+							<select>
+								<option>D2xx</option>
+								<option>VCP</option>
+							</select>
+						</label>
+
+						<label>
+							<span>Channel A Type</span>
+							<select>
+								<option>UART</option>
+								<option>FIFO</option>
+								<option>OPTO</option>
+								<option>CPU</option>
+								<option>FT1284</option>
+							</select>
+						</label>
+
+						<label>
+							<span>clockPolarityHigh</span>
+							<input type="checkbox">
+						</label>
+
+						<label>
+							<span>lsbData</span>
+							<input type="checkbox">
+						</label>
+
+						<label>
+							<span>flowcontrol</span>
+							<input type="checkbox">
+						</label>
+
+						<label>
+							<span>powersave</span>
+							<input type="checkbox">
+						</label>
+					</fieldset>
+
+
+
+
+
+
+					<fieldset>
+						<legend>Group 0</legend>
+
+						<label>
+							<span>Drive</span>
+							<select>
+								<option>4mA</option>
+								<option>8mA</option>
+								<option>12mA</option>
+								<option>16mA</option>
+							</select>
+						</label>
+
+						<label>
+							<span>isSchmitt</span>
+							<input type="checkbox">
+						</label>
+
+						<label>
+							<span>slowSlew</span>
+							<input type="checkbox">
+						</label>
+
+
+					</fieldset>
+
+					<fieldset>
+						<legend>Group 0</legend>
+
+
+					</fieldset>
+
+					<fieldset>
+						<legend>CBUS Functions</legend>
+
+						<label>
+							<span>c0</span>
+							<select>
+								<option>TRISTATE</option>
+								<option>TXLED</option>
+								<option>RXLED</option>
+								<option>TXRXLED</option>
+								<option>PWREN</option>
+								<option>SLEEP</option>
+								<option>DRIVE0</option>
+								<option>DRIVE1</option>
+								<option>GPIO</option>
+								<option>TXDEN</option>
+								<option>CLK30</option>
+								<option>CLK15</option>
+								<option>CLK7_5</option>
+							</select>
+						</label>
+
+						<label>
+							<span>c1</span>
+							<select>
+								<option>TRISTATE</option>
+								<option>TXLED</option>
+								<option>RXLED</option>
+								<option>TXRXLED</option>
+								<option>PWREN</option>
+								<option>SLEEP</option>
+								<option>DRIVE0</option>
+								<option>DRIVE1</option>
+								<option>GPIO</option>
+								<option>TXDEN</option>
+								<option>CLK30</option>
+								<option>CLK15</option>
+								<option>CLK7_5</option>
+							</select>
+						</label>
+
+						<label>
+							<span>c2</span>
+							<select>
+								<option>TRISTATE</option>
+								<option>TXLED</option>
+								<option>RXLED</option>
+								<option>TXRXLED</option>
+								<option>PWREN</option>
+								<option>SLEEP</option>
+								<option>DRIVE0</option>
+								<option>DRIVE1</option>
+								<option>GPIO</option>
+								<option>TXDEN</option>
+								<option>CLK30</option>
+								<option>CLK15</option>
+								<option>CLK7_5</option>
+							</select>
+						</label>
+
+						<label>
+							<span>c3</span>
+							<select>
+								<option>TRISTATE</option>
+								<option>TXLED</option>
+								<option>RXLED</option>
+								<option>TXRXLED</option>
+								<option>PWREN</option>
+								<option>SLEEP</option>
+								<option>DRIVE0</option>
+								<option>DRIVE1</option>
+								<option>GPIO</option>
+								<option>TXDEN</option>
+								<option>CLK30</option>
+								<option>CLK15</option>
+								<option>CLK7_5</option>
+							</select>
+						</label>
+
+						<label>
+							<span>c4</span>
+							<select>
+								<option>TRISTATE</option>
+								<option>TXLED</option>
+								<option>RXLED</option>
+								<option>TXRXLED</option>
+								<option>PWREN</option>
+								<option>SLEEP</option>
+								<option>DRIVE0</option>
+								<option>DRIVE1</option>
+								<option>GPIO</option>
+								<option>TXDEN</option>
+								<option>CLK30</option>
+								<option>CLK15</option>
+								<option>CLK7_5</option>
+							</select>
+						</label>
+
+						<label>
+							<span>c5</span>
+							<select>
+								<option>TRISTATE</option>
+								<option>TXLED</option>
+								<option>RXLED</option>
+								<option>TXRXLED</option>
+								<option>PWREN</option>
+								<option>SLEEP</option>
+								<option>DRIVE0</option>
+								<option>DRIVE1</option>
+								<option>GPIO</option>
+								<option>TXDEN</option>
+								<option>CLK30</option>
+								<option>CLK15</option>
+								<option>CLK7_5</option>
+							</select>
+						</label>
+
+						<label>
+							<span>c6</span>
+							<select>
+								<option>TRISTATE</option>
+								<option>TXLED</option>
+								<option>RXLED</option>
+								<option>TXRXLED</option>
+								<option>PWREN</option>
+								<option>SLEEP</option>
+								<option>DRIVE0</option>
+								<option>DRIVE1</option>
+								<option>GPIO</option>
+								<option>TXDEN</option>
+								<option>CLK30</option>
+								<option>CLK15</option>
+								<option>CLK7_5</option>
+							</select>
+						</label>
+
+						<label>
+							<span>c7</span>
+							<select>
+								<option>TRISTATE</option>
+								<option>TXLED</option>
+								<option>RXLED</option>
+								<option>TXRXLED</option>
+								<option>PWREN</option>
+								<option>SLEEP</option>
+								<option>DRIVE0</option>
+								<option>DRIVE1</option>
+								<option>GPIO</option>
+								<option>TXDEN</option>
+								<option>CLK30</option>
+								<option>CLK15</option>
+								<option>CLK7_5</option>
+							</select>
+						</label>
+					</fieldset>
+				</form>
+
+				<form name="TypeR">
+
+
+				</form>
+			</div>
+
+			<div data-for-tab="i2c">
+				<div data-scan-group>
+					<button type="button" data-scan>Scan</button>
+
+					<addr-display name="scanResults">
+						<!--  -->
+					</addr-display>
+
+					<ul data-device-list>
+						<template>
+							<li>
+								<form>
+									<hex-display></hex-display>
+									<select></select>
+									<button type="button">Create Device 🕹️</button>
+								</form>
+							</li>
+						</template>
+					</ul>
+				</div>
+			</div>
+
+
+		</ftdi-config>
+	</body>
+</html>

@@ -1,0 +1,797 @@
+<!DOCTYPE html>
+<html lang="en">
+  <body>
+    <bosch-ieu-config kind="">
+      <div class="tabs">
+				<button type="button" data-tab="common" data-active>Common</button>
+				<button type="button" data-tab="profile">Profile</button>
+        <button type="button" data-kind="6xx" data-tab="setpoints">Set Points</button>
+        <button type="button" data-kind="3xx 5xx" data-tab="fifo">FIFO</button>
+        <button type="button" data-tab="measurement">Measurement</button>
+			</div>
+
+			<div data-for-tab="common" data-active>
+        <div data-button-group>
+          <button name="Reset" type="button">Reset</button>
+        </div>
+
+        <form name="Info">
+          <fieldset>
+            <legend>Info</legend>
+
+            <label>
+              <span>Name</span>
+              <output name="ChipName"></output>
+            </label>
+
+            <label>
+              <span>Calibrated</span>
+              <output name="isCalibrated"></output>
+            </label>
+
+          </fieldset>
+
+          <fieldset>
+            <legend>Features</legend>
+
+            <label>
+              <span>Pressure</span>
+              <output name="FeaturePressure"></output>
+            </label>
+
+            <label>
+              <span>Temperature</span>
+              <output name="FeatureTemperature"></output>
+            </label>
+
+            <label>
+              <span>Humidity</span>
+              <output name="FeatureHumidity"></output>
+            </label>
+
+            <label>
+              <span>Gas</span>
+              <output name="FeatureGas"></output>
+            </label>
+
+            <label>
+              <span>Normal Mode</span>
+              <output name="FeatureNormalMode"></output>
+            </label>
+
+            <label>
+              <span>Interrupt</span>
+              <output name="FeatureInterrupt"></output>
+            </label>
+
+            <label>
+              <span>FIFO</span>
+              <output name="FeatureFIFO"></output>
+            </label>
+
+            <label>
+              <span>Time</span>
+              <output name="FeatureTime"></output>
+            </label>
+
+          </fieldset>
+
+        </form>
+      </div>
+
+      <div data-for-tab="profile">
+        <form name="ProfileForm">
+          <fieldset>
+            <legend>Profile</legend>
+
+            <label>
+              <span>Mode</span>
+              <select name="Mode">
+                <option value="PARALLEL" disabled>Parallel</option>
+                <option value="NON-STOP" disabled>Non-Stop</option>
+                <option value="NORMAL" disabled>Normal</option>
+                <option value="FORCED" disabled>Forced</option>
+                <option value="SLEEP" disabled>Sleep</option>
+              </select>
+            </label>
+          </fieldset>
+
+          <fieldset data-kind="2xx">
+            <legend>Profile (2xx)</legend>
+
+          </fieldset>
+
+          <fieldset data-kind="3xx">
+            <legend>Profile (3xx)</legend>
+
+            <label>
+              <span>Oversampling Temperature</span>
+              <select name="OversamplingTemperature3xx">
+                <option value="false">Off</option>
+                <option value="1">1x</option>
+                <option value="2">2x</option>
+                <option value="4">4x</option>
+                <option value="8">8x</option>
+                <option value="16">16x</option>
+                <option value="32">32x</option>
+              </select>
+            </label>
+
+            <label>
+              <span>Oversampling Pressure</span>
+              <select name="OversamplingPressure3xx">
+                <option value="false">Off</option>
+                <option value="1">1x</option>
+                <option value="2">2x</option>
+                <option value="4">4x</option>
+                <option value="8">8x</option>
+                <option value="16">16x</option>
+                <option value="32">32x</option>
+              </select>
+            </label>
+
+            <label>
+              <span>Filter Coefficient</span>
+              <select name="FilterCoefficient3xx">
+                <option value="false">off</option>
+                <option value="1">1</option>
+                <option value="3">3</option>
+                <option value="7">7</option>
+                <option value="15">15</option>
+                <option value="31">31</option>
+                <option value="63">63</option>
+                <option value="127">127</option>
+              </select>
+            </label>
+
+            <label>
+              <span>Standby Prescaler</span>
+              <select name="StandbyPrescaler3xx">
+                <option value="1">1 (200Hz, 5ms)</option>
+                <option value="2">2 (100Hz, 10ms)</option>
+                <option value="4">4 (50Hz, 20ms)</option>
+                <option value="8">8 (25Hz, 40ms)</option>
+                <option value="16">16 (12.5Hz, 80ms)</option>
+                <option value="32">32 (6.5Hz, 160ms)</option>
+                <option value="64">64 (3.1Hz, 320ms)</option>
+                <option value="127">127 (1.5Hz, 640ms)</option>
+                <option value="256">256 (0.78Hz, 1.28s)</option>
+                <option value="512">512 (0.39Hz, 2.56s)</option>
+                <option value="1024">1024 (0.2Hz, 5.12s)</option>
+                <option value="2048">2048 (0.1Hz, 10.24s)</option>
+                <option value="4096">4096 (0.05Hz, 20.48s)</option>
+                <option value="8192">8192 (0.02Hz, 40.96s)</option>
+                <option value="16384">16,384 (0.01Hz, 81.92s)</option>
+                <option value="32768">32,768 (0.006Hz, 163.84s)</option>
+                <option value="65536">65,536 (0.003Hz, 327.68s)</option>
+                <option value="131072">131,072 (00015.Hz, 655.36s)</option>
+              </select>
+            </label>
+
+            <label>
+              <span>I²C Watch Dog</span>
+              <select name="WatchDog3xx">
+                <option value="false">Off</option>
+                <option value="SHORT">1.25ms</option>
+                <option value="LONG">40ms</option>
+              </select>
+            </label>
+
+            <label>
+              <span>SPI Mode</span>
+              <select name="SPIMode3xx">
+                <option value="4-wire">4-Wire</option>
+                <option value="3-wire">3-Wire</option>
+              </select>
+            </label>
+
+          </fieldset>
+
+          <fieldset data-kind="3xx">
+            <legend>Interrupt</legend>
+
+            <label>
+              <span>Mode</span>
+              <select name="InterruptMode3xx">
+                <option value="push-pull">Push Pull</option>
+                <option value="open-drain">Open Drain</option>
+              </select>
+            </label>
+
+            <label>
+              <span>Level</span>
+              <select name="InterruptLevel3xx">
+                <option value="active-low">Active Low</option>
+                <option value="active-high">Active high</option>
+              </select>
+            </label>
+
+            <label>
+              <span>Drive Strength</span>
+              <select name="InterruptDriveStrength3xx">
+                <option value="low">Low</option>
+                <option value="high">High</option>
+              </select>
+            </label>
+
+            <label>
+              <span>Latched</span>
+              <input name="InterruptLatched3xx" type="checkbox" />
+            </label>
+
+            <label>
+              <span>Enable FIFO High Watermark</span>
+              <input name="InterruptFIFOHightWatermark3xx" type="checkbox" />
+            </label>
+
+            <label>
+              <span>Enable FIFO Full</span>
+              <input name="InterruptFIFOFull3xx" type="checkbox" />
+            </label>
+
+            <label>
+              <span>Enable Data Ready</span>
+              <input name="InterruptDataReady3xx" type="checkbox" />
+            </label>
+          </fieldset>
+
+          <fieldset data-kind="5xx">
+            <legend>Profile (5xx)</legend>
+
+          </fieldset>
+
+          <fieldset data-kind="6xx">
+            <legend>Profile (6xx)</legend>
+
+            <label>
+              <span>Oversampling Temperature</span>
+              <select name="OversamplingTemperature6xx">
+                <option value="false">off</option>
+                <option value="1">1x</option>
+                <option value="2">2x</option>
+                <option value="4">4x</option>
+                <option value="8">8x</option>
+                <option value="16">16x</option>
+              </select>
+            </label>
+
+            <label>
+              <span>Oversampling Pressure</span>
+              <select name="OversamplingPressure6xx">
+                <option value="false">off</option>
+                <option value="1">1x</option>
+                <option value="2">2x</option>
+                <option value="4">4x</option>
+                <option value="8">8x</option>
+                <option value="16">16x</option>
+              </select>
+            </label>
+
+            <label>
+              <span>Oversampling Humidity</span>
+              <select name="OversamplingHumidity6xx">
+                <option value="false">off</option>
+                <option value="1">1x</option>
+                <option value="2">2x</option>
+                <option value="4">4x</option>
+                <option value="8">8x</option>
+                <option value="16">16x</option>
+              </select>
+            </label>
+
+            <label>
+              <span>Filter Coefficient</span>
+              <select name="FilterCoefficient6xx">
+                <option value="false">off</option>
+                <option value="1">1</option>
+                <option value="3">3</option>
+                <option value="7">7</option>
+                <option value="15">15</option>
+                <option value="31">31</option>
+                <option value="63">63</option>
+                <option value="127">127</option>
+              </select>
+            </label>
+
+            <label>
+              <span>Enable Heater</span>
+              <input name="EnableGasHeat" type="checkbox" />
+            </label>
+
+            <label>
+              <span>Enable Gas Conversion</span>
+              <input name="EnableGasConversion" type="checkbox" />
+            </label>
+
+            <label>
+              <span>Shared Gas Wait Duration</span>
+              <input name="SharedGasWaitDuration" type="number" />
+            </label>
+
+            <label>
+              <span>SPI Page</span>
+              <select name="SPIPage6xx">
+                <option value="0">0</option>
+                <option value="1">1</option>
+              </select>
+            </label>
+
+            <label>
+              <span>SPI Mode</span>
+              <select name="SPIMode6xx">
+                <option value="4-wire">4-Wire</option>
+                <option value="3-wire">3-Wire</option>
+              </select>
+            </label>
+
+            <label>
+              <span>SPI Interrupt</span>
+              <input name="SPIInterrupt6xx" type="checkbox" />
+            </label>
+
+          </fieldset>
+        </form>
+      </div>
+
+      <div data-for-tab="setpoints">
+        <div data-button-group>
+          <button name="SetpointSave" type="button">Save</button>
+          <button name="SetpointReset" type="button">Reset</button>
+        </div>
+
+        <form name="SetpointForm">
+          <fieldset>
+            <legend></legend>
+
+            <table data-setpoint-grid border="0">
+              <thead>
+                <tr>
+                  <th>Index</th>
+                  <th>Temperature (C)</th>
+                  <th>Duration (Ms)</th>
+                  <th>Initial (Ma)</th>
+                </tr>
+              </thead>
+
+              <tbody>
+                <tr>
+                  <td>
+                    <label>
+                      <span>0</span>
+                      <input name="SetpointSelect" value="0" type="radio" >
+                    </label>
+                  </td>
+                  <td>
+                    <label>
+                      <span>Temperature</span>
+                      <input name="SetpointTemperature_0" type="number" />
+                    </label>
+                  </td>
+                  <td>
+                    <label>
+                      <span>Duration</span>
+                      <input name="SetpointDuration_0" type="number" />
+                    </label>
+                  </td>
+                  <td>
+                    <label>
+                      <span>Initial</span>
+                      <input name="SetpointInitial_0" type="number" />
+                    </label>
+                  </td>
+                </tr>
+
+                <tr>
+                  <td><label>
+                      <span>1</span>
+                      <input name="SetpointSelect" value="1" type="radio" >
+                    </label></td>
+                  <td>
+                    <label>
+                      <span>Temperature</span>
+                      <input name="SetpointTemperature_1" type="number" />
+                    </label>
+                  </td>
+                  <td>
+                    <label>
+                      <span>Duration</span>
+                      <input name="SetpointDuration_1" type="number" />
+                    </label>
+                  </td>
+                  <td>
+                    <label>
+                      <span>Initial</span>
+                      <input name="SetpointInitial_1" type="number" />
+                    </label>
+                  </td>
+                </tr>
+
+                <tr>
+                  <td>
+                    <label>
+                      <span>2</span>
+                      <input name="SetpointSelect" value="2" type="radio" >
+                    </label>
+                  </td>
+                  <td>
+                    <label>
+                      <span>Temperature</span>
+                      <input name="SetpointTemperature_2" type="number" />
+                    </label>
+                  </td>
+                  <td>
+                    <label>
+                      <span>Duration</span>
+                      <input name="SetpointDuration_2" type="number" />
+                    </label>
+                  </td>
+                  <td>
+                    <label>
+                      <span>Initial</span>
+                      <input name="SetpointInitial_2" type="number" />
+                    </label>
+                  </td>
+                </tr>
+
+                <tr>
+                  <td>
+                    <label>
+                      <span>3</span>
+                      <input name="SetpointSelect" value="3" type="radio" >
+                    </label>
+                  </td>
+                  <td>
+                    <label>
+                      <span>Temperature</span>
+                      <input name="SetpointTemperature_3" type="number" />
+                    </label>
+                  </td>
+                  <td>
+                    <label>
+                      <span>Duration</span>
+                      <input name="SetpointDuration_3" type="number" />
+                    </label>
+                  </td>
+                  <td>
+                    <label>
+                      <span>Initial</span>
+                      <input name="SetpointInitial_3" type="number" />
+                    </label>
+                  </td>
+                </tr>
+
+                <tr>
+                  <td>
+                    <label>
+                      <span>4</span>
+                      <input name="SetpointSelect" value="4" type="radio" >
+                    </label>
+                  </td>
+                  <td>
+                    <label>
+                      <span>Temperature</span>
+                      <input name="SetpointTemperature_4" type="number" />
+                    </label>
+                  </td>
+                  <td>
+                    <label>
+                      <span>Duration</span>
+                      <input name="SetpointDuration_4" type="number" />
+                    </label>
+                  </td>
+                  <td>
+                    <label>
+                      <span>Initial</span>
+                      <input name="SetpointInitial_4" type="number" />
+                    </label>
+                  </td>
+                </tr>
+
+                <tr>
+                  <td>
+                    <label>
+                      <span>5</span>
+                      <input name="SetpointSelect" value="5" type="radio" >
+                    </label>
+                  </td>
+                  <td>
+                    <label>
+                      <span>Temperature</span>
+                      <input name="SetpointTemperature_5" type="number" />
+                    </label>
+                  </td>
+                  <td>
+                    <label>
+                      <span>Duration</span>
+                      <input name="SetpointDuration_5" type="number" />
+                    </label>
+                  </td>
+                  <td>
+                    <label>
+                      <span>Initial</span>
+                      <input name="SetpointInitial_5" type="number" />
+                    </label>
+                  </td>
+                </tr>
+
+                <tr>
+                  <td>
+                    <label>
+                      <span>6</span>
+                      <input name="SetpointSelect" value="6" type="radio" >
+                    </label>
+                  </td>
+                  <td>
+                    <label>
+                      <span>Temperature</span>
+                      <input name="SetpointTemperature_6" type="number" />
+                    </label>
+                  </td>
+                  <td>
+                    <label>
+                      <span>Duration</span>
+                      <input name="SetpointDuration_6" type="number" />
+                    </label>
+                  </td>
+                  <td>
+                    <label>
+                      <span>Initial</span>
+                      <input name="SetpointInitial_6" type="number" />
+                    </label>
+                  </td>
+                </tr>
+
+                <tr>
+                  <td>
+                    <label>
+                      <span>7</span>
+                      <input name="SetpointSelect" value="7" type="radio" >
+                    </label>
+                  </td>
+                  <td>
+                    <label>
+                      <span>Temperature</span>
+                      <input name="SetpointTemperature_7" type="number" />
+                    </label>
+                  </td>
+                  <td>
+                    <label>
+                      <span>Duration</span>
+                      <input name="SetpointDuration_7" type="number" />
+                    </label>
+                  </td>
+                  <td>
+                    <label>
+                      <span>Initial</span>
+                      <input name="SetpointInitial_7" type="number" />
+                    </label>
+                  </td>
+                </tr>
+
+                <tr>
+                  <td>
+                    <label>
+                      <span>8</span>
+                      <input name="SetpointSelect" value="8" type="radio" >
+                    </label>
+                  </td>
+                  <td>
+                    <label>
+                      <span>Temperature</span>
+                      <input name="SetpointTemperature_8" type="number" />
+                    </label>
+                  </td>
+                  <td>
+                    <label>
+                      <span>Duration</span>
+                      <input name="SetpointDuration_8" type="number" />
+                    </label>
+                  </td>
+                  <td>
+                    <label>
+                      <span>Initial</span>
+                      <input name="SetpointInitial_8" type="number" />
+                    </label>
+                  </td>
+                </tr>
+
+                <tr>
+                  <td>
+                    <label>
+                      <span>9</span>
+                      <input name="SetpointSelect" value="9" type="radio" >
+                    </label>
+                  </td>
+                  <td>
+                    <label>
+                      <span>Temperature</span>
+                      <input name="SetpointTemperature_9" type="number" />
+                    </label>
+                  </td>
+                  <td>
+                    <label>
+                      <span>Duration</span>
+                      <input name="SetpointDuration_9" type="number" />
+                    </label>
+                  </td>
+                  <td>
+                    <label>
+                      <span>Initial</span>
+                      <input name="SetpointInitial_9" type="number" />
+                    </label>
+                  </td>
+                </tr>
+              </tbody>
+
+
+            </table>
+          </fieldset>
+        </form>
+      </div>
+
+      <div data-for-tab="fifo">
+        <form name="FifoForm">
+          <fieldset data-kind="3xx">
+            <legend>Control</legend>
+
+            <label>
+              <span>Enable</span>
+              <input name="FifoEnable3xx" type="checkbox" />
+            </label>
+
+            <label>
+              <span>Stop On Full</span>
+              <input name="FifoStopOnFull3xx" type="checkbox" />
+            </label>
+
+            <label>
+              <span>Temperature</span>
+              <input name="FifoTemperature3xx" type="checkbox" />
+            </label>
+
+            <label>
+              <span>Pressure</span>
+              <input name="FifoPressure3xx" type="checkbox" />
+            </label>
+
+            <label>
+              <span>Time</span>
+              <input name="FifoTime3xx" type="checkbox" />
+            </label>
+
+            <label>
+              <span>Filtering</span>
+              <select name="FifoFilter3xx">
+                <option value="unfiltered">Unfiltered</option>
+                <option value="filtered">Filtered</option>
+              </select>
+            </label>
+
+            <label>
+              <span>Sub Sampling</span>
+              <input name="FifoSubSampling3xx" type="number" />
+            </label>
+
+            <label>
+              <span>High Watermark</span>
+              <input name="FifoHighWatermark3xx" type="number" />
+            </label>
+          </fieldset>
+        </form>
+      </div>
+
+      <div data-for-tab="measurement">
+        <div data-button-group>
+          <button type="button" name="Measure">Measure</button>
+        </div>
+
+        <form>
+          <fieldset>
+            <legend>Measurement</legend>
+
+            <label>
+              <span>Sensor Time</span>
+              <output name="MeasurementSensorTime"></output>
+            </label>
+
+            <label>
+              <span>Temperature</span>
+              <output name="MeasurementTemperature"></output>
+            </label>
+
+            <label>
+              <span>Pressure</span>
+              <output name="MeasurementPressure"></output>
+            </label>
+
+            <label data-kind="2xx 6xx">
+              <span>Humidity</span>
+              <output name="MeasurementHumidity"></output>
+            </label>
+
+            <label data-kind="6xx">
+              <span>Gas</span>
+              <output name="MeasurementGas"></output>
+            </label>
+
+          </fieldset>
+
+          <fieldset data-kind="3xx">
+            <legend>Status</legend>
+
+            <label>
+              <span>Temperature Ready</span>
+              <output name="MeasurementTemperatureReady3xx"></output>
+            </label>
+
+            <label>
+              <span>Pressure Ready</span>
+              <output name="MeasurementPressureReady3xx"></output>
+            </label>
+
+            <label>
+              <span>Command Ready</span>
+              <output name="MeasurementCommandReady3xx"></output>
+            </label>
+
+            <label>
+              <span>Config Error</span>
+              <output name="MeasurementConfigError3xx"></output>
+            </label>
+
+            <label>
+              <span>Command Error</span>
+              <output name="MeasurementCommandError3xx"></output>
+            </label>
+
+            <label>
+              <span>Fatal Error</span>
+              <output name="MeasurementFatalError3xx"></output>
+            </label>
+
+          </fieldset>
+
+          <fieldset data-kind="6xx">
+            <legend>Status</legend>
+
+            <label>
+              <span>New Data</span>
+              <output name="MeasurementNewData6xx"></output>
+            </label>
+
+            <label>
+              <span>Measuring</span>
+              <output name="MeasurementMeasuring6xx"></output>
+            </label>
+
+            <label>
+              <span>Measuring Gas</span>
+              <output name="MeasurementMeasuringGas6xx"></output>
+            </label>
+
+            <label>
+              <span>Gas Valid</span>
+              <output name="MeasurementGasValid6xx"></output>
+            </label>
+
+            <label>
+              <span>Heater Stable</span>
+              <output name="MeasurementHeaterStable6xx"></output>
+            </label>
+
+            <label>
+              <span>Active Profile Index</span>
+              <output name="MeasurementActiveProfileIndex6xx"></output>
+            </label>
+
+            <label>
+              <span>Sub Index</span>
+              <output name="MeasurementSubIndex6xx"></output>
+            </label>
+          </fieldset>
+        </form>
+      </div>
+
+    </bosch-ieu-config>
+  </body>
+</html>

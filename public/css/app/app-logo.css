@@ -6,6 +6,7 @@ h1 {
 h1 {
   grid-area: logo;
   width: 100%;
+  padding-inline-start: 1ch;
 
   font-size: 1.25em;
   display: flex;

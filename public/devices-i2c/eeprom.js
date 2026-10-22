@@ -1,26 +1,34 @@
-import { I2CAddressedBus, I2CAddressedTransactionBus } from '@johntalton/and-other-delights'
+import { I2CAddressedBus } from '@johntalton/and-other-delights'
 
-import { EEPROM } from '@johntalton/eeprom'
-import { EEFS, EEFS_SUCCESS, format, O_CREAT } from '@johntalton/eefs'
+import { CyclicFS } from '@johntalton/cyclic-fs'
+import { EEFS, EEFS_SUCCESS, format } from '@johntalton/eefs'
 import { EEPROMArrayBuffer } from '@johntalton/eefs/eeprom-array-buffer'
 import { EEFSStorageManager } from '@johntalton/eefs/storage'
-import { CyclicFS } from '@johntalton/cyclic-fs'
+import { EEPROM } from '@johntalton/eeprom'
 
-import { range } from '../util/range.js'
 import { asyncEvent } from '../util/async-event.js'
+import { range } from '../util/range.js'
 import { bindTabRoot } from '../util/tabs.js'
+
+/** @import { I2CDefinition } from './device-factory.js' */
 
 export class EEPROMBuilder {
 	#atbus
-	/** @type {EEPROM} */
+	/** @type {EEPROM|undefined} */
 	#device
-	/** @type {EEPROMArrayBuffer} */
+	/** @type {EEPROMArrayBuffer|undefined} */
 	#eefsBacking
 
+	/**
+	 * @param {I2CDefinition} definition
+	 */
 	static async builder(definition, ui) {
 		return new EEPROMBuilder(definition, ui)
 	}
 
+	/**
+	 * @param {I2CDefinition} definition
+	 */
 	constructor(definition, ui) {
 		const { bus, address } = definition
 		// this.#atbus = new I2CAddressedTransactionBus(bus, address)
@@ -49,9 +57,19 @@ export class EEPROMBuilder {
 		const root = doc?.querySelector('generic-eeprom-config')
 		if (root === null) { throw new Error('no root for template') }
 
+		// await this.device.write(16, Uint8Array.from([ 37, 42 ]))
+		// const buffer = await this.device.read(16, 2)
+		// console.log(buffer)
+
+		const writePageSizeSelect = root.querySelector('select[name="WriteBufferSize"]')
+		const memorySizeSelect = root.querySelector('select[name="MemorySize"]')
+		// const memoryMap = root.querySelector('memory-map')
+
+		if(!(memorySizeSelect instanceof HTMLSelectElement)) { throw new Error('missing select element') }
+
 
 		const getSelectByteSize = () => {
-			const size = parseInt(memorySizeSelect.value)
+			const size = parseInt(memorySizeSelect.value, 10)
 			return size * 1024 / 8
 		}
 
@@ -66,15 +84,6 @@ export class EEPROMBuilder {
 
 			}
 		}
-
-
-		// await this.device.write(16, Uint8Array.from([ 37, 42 ]))
-		// const buffer = await this.device.read(16, 2)
-		// console.log(buffer)
-
-		const writePageSizeSelect = root.querySelector('select[name="WriteBufferSize"]')
-		const memorySizeSelect = root.querySelector('select[name="MemorySize"]')
-		// const memoryMap = root.querySelector('memory-map')
 
 		// const refreshMemoryMap = async () => {
 		// 	const size = parseInt(memorySizeSelect.value)
@@ -112,7 +121,7 @@ export class EEPROMBuilder {
 		const peekTypeSelect = root.querySelector('select[name="PeekType"]')
 		const peekLittleEndianCheckbox = root.querySelector('input[name="PeekLittleEndian"]')
 		const peekButton = root.querySelector('button[command="peek"]')
-		peekButton.addEventListener('click', asyncEvent(async event => {
+		peekButton?.addEventListener('click', asyncEvent(async event => {
 			const address = parseInt(peekAddressNumber.value)
 			const length = parseInt(peekLengthNumber.value)
 			const type = peekTypeSelect.value

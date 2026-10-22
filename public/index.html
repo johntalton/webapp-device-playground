@@ -53,7 +53,8 @@
 					"@johntalton/aw9523": "/node_modules/@johntalton/aw9523/src/index.js",
 					"@johntalton/bno08x": "/node_modules/@johntalton/bno08x/lib/index.js",
 					"@johntalton/ds1841": "/node_modules/@johntalton/ds1841/lib/index.js",
-					"@johntalton/ft232h": "/node_modules/@johntalton/ft232h/lib/index.js",
+					"@johntalton/ftdi": "/node_modules/@johntalton/ftdi/lib/index.js",
+					"@johntalton/ftdi/i2c": "/node_modules/@johntalton/ftdi/lib/i2c/index.js",
 					"@johntalton/ags02ma": "/node_modules/@johntalton/ags02ma/lib/index.js",
 					"@johntalton/pca9536": "/node_modules/@johntalton/pca9536/src/index.js",
 					"@johntalton/ssd1306": "/node_modules/@johntalton/ssd1306/lib/index.js",
@@ -92,7 +93,10 @@
 				<!--  -->
 				<template>
 					<li>
-						<button type="button" name="title"></button>
+						<button type="button" name="title">
+							<span data-title></span>
+							<span data-subtitle></span>
+						</button>
 					</li>
 				</template>
 			</ul>

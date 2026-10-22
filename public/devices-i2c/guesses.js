@@ -85,7 +85,7 @@ export const ST25DV_SYSTEM_INFO = { addresses: [ 0x57 ], name: 'st25dv16k-system
 export const SI5351_INFO = { addresses: [ 0x60 ], name: 'SI5351 Clock' }
 
 
-export const I2C_GUESSES = [
+export const I2C_GUESSES = Object.freeze([
 	// 0x00
 	// 0x10
 	{ addresses: [ ...range(0x18, 0x1F) ], name: 'mcp9808' },
@@ -128,10 +128,10 @@ export const I2C_GUESSES = [
 	ADT7410_INFO,
 	AGS02MA_INFO,
 	DRV2605_INFO
-]
+])
 
 export function deviceGuessByAddress(address) {
 	return I2C_GUESSES
-		.sort((a, b) => a.addresses.length < b.addresses.length ? -1 : 1)
+		.toSorted((a, b) => a.addresses.length < b.addresses.length ? -1 : 1)
 		.filter(item => item.addresses.includes(address))
 }

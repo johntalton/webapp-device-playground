@@ -70,11 +70,11 @@ export class WebServiceBuilder {
 					addressElem.append(hexElem)
 
 					//
-					const listElem = document.createElement('li')
-					listElem.textContent = addr
+					// const listElem = document.createElement('li')
+					// listElem.textContent = addr
 
-					listElem.setAttribute('slot', 'vdevice-guess-list')
-					listElem.toggleAttribute('data-acked', true)
+					// listElem.setAttribute('slot', 'vdevice-guess-list')
+					// listElem.toggleAttribute('data-acked', true)
 
 					const guesses = deviceGuessByAddress(addr)
 					const item = appendDeviceListItem(deviceList, addr, { acked, guesses })
